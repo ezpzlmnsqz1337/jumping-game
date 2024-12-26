@@ -1,9 +1,12 @@
 import * as BABYLON from '@babylonjs/core';
 
 export interface PlayerEntity {
-  speed: 1
-  isJumping: boolean
+  moving: boolean
+  maxSpeed: number
+  rotationSpeed: number
+  jumping: boolean
   mesh: BABYLON.Mesh
+  physics: BABYLON.PhysicsAggregate
 }
 
 export interface CreatePlayerOptions {
@@ -40,23 +43,41 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 24, 6, box)); // Face 5
   box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 30, 6, box)); // Face 6
 
+  // physics
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
     BABYLON.PhysicsShapeType.BOX,
-    { mass: 1, restitution: 0.75, friction: 0.4 },
+    { mass: 1, restitution: 0.75, friction: 0.7},
     scene
   );
 
+  const player: PlayerEntity = {
+    maxSpeed: 1,
+    rotationSpeed: 4,
+    jumping: false,
+    moving: false,
+    mesh: box,
+    physics: boxAggregate
+  }
+
+  boxAggregate.body.setCollisionCallbackEnabled(true);
+  boxAggregate.body.setLinearDamping(5);
+  // boxAggregate.body.setMassProperties({ inertia: BABYLON.Vector3.Zero() });
+  const observable = boxAggregate.body.getCollisionObservable();
+  const observer = observable.add(collisionEvent => {
+    if (collisionEvent.collidedAgainst === null) return;
+    if (collisionEvent.collidedAgainst.transformNode.name === 'ground') {
+      if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
+        player.jumping = false;
+      }
+    }
+  });
+
   // Continuously set angular velocity to zero to disallow rotation
   scene.onBeforeRenderObservable.add(() => {
-    boxAggregate.body.setAngularVelocity(BABYLON.Vector3.Zero());
-  });  
-
-  const player: PlayerEntity = {
-    speed: 1,
-    isJumping: false,
-    mesh: box
-  }
+    const angularVelocity = boxAggregate.body.getAngularVelocity();
+    boxAggregate.body.setAngularVelocity(new BABYLON.Vector3(0, angularVelocity.y, 0));
+  });
   
   return player;
 }

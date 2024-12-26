@@ -1,13 +1,30 @@
 import * as BABYLON from '@babylonjs/core';
+import { PlayerEntity } from './player';
+
+export interface KeyStatus {
+  KeyW: boolean,
+  KeyS: boolean,
+  KeyA: boolean,
+  KeyD: boolean,
+  Comma: boolean,
+  Period: boolean,
+  Space: boolean,
+  ControlLeft: boolean
+}
+
+export interface Controls {
+  keyStatus: KeyStatus,
+  player: BABYLON.Nullable<PlayerEntity>
+}
 
 export const createControls = (scene: BABYLON.Scene) => {
-  const keyStatus = {
+  const keyStatus: KeyStatus = {
     KeyW: false,
     KeyS: false,
     KeyA: false,
     KeyD: false,
-    ArrowLeft: false,
-    ArrowRight: false,
+    Comma: false,
+    Period: false,
     Space: false,
     ControlLeft: false
   }
@@ -21,7 +38,6 @@ export const createControls = (scene: BABYLON.Scene) => {
         let key = e.sourceEvent.code as string;
         if (key in keyStatus) {
           keyStatus[key as keyof typeof keyStatus] = true;
-          console.table(keyStatus);
         }
       }
     )
@@ -34,11 +50,109 @@ export const createControls = (scene: BABYLON.Scene) => {
         let key = e.sourceEvent.code as string;
         if (key in keyStatus) {
           keyStatus[key as keyof typeof keyStatus] = false;
-          console.table(keyStatus);
         }
       }
     )
   )
-  
-  return keyStatus;
+
+  const controls: Controls = {
+    keyStatus,
+    player: null
+  };
+
+  scene.onBeforeRenderObservable.add(() => {
+    const player = controls.player;
+    if (!player) return;
+    handleWSADMovement(keyStatus, player);
+    handleTurning(keyStatus, player);
+    handleJumping(keyStatus, player);
+
+  });
+
+  return controls;
+}
+
+const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
+  if (
+    keyStatus.KeyW ||
+    keyStatus.KeyS ||
+    keyStatus.KeyA ||
+    keyStatus.KeyD
+  ) {
+    player.moving = true;
+    const forward = player.mesh.getDirection(BABYLON.Axis.Z);
+    const right = player.mesh.getDirection(BABYLON.Axis.X);
+
+    if (keyStatus.KeyW && !keyStatus.KeyS) {
+      player.physics.body.applyImpulse(
+        forward.scale(-0.3),
+        player.mesh.getAbsolutePosition()
+      );
+    }
+    if (keyStatus.KeyS && !keyStatus.KeyW) {
+      if (player.jumping) {
+        const linearVelocity = player.physics.body.getLinearVelocity();
+        player.physics.body.setLinearVelocity(new BABYLON.Vector3(0, linearVelocity.y, 0));
+      } else {
+        player.physics.body.applyImpulse(
+          forward.scale(0.3),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+    }
+    if (keyStatus.KeyA && !keyStatus.KeyD) {
+      if (!player.jumping) {
+        player.physics.body.applyImpulse(
+          right.scale(0.3),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+    }
+    if (keyStatus.KeyD && !keyStatus.KeyA) {
+      if (!player.jumping) {
+        player.physics.body.applyImpulse(
+          right.scale(-0.3),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+    }
+  }
+  if (player.physics.body.getLinearVelocity().x < 0.05, player.physics.body.getLinearVelocity().z < 0.05) {
+    player.moving = false;
+  }
+}
+
+const handleJumping = (keyStatus: KeyStatus, player: PlayerEntity) => {
+  if (keyStatus.Space && !player.jumping) {
+    player.jumping = true;
+    player.physics.body.applyImpulse(
+      new BABYLON.Vector3(0, 8, 0),
+      player.mesh.getAbsolutePosition()
+    );
+  }
+}
+
+const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
+  const rotationSpeed = player.rotationSpeed || 0.05;
+  const forward = player.mesh.getDirection(BABYLON.Axis.Z);
+
+  if (keyStatus.Comma && !keyStatus.Period) {
+    player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, -rotationSpeed, 0));
+    if (keyStatus.KeyA && player.jumping) {
+      player.physics.body.applyImpulse(
+        forward.scale(-0.05),
+        player.mesh.getAbsolutePosition()
+      );
+    }
+  } else if (keyStatus.Period && !keyStatus.Comma) {
+    player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, rotationSpeed, 0));
+    if (keyStatus.KeyD && player.jumping) {
+      player.physics.body.applyImpulse(
+        forward.scale(-0.05),
+        player.mesh.getAbsolutePosition()
+      );
+    }
+  } else {
+    player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+  }
 }

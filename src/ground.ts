@@ -11,7 +11,7 @@ export const createGround = (scene: BABYLON.Scene) => {
   }, scene);
   ground.material = groundMaterial;
 
-  const groundAggregate = new BABYLON.PhysicsAggregate(ground, BABYLON.PhysicsShapeType.BOX, { mass: 0 }, scene);
+  const groundAggregate = new BABYLON.PhysicsAggregate(ground, BABYLON.PhysicsShapeType.BOX, { mass: 0, friction: 0.7 }, scene);
 
   return ground;
 }
