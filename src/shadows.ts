@@ -9,11 +9,11 @@ export const createShadowGenerator = (scene: BABYLON.Scene,
   meshesCastingShadow.forEach(x => shadowGenerator.addShadowCaster(x));
   meshesReceivingShadows.forEach(x => x.receiveShadows = true);
   
-  // shadowGenerator.useBlurCloseExponentialShadowMap = true;
-  // shadowGenerator.useKernelBlur = true;
-  // shadowGenerator.blurKernel = 64;
+  shadowGenerator.useBlurCloseExponentialShadowMap = true;
+  shadowGenerator.useKernelBlur = true;
+  shadowGenerator.blurKernel = 64;
   
   // shadowGenerator.useCloseExponentialShadowMap = true;
-  shadowGenerator.usePercentageCloserFiltering  = true;
+  // shadowGenerator.usePercentageCloserFiltering  = true;
   
 };

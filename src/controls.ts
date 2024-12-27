@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from './player';
+import { PlayerEntity } from './entities/player';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -85,7 +85,7 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
 
     if (keyStatus.KeyW && !keyStatus.KeyS) {
       player.physics.body.applyImpulse(
-        forward.scale(-0.3),
+        forward.scale(-player.speed),
         player.mesh.getAbsolutePosition()
       );
     }
@@ -95,29 +95,25 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
         player.physics.body.setLinearVelocity(new BABYLON.Vector3(0, linearVelocity.y, 0));
       } else {
         player.physics.body.applyImpulse(
-          forward.scale(0.3),
+          forward.scale(player.speed),
           player.mesh.getAbsolutePosition()
         );
       }
     }
     if (keyStatus.KeyA && !keyStatus.KeyD) {
-      if (!player.jumping) {
-        player.physics.body.applyImpulse(
-          right.scale(0.3),
-          player.mesh.getAbsolutePosition()
-        );
-      }
+      player.physics.body.applyImpulse(
+        right.scale(player.speed),
+        player.mesh.getAbsolutePosition()
+      );
     }
     if (keyStatus.KeyD && !keyStatus.KeyA) {
-      if (!player.jumping) {
-        player.physics.body.applyImpulse(
-          right.scale(-0.3),
-          player.mesh.getAbsolutePosition()
-        );
-      }
+      player.physics.body.applyImpulse(
+        right.scale(-player.speed),
+        player.mesh.getAbsolutePosition()
+      );
     }
   }
-  if (player.physics.body.getLinearVelocity().x < 0.05, player.physics.body.getLinearVelocity().z < 0.05) {
+  if (player.physics.body.getLinearVelocity().length() === 0) {
     player.moving = false;
   }
 }
@@ -125,8 +121,9 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
 const handleJumping = (keyStatus: KeyStatus, player: PlayerEntity) => {
   if (keyStatus.Space && !player.jumping) {
     player.jumping = true;
+    player.moving = true;
     player.physics.body.applyImpulse(
-      new BABYLON.Vector3(0, 8, 0),
+      BABYLON.Vector3.Up().scale(7),
       player.mesh.getAbsolutePosition()
     );
   }

@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 
 export interface PlayerEntity {
   moving: boolean
-  maxSpeed: number
+  speed: number
   rotationSpeed: number
   jumping: boolean
   mesh: BABYLON.Mesh
@@ -52,7 +52,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   );
 
   const player: PlayerEntity = {
-    maxSpeed: 1,
+    speed: 0.2,
     rotationSpeed: 4,
     jumping: false,
     moving: false,
@@ -62,13 +62,16 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
   boxAggregate.body.setLinearDamping(5);
-  // boxAggregate.body.setMassProperties({ inertia: BABYLON.Vector3.Zero() });
+  
   const observable = boxAggregate.body.getCollisionObservable();
   const observer = observable.add(collisionEvent => {
     if (collisionEvent.collidedAgainst === null) return;
-    if (collisionEvent.collidedAgainst.transformNode.name === 'ground') {
+    if (['ground', 'wall'].includes(collisionEvent.collidedAgainst.transformNode.name)) {
       if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
-        player.jumping = false;
+        const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
+        if(upCollission < -0.999 && upCollission > -1.001) {
+          player.jumping = false;
+        }
       }
     }
   });
@@ -76,7 +79,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   // Continuously set angular velocity to zero to disallow rotation
   scene.onBeforeRenderObservable.add(() => {
     const angularVelocity = boxAggregate.body.getAngularVelocity();
-    boxAggregate.body.setAngularVelocity(new BABYLON.Vector3(0, angularVelocity.y, 0));
+    // boxAggregate.body.setAngularVelocity(new BABYLON.Vector3(0, angularVelocity.y, 0));
   });
   
   return player;
