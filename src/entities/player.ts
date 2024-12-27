@@ -4,6 +4,7 @@ export interface PlayerEntity {
   moving: boolean
   speed: number
   rotationSpeed: number
+  jumpingPower: number
   jumping: boolean
   mesh: BABYLON.Mesh
   physics: BABYLON.PhysicsAggregate
@@ -16,7 +17,7 @@ export interface CreatePlayerOptions {
 
 export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
   const boxMaterial = new BABYLON.StandardMaterial('boxMaterial');
-  boxMaterial.diffuseColor = opts.color || new BABYLON.Color3(0,0,1);
+  boxMaterial.diffuseColor = opts.color || new BABYLON.Color3(29/255, 150/255, 1);
 
   const redMaterial = new BABYLON.StandardMaterial('redMaterial');
   redMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
@@ -26,9 +27,9 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   multiMaterial.subMaterials.push(redMaterial); // Red material
 
   const box = BABYLON.MeshBuilder.CreateBox('player', {
-    width: 0.2,
-    height: 0.2,
-    depth: 0.2
+    width: 0.4,
+    height: 0.4,
+    depth: 0.4
   }, scene);
   box.position = opts.startPosition || new BABYLON.Vector3(0,0,0);
   box.material = multiMaterial;
@@ -47,13 +48,14 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
     BABYLON.PhysicsShapeType.BOX,
-    { mass: 1, restitution: 0.75, friction: 0.7},
+    { mass: 10, restitution: 0.75, friction: 3},
     scene
   );
 
   const player: PlayerEntity = {
-    speed: 0.2,
+    speed: 2,
     rotationSpeed: 4,
+    jumpingPower: 100,
     jumping: false,
     moving: false,
     mesh: box,

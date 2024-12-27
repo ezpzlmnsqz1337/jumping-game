@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 
 export const createFollowCamera = (scene: BABYLON.Scene) => {
-  const camera = new BABYLON.FollowCamera('mainFollowCamera', new BABYLON.Vector3(0, 5, 5), scene);
+  const camera = new BABYLON.FollowCamera('mainFollowCamera', new BABYLON.Vector3(0, 15, 5), scene);
 
   camera.radius = 5;
   camera.heightOffset = 1.8;

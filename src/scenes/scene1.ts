@@ -18,7 +18,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const controls = createControls(scene);
   const ground = createGround(scene);
-  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(8, 7, 0) });
+  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(10, 13, -10) });
   controls.player = player;
 
   const walls = createWalls(scene);

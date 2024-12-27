@@ -82,33 +82,33 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
     player.moving = true;
     const forward = player.mesh.getDirection(BABYLON.Axis.Z);
     const right = player.mesh.getDirection(BABYLON.Axis.X);
+    const speed = (keyStatus.KeyS || keyStatus.KeyW) &&
+      (keyStatus.KeyA || keyStatus.KeyD) ||
+      player.jumping ?
+      player.speed * 0.7 :
+      player.speed;
 
     if (keyStatus.KeyW && !keyStatus.KeyS) {
       player.physics.body.applyImpulse(
-        forward.scale(-player.speed),
+        forward.scale(-speed),
         player.mesh.getAbsolutePosition()
       );
     }
     if (keyStatus.KeyS && !keyStatus.KeyW) {
-      if (player.jumping) {
-        const linearVelocity = player.physics.body.getLinearVelocity();
-        player.physics.body.setLinearVelocity(new BABYLON.Vector3(0, linearVelocity.y, 0));
-      } else {
-        player.physics.body.applyImpulse(
-          forward.scale(player.speed),
-          player.mesh.getAbsolutePosition()
-        );
-      }
+      player.physics.body.applyImpulse(
+        forward.scale(speed),
+        player.mesh.getAbsolutePosition()
+      );
     }
     if (keyStatus.KeyA && !keyStatus.KeyD) {
       player.physics.body.applyImpulse(
-        right.scale(player.speed),
+        right.scale(speed),
         player.mesh.getAbsolutePosition()
       );
     }
     if (keyStatus.KeyD && !keyStatus.KeyA) {
       player.physics.body.applyImpulse(
-        right.scale(-player.speed),
+        right.scale(-speed),
         player.mesh.getAbsolutePosition()
       );
     }
@@ -119,18 +119,20 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
 }
 
 const handleJumping = (keyStatus: KeyStatus, player: PlayerEntity) => {
+  const jumpingPower = player.jumpingPower || 70;
+
   if (keyStatus.Space && !player.jumping) {
     player.jumping = true;
     player.moving = true;
     player.physics.body.applyImpulse(
-      BABYLON.Vector3.Up().scale(7),
+      BABYLON.Vector3.Up().scale(jumpingPower),
       player.mesh.getAbsolutePosition()
     );
   }
 }
 
 const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
-  const rotationSpeed = player.rotationSpeed || 0.05;
+  const rotationSpeed = player.rotationSpeed || 4;
   const forward = player.mesh.getDirection(BABYLON.Axis.Z);
 
   if (keyStatus.Comma && !keyStatus.Period) {
