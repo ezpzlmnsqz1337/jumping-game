@@ -1,8 +1,8 @@
-import { createServer } from 'http';
 import express from 'express';
+import { createServer } from 'http';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
 
 const app = express()
 const server = createServer(app)
@@ -20,7 +20,12 @@ app.use(express.static("./dist"))
 server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 const gameInfo = {
-  players: {}
+  players: {},
+  times: [
+    { nickname: 'Player2', timeStr: '02:36.000', time: 156000, checkpoints: 1 },
+    { nickname: 'Player3', timeStr: '01:40.000', time: 100000, checkpoints: 2 },
+    { nickname: 'Player1', timeStr: '04:10.000', time: 250000, checkpoints: 1 },
+  ]
 }
 
 // event handlers
@@ -49,7 +54,8 @@ const EventType = Object.freeze({
   PLAYER_DISCONNECTED: 'player:disconnected',
   PLAYER_INFO: 'player:info',
   PLAYER_ID: 'player:id',
-  GAME_INFO: 'game:info'
+  GAME_INFO: 'game:info',
+  ADD_TIME: 'add:time'
 })
 
 let broadcasting = false;
@@ -63,7 +69,17 @@ io.on('connection', socket => {
 
   socket.on(EventType.PLAYER_INFO, playerInfo => {
     gameInfo.players[socket.id] = playerInfo;
-  })
+  });
+
+  socket.on(EventType.ADD_TIME, time => {
+    gameInfo.times.push(time);
+    gameInfo.times.sort((a, b) => {
+      if (a.checkpoints === b.checkpoints) {
+        return a.time - b.time;
+      }
+      return a.checkpoints - b.checkpoints;
+    });
+  });
 
   socket.emit(EventType.PLAYER_ID, socket.id);
 
@@ -79,10 +95,10 @@ const broadcastPlayerInfo = (socket) => {
   if (stopRequested) {
     broadcasting = false;
     stopRequested = false;
-    return
+    return;
   }
 
-  socket.broadcast.emit(EventType.GAME_INFO, {id: socket.id, gameInfo});
+  socket.broadcast.emit(EventType.GAME_INFO, { id: socket.id, gameInfo });
 
-  setTimeout(() => broadcastPlayerInfo(socket), 10)
+  setTimeout(() => broadcastPlayerInfo(socket), 10);
 };

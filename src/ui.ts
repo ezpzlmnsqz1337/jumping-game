@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from "./entities/player";
-import { formatTime, TimerEntity } from './timer';
+import { formatTime, getCurrentTimerTimeStr, TimerEntity } from './timer';
+import { TimeEntry } from './timer';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, timer: TimerEntity) => {
   const uiTimer = document.querySelector('.timer > .value') as HTMLDivElement;
@@ -52,5 +53,25 @@ const updateTime = (timer: TimerEntity, htmlEl: HTMLDivElement) => {
     htmlEl.innerText = formatTime(new Date(0));
   }
   if (!timer.active) return;
-  htmlEl.innerText = formatTime(new Date(Date.now() - timer.startedAt));
+  htmlEl.innerText = getCurrentTimerTimeStr();
 }
+
+export const updateTimes = (times: TimeEntry[]) => {
+  if (times.length === 0) return;
+  document.querySelector('.times-list > div')?.remove();  
+  const timesList = document.querySelector('.times-list > ol');
+  if (!timesList) return;
+  timesList.innerHTML = ''
+  times.forEach(time => {
+    const timeElement = document.createElement('li');
+    let checkpoints = 'No checkpoints!'
+    if (time.checkpoints > 0) {
+      checkpoints = `${time.checkpoints} checkpoint`
+    }
+    if (time.checkpoints > 1) {
+      checkpoints += 's'
+    }
+    timeElement.innerText = `${time.timeStr} - ${checkpoints} - ${time.nickname} `;
+    timesList.appendChild(timeElement);
+  });
+};

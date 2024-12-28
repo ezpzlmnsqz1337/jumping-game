@@ -85,7 +85,7 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
     const speed = (keyStatus.KeyS || keyStatus.KeyW) &&
       (keyStatus.KeyA || keyStatus.KeyD) ||
       player.jumping ?
-      player.speed * 0.7 :
+      player.speed * 0.5 :
       player.speed;
 
     if (keyStatus.KeyW && !keyStatus.KeyS) {

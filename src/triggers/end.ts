@@ -1,7 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { resetTimer, stopTimer, TimerEntity } from '../timer';
+import { getCurrentTimerTime, getCurrentTimerTimeStr, stopTimer, TimerEntity } from '../timer';
 import { endTriggerColor } from '../colors';
+import { getMultiplayerSession } from '../multiplayer';
 
 export interface CreateEndTriggerOptions {
   player: PlayerEntity
@@ -35,7 +36,14 @@ const onEnterTriggerAction = (player: PlayerEntity) => {
     },
     () => {
       console.log('Player entered the end trigger');
-      resetTimer();
+      stopTimer();
+      const defaultNickname = `player${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}`;
+      getMultiplayerSession().sendTimeToServer({
+        nickname: player.nickname || defaultNickname,
+        timeStr: getCurrentTimerTimeStr(true),
+        time: getCurrentTimerTime(true),
+        checkpoints: 0
+      });
     }
   )
 }
@@ -48,7 +56,6 @@ const onExitTriggerAction = (player: PlayerEntity) => {
     },
     () => {
       console.log('Player exited the end trigger');
-      stopTimer();
     }
   )
 }

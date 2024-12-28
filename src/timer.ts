@@ -1,9 +1,18 @@
 export interface TimerEntity {
   active: boolean;
   startedAt: number;
+  finishedAt: number | null;
 }
 
-let timer = { active: false, startedAt: Date.now() };
+
+export interface TimeEntry {
+  nickname: string
+  timeStr: string
+  time: number
+  checkpoints: number
+}
+
+let timer: TimerEntity = { active: false, startedAt: Date.now(), finishedAt: null };
 
 export const createTimer = (): TimerEntity => {
   return timer;
@@ -12,16 +21,30 @@ export const createTimer = (): TimerEntity => {
 export const startTimer = () => {
   timer.active = true;
   timer.startedAt = Date.now();
+  timer.finishedAt = null;
 }
 
 export const resetTimer = () => {
   timer.active = false;
   timer.startedAt = Date.now();
+  timer.finishedAt = null;
 }
 
 export const stopTimer = () => {
   timer.active = false;
-  timer.startedAt = Date.now();
+  timer.finishedAt = Date.now();
+}
+
+export const getCurrentTimerTimeStr = (force: boolean = false) => {
+  if (!force && !timer.active) return '0:00.000';
+  if (timer.finishedAt) return formatTime(new Date(timer.finishedAt - timer.startedAt));
+  return formatTime(new Date(Date.now() - timer.startedAt));
+}
+
+export const getCurrentTimerTime = (force: boolean = false) => {
+  if (!force && !timer.active) return 0;
+  if (timer.finishedAt) return timer.finishedAt - timer.startedAt;
+  return Date.now() - timer.startedAt;
 }
 
 export const formatTime = (date: Date) => {

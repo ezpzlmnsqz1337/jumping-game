@@ -68,3 +68,14 @@ html, body {
   justify-content: center;
   z-index: 9999;
 }
+
+.times-list {
+  color: white;
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+}
+
+.times-list > ol > li{
+  padding: 0.3rem;
+}

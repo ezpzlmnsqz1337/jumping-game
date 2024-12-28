@@ -99,7 +99,7 @@ const createWall = (scene: BABYLON.Scene, position: BABYLON.Vector3, type: WallT
   wall.position = position;
   wall.metadata = opts;
 
-  const wallAggregate = new BABYLON.PhysicsAggregate(wall, BABYLON.PhysicsShapeType.BOX, { mass: 0, friction: 0.1 }, scene);
+  const wallAggregate = new BABYLON.PhysicsAggregate(wall, BABYLON.PhysicsShapeType.BOX, { mass: 0, friction: 1 }, scene);
 
   return wall;
 };

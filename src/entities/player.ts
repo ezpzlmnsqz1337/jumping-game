@@ -2,6 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { playerColor } from '../colors';
 
 export interface PlayerEntity {
+  nickname?: string
   moving: boolean
   speed: number
   rotationSpeed: number
@@ -49,14 +50,14 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
     BABYLON.PhysicsShapeType.BOX,
-    { mass: 10, restitution: 0.75, friction: 3},
+    { mass: 10, restitution: 0, friction: 0.7},
     scene
   );
 
   const player: PlayerEntity = {
-    speed: 2,
+    speed: 1.3,
     rotationSpeed: 4,
-    jumpingPower: 100,
+    jumpingPower: 60,
     jumping: false,
     moving: false,
     mesh: box,
@@ -64,7 +65,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   }
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
-  boxAggregate.body.setLinearDamping(5);
+  boxAggregate.body.setLinearDamping(1);
   
   const observable = boxAggregate.body.getCollisionObservable();
   const observer = observable.add(collisionEvent => {
