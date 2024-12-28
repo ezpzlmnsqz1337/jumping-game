@@ -21,11 +21,7 @@ server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 const gameInfo = {
   players: {},
-  times: [
-    { nickname: 'Player2', timeStr: '02:36.000', time: 156000, checkpoints: 1 },
-    { nickname: 'Player3', timeStr: '01:40.000', time: 100000, checkpoints: 2 },
-    { nickname: 'Player1', timeStr: '04:10.000', time: 250000, checkpoints: 1 },
-  ]
+  times: []
 }
 
 // event handlers

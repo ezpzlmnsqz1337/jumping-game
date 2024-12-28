@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { playerColor } from '../colors';
+import { playerColor } from '../assets/colors';
 
 export interface PlayerEntity {
   nickname?: string

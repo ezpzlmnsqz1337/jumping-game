@@ -66,7 +66,6 @@ export const createControls = (scene: BABYLON.Scene) => {
     handleWSADMovement(keyStatus, player);
     handleTurning(keyStatus, player);
     handleJumping(keyStatus, player);
-
   });
 
   return controls;

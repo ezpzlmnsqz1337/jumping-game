@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { getDarkTexture, getRedTexture } from '../textures';
+import { getDarkTexture, getRedTexture } from '../assets/textures';
 
 export type WallType = 'box' | 'sphere' | 'cylinder';
 

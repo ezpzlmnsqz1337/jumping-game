@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { getCurrentTimerTime, getCurrentTimerTimeStr, stopTimer, TimerEntity } from '../timer';
-import { endTriggerColor } from '../colors';
+import { getCurrentTimerTime, getCurrentTimerTimeStr, stopTimer, TimerEntity } from '../entities/timer';
+import { endTriggerColor } from '../assets/colors';
 import { getMultiplayerSession } from '../multiplayer';
 
 export interface CreateEndTriggerOptions {

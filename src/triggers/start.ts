@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { resetTimer, startTimer, TimerEntity } from '../timer';
-import { startTriggerColor } from '../colors';
+import { resetTimer, startTimer, TimerEntity } from '../entities/timer';
+import { startTriggerColor } from '../assets/colors';
 
 export interface CreateStartTriggerOptions {
   player: PlayerEntity

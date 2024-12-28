@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { getDarkTexture } from '../textures.ts';
+import { getDarkTexture } from '../assets/textures.ts';
 
 export const createGround = (scene: BABYLON.Scene) => {
   const groundMaterial = new BABYLON.StandardMaterial('groundMaterial');

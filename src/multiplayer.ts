@@ -1,8 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import io, { Socket } from 'socket.io-client';
 import { PlayerEntity } from './entities/player';
-import { TimeEntry } from './timer';
-import { updateTimes } from './ui';
+import { TimeEntry } from './entities/timer';
+import { updateTimes } from './ui/ui';
 
 interface MultiplayerData {
   gameInfo: MultiplayerGameInfo
@@ -32,7 +32,7 @@ let players: MultiplayerPlayers = {};
 let mp: MultiplayerSession;
 
 export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): MultiplayerSession => {
-  const ws = io('http://localhost:3000');
+  const ws = io(window.location.origin);
   // socket status
   ws.on('connect', () => console.log('connected'));
   ws.on('disconnect', () => console.log('disconnect'));

@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from "./entities/player";
-import { formatTime, getCurrentTimerTimeStr, TimerEntity } from './timer';
-import { TimeEntry } from './timer';
+import { PlayerEntity } from '../entities/player';
+import { formatTime, getCurrentTimerTimeStr, TimerEntity } from '../entities/timer';
+import { TimeEntry } from '../entities/timer';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, timer: TimerEntity) => {
   const uiTimer = document.querySelector('.timer > .value') as HTMLDivElement;
@@ -49,16 +49,12 @@ const updateJumping = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
 }
 
 const updateTime = (timer: TimerEntity, htmlEl: HTMLDivElement) => {
-  if (htmlEl.innerText !== '00:00.000') {
-    htmlEl.innerText = formatTime(new Date(0));
-  }
-  if (!timer.active) return;
   htmlEl.innerText = getCurrentTimerTimeStr();
 }
 
 export const updateTimes = (times: TimeEntry[]) => {
   if (times.length === 0) return;
-  document.querySelector('.times-list > div')?.remove();  
+  document.querySelector('.times-list > div')?.remove();
   const timesList = document.querySelector('.times-list > ol');
   if (!timesList) return;
   timesList.innerHTML = ''
