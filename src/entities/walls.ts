@@ -58,6 +58,12 @@ export const createWalls = (scene: BABYLON.Scene) => {
     createWall(scene, new BABYLON.Vector3(9.3, 19.6, -7.6), 'box', { width: 0.3, depth: 0.8, height: 0.2 }),
     createWall(scene, new BABYLON.Vector3(11, 20, -7.6), 'box', { width: 0.8, depth: 0.8, height: 0.2 }),
     createWall(scene, new BABYLON.Vector3(13, 20.5, -7.6), 'box', { width: 0.8, depth: 0.8, height: 0.2 }),
+    // left side
+    createWall(scene, new BABYLON.Vector3(14.4, 21, -10), 'box', { width: 0.8, depth: 0.8, height: 0.2 }),
+    createWall(scene, new BABYLON.Vector3(14.4, 21.4, -13), 'box', { width: 0.8, depth: 0.8, height: 0.2 }),
+
+    // fourth stage
+    createWall(scene, new BABYLON.Vector3(0, 11, -12), 'box', { width: 10, depth: 10, height: 22 }),
 
   ];
 

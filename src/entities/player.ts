@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { playerColor } from '../colors';
 
 export interface PlayerEntity {
   moving: boolean
@@ -17,7 +18,7 @@ export interface CreatePlayerOptions {
 
 export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
   const boxMaterial = new BABYLON.StandardMaterial('boxMaterial');
-  boxMaterial.diffuseColor = opts.color || new BABYLON.Color3(29/255, 150/255, 1);
+  boxMaterial.diffuseColor = opts.color || playerColor;
 
   const redMaterial = new BABYLON.StandardMaterial('redMaterial');
   redMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
@@ -76,12 +77,6 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
         }
       }
     }
-  });
-
-  // Continuously set angular velocity to zero to disallow rotation
-  scene.onBeforeRenderObservable.add(() => {
-    const angularVelocity = boxAggregate.body.getAngularVelocity();
-    // boxAggregate.body.setAngularVelocity(new BABYLON.Vector3(0, angularVelocity.y, 0));
   });
   
   return player;

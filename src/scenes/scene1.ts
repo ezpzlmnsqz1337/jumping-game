@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { createPlayer, PlayerEntity } from '../entities/player.ts';
+import { createPlayer } from '../entities/player.ts';
 import { createPhysics } from '../physics.ts';
 import { createControls } from '../controls.ts';
 import { createGround } from '../entities/ground.ts';
@@ -7,21 +7,28 @@ import { createArcRotateCamera, createFollowCamera } from '../camera.ts';
 import { createShadowGenerator } from '../shadows.ts';
 import { bindUI } from '../ui.ts';
 import { createWalls } from '../entities/walls.ts';
-import io from 'socket.io-client';
+import { createMultiplayer } from '../multiplayer.ts';
+import { createStartTrigger } from '../triggers/start.ts';
+import { createTimer } from '../timer.ts';
+import { createEndTrigger } from '../triggers/end.ts';
 
 export const createScene1 = async (engine: BABYLON.Engine) => {
   const scene = new BABYLON.Scene(engine);
 
   await createPhysics(scene);
 
-  const followCamera = createFollowCamera(scene);
+  // const followCamera = createFollowCamera(scene);
+  const followCamera = createArcRotateCamera(scene);
 
   const controls = createControls(scene);
   const ground = createGround(scene);
-  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(10, 13, -10) });
+  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(7.5, 19.1, -7.6) });
   controls.player = player;
 
   const walls = createWalls(scene);
+  const timer = createTimer();
+  createStartTrigger(scene, {player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.5, 7) });
+  createEndTrigger(scene, {player, timer, position: new BABYLON.Vector3(0, 22, -12), scaling: new BABYLON.Vector3(5, 0.5, 5) });
 
   followCamera.lockedTarget = player.mesh;
 
@@ -40,79 +47,17 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   createShadowGenerator(scene, light1, [player.mesh, ...walls], [player.mesh, ground, ...walls]);
 
   // fog
-  scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-  scene.fogStart = 20;
-  scene.fogEnd = 40;
+  // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+  // scene.fogStart = 20;
+  // scene.fogEnd = 40;
 
   // UI
-  bindUI(scene, player);
+  bindUI(scene, player, timer);
 
   // multiplayer
-  createMultiplayer(scene, player);
-
-  return scene;
-}
-
-interface MultiplayerData {
-  gameInfo: MultiplayerGameInfo
-}
-
-interface MultiplayerGameInfo {
-  players: MultiplayerPlayers
-}
-
-interface MultiplayerPlayers {
-  [key: string]: PlayerInfo
-}
-interface PlayerInfo {  
-  position?: number[]
-  rotation?: number[]
-  mesh?: BABYLON.Mesh
-}
-
-const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity) => {
-  let playerMpId = '';
-  let players: MultiplayerPlayers = {};
-
-  const ws = io('http://localhost:3000');
-  // socket status
-  ws.on('connect', () => console.log('connected'));
-  ws.on('disconnect', () => console.log('disconnect'));
-  ws.on('player:id', (data: string) => (playerMpId = data));
-  ws.on('game:info', (data: MultiplayerData) => {
-    Object.entries(data.gameInfo.players).forEach(([id, playerInfo]) => {
-      if (id === playerMpId) return;
-      if (!players[id]) (players[id] = {});
-      players[id].position = playerInfo.position;
-      players[id].rotation = playerInfo.rotation;
-    });
-
-    updatePlayers();
-  });
-
-  const updatePlayers = () => {
-    Object.entries(players).forEach(([id, playerInfo]) => {
-      if (id === playerMpId) return;
-      if (!players[id].mesh) {
-        players[id].mesh = BABYLON.MeshBuilder.CreateBox('player-mp', {
-          width: 0.4,
-          height: 0.4,
-          depth: 0.4
-        }, scene);
-      }
-      if (playerInfo.position && playerInfo.rotation) {
-        players[id].mesh.position = new BABYLON.Vector3(playerInfo.position[0], playerInfo.position[1], playerInfo.position[2]);
-        players[id].mesh.rotationQuaternion = new BABYLON.Quaternion(playerInfo.rotation[0], playerInfo.rotation[1], playerInfo.rotation[2], playerInfo.rotation[3]);
-      }
-    });
+  if (!import.meta.env.DEV) { // if not running in dev mode
+    createMultiplayer(scene, player);
   }
 
-  const sendPlayerInfo = (player: PlayerEntity) => {
-    ws.emit('player:info', {
-      position: [player.mesh.position.x, player.mesh.position.y, player.mesh.position.z],
-      rotation: [player.mesh.rotationQuaternion?.x, player.mesh.rotationQuaternion?.y, player.mesh.rotationQuaternion?.z, player.mesh.rotationQuaternion?.w],
-    });
-    setTimeout(() => sendPlayerInfo(player), 10);
-  };
-  sendPlayerInfo(player);
+  return scene;
 }

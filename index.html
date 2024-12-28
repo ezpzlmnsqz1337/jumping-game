@@ -1,26 +1,36 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jumping game</title>
-  </head>
-  <body>
-    <canvas id="render-canvas"></canvas>
-    <div class="player-info">
-      <div class="speed">
-        <span class="label">Speed</span>
-        <span class="value">150</span>
-      </div>
-      <div class="moving">
-        <span class="label">Moving</span>
-        <span class="value yes">Yes</span>
-      </div>
-      <div class="jumping">
-        <span class="label">Jumping</span>
-        <span class="value yes">Yes</span>
-      </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jumping game</title>
+</head>
+
+<body>
+  <canvas id="render-canvas"></canvas>
+  <div class="timer">
+    <span class="value">0:00.000</span>
+  </div>
+  <div class="player-info">
+    <div class="horizontal-speed">
+      <span class="label">Horizontal</span>
+      <span class="value">0.00</span>
     </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+    <div class="vertical-speed">
+      <span class="label">Vertical</span>
+      <span class="value">0.00</span>
+    </div>
+    <div class="moving">
+      <span class="label">Moving</span>
+      <span class="value yes">Yes</span>
+    </div>
+    <div class="jumping">
+      <span class="label">Jumping</span>
+      <span class="value yes">Yes</span>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>
