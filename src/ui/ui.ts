@@ -1,9 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { formatTime, getCurrentTimerTimeStr, TimerEntity } from '../entities/timer';
-import { TimeEntry } from '../entities/timer';
+import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
 
-export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, timer: TimerEntity) => {
+export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
   const uiTimer = document.querySelector('.timer > .value') as HTMLDivElement;
 
   const uiPlayerInfo = {
@@ -18,8 +17,10 @@ export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, timer: TimerE
     updateVerticalSpeed(player, uiPlayerInfo.vSpeed);
     updateMoving(player, uiPlayerInfo.moving);
     updateJumping(player, uiPlayerInfo.jumping);
-    updateTime(timer, uiTimer);
+    updateTime(uiTimer);
   });
+
+  bindEditorUI(gizmoManager);
 };
 
 const updateHorizontalSpeed = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
@@ -48,7 +49,7 @@ const updateJumping = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
   htmlEl.classList.toggle('no', !player.jumping);
 }
 
-const updateTime = (timer: TimerEntity, htmlEl: HTMLDivElement) => {
+const updateTime = (htmlEl: HTMLDivElement) => {
   htmlEl.innerText = getCurrentTimerTimeStr();
 }
 
@@ -71,3 +72,87 @@ export const updateTimes = (times: TimeEntry[]) => {
     timesList.appendChild(timeElement);
   });
 };
+
+const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
+  // editor
+  const editorDiv = document.querySelector('.editor') as HTMLInputElement;
+
+  const editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;  
+  const transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
+  const scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
+  const rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
+
+  const controlsToggle = document.querySelectorAll('.editor > div:not(:first-child)') as NodeListOf<HTMLDivElement>;
+  
+  const positionValue = document.querySelector('.transform-value') as HTMLDivElement;
+  const rotationValue = document.querySelector('.rotation-value') as HTMLDivElement;
+  const scalingValue = document.querySelector('.scaling-value') as HTMLDivElement;
+
+  editModeCheckBox.setAttribute('checked', 'true');
+  transformCheckBox.setAttribute('checked', 'true');
+
+  if (!gizmoManager) {
+    editorDiv.style.display = 'none';
+    return;
+  }
+
+  // enable all to assign events
+  gizmoManager.positionGizmoEnabled = true;
+  gizmoManager.rotationGizmoEnabled = true;
+  gizmoManager.scaleGizmoEnabled = true;
+
+  gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'position', positionValue);
+  });
+  gizmoManager.gizmos.positionGizmo?.onDragObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'position', positionValue);
+  });
+
+  gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'rotation', rotationValue);
+  });
+  gizmoManager.gizmos.rotationGizmo?.onDragObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'rotation', rotationValue);
+  });
+
+  gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'scaling', scalingValue);
+  });
+  gizmoManager.gizmos.scaleGizmo?.onDragObservable.add(() => {
+    updateMeshDetails(gizmoManager, 'scaling', scalingValue);
+  });
+
+  // leave only transform enabled
+  gizmoManager.positionGizmoEnabled = true;
+  gizmoManager.rotationGizmoEnabled = false;
+  gizmoManager.scaleGizmoEnabled = false;
+
+  editModeCheckBox.addEventListener('click', () => {
+    if (!gizmoManager) return;
+    gizmoManager.attachableMeshes = gizmoManager.attachableMeshes === null ? [] : null;
+    gizmoManager.attachToMesh(null);
+    controlsToggle.forEach(x => x.style.display = x.style.display === 'none' ? 'flex' : 'none');
+  });
+
+  transformCheckBox.addEventListener('click', () => {
+    if (!gizmoManager) return;
+    gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled;
+  });
+
+  scalingCheckBox.addEventListener('click', () => {
+    if (!gizmoManager) return;
+    gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled;
+  });
+
+  rotationCheckBox.addEventListener('click', () => {
+    if (!gizmoManager) return;
+    gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled;
+  });
+}
+
+export type GizmoType = 'position' | 'rotation' | 'scaling';
+
+const updateMeshDetails = (gizmoManager: BABYLON.GizmoManager, gizmoType: GizmoType, htmlElement: HTMLDivElement) => {
+  const gizmo = gizmoManager.attachedMesh![gizmoType];
+  htmlElement.innerText = `[ ${gizmo.x.toFixed(2)}, ${gizmo.y.toFixed(2)}, ${gizmo.z.toFixed(2)} ]`;
+}

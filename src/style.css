@@ -79,3 +79,21 @@ html, body {
 .times-list > ol > li{
   padding: 0.3rem;
 }
+
+.editor {
+  display: flex;
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  flex-direction: column;
+  color: white;
+}
+
+.editor > div {
+  flex: 1;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-direction: row;
+}

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:watch": "vite build --watch",
+    "start:server": "node multiplayer-server.js",
     "preview": "vite preview"
   },
   "devDependencies": {

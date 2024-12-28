@@ -12,6 +12,8 @@ import { createEndTrigger } from '../triggers/end.ts';
 import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
 
+const ENABLE_EDITOR = true && import.meta.env.DEV;
+
 export const createScene1 = async (engine: BABYLON.Engine) => {
   const scene = new BABYLON.Scene(engine);
 
@@ -27,9 +29,9 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const walls = createWalls(scene);
   const timer = createTimer();
-  createStartTrigger(scene, {player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.1, 7) });
-  createEndTrigger(scene, {player, timer, position: new BABYLON.Vector3(0, 22, -12), scaling: new BABYLON.Vector3(5, 0.1, 5) });
-  createEndTrigger(scene, {player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  createStartTrigger(scene, { player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.1, 7) });
+  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(0, 22, -12), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
   followCamera.lockedTarget = player.mesh;
 
@@ -45,6 +47,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
   lightGizmo1.light = light1;
 
+
   createShadowGenerator(scene, light1, [player.mesh, ...walls], [player.mesh, ground, ...walls]);
 
   // fog
@@ -52,13 +55,20 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // scene.fogStart = 20;
   // scene.fogEnd = 40;
 
-  // UI
-  bindUI(scene, player, timer);
+  // editor
+  let gizmoManager!: BABYLON.GizmoManager;
+
+  if (ENABLE_EDITOR) {
+    gizmoManager = new BABYLON.GizmoManager(scene);
+  }
 
   // multiplayer
   if (!import.meta.env.DEV) { // if not running in dev mode
-    createMultiplayer(scene, player);   
+    createMultiplayer(scene, player);
   }
+
+  // UI
+  bindUI(scene, player, gizmoManager);
 
   return scene;
 }
