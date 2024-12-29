@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from './entities/player';
+import { Checkpoint, PlayerEntity } from './entities/player';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -66,6 +66,12 @@ export const createControls = (scene: BABYLON.Scene) => {
     handleWSADMovement(keyStatus, player);
     handleTurning(keyStatus, player);
     handleJumping(keyStatus, player);
+  });
+
+  window.addEventListener('keypress', e => {
+    const player = controls.player;
+    if (!player) return;
+    handleCheckpoints(e.code, player);
   });
 
   return controls;
@@ -152,5 +158,27 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
     }
   } else {
     player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+  }
+}
+
+const handleCheckpoints = (key: string, player: PlayerEntity) => {
+  console.log(key);
+  if ('Digit1' === key) {
+    player.checkpoints.push({
+      position: player.mesh.getAbsolutePosition().clone(),
+      rotationQuaternion: player.mesh.rotationQuaternion!.clone()
+    });
+  }
+  if ('Digit2' === key) {
+    console.log(player.checkpoints);
+    if (player.checkpoints.length > 0) {
+      const lastCheckpoint = [...player.checkpoints].pop() as Checkpoint;
+      player.physics.body.disablePreStep = true;
+      player.mesh.position = lastCheckpoint.position.clone();
+      player.mesh.rotationQuaternion = lastCheckpoint.rotationQuaternion.clone();
+      player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
+      player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+      player.physics.body.disablePreStep = false;
+    }
   }
 }

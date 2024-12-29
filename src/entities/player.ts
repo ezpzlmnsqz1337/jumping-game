@@ -1,6 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
 import { playerColor } from '../assets/colors';
 
+export interface Checkpoint {
+  position: BABYLON.Vector3
+  rotationQuaternion: BABYLON.Quaternion
+}
+
 export interface PlayerEntity {
   nickname?: string
   moving: boolean
@@ -10,6 +15,7 @@ export interface PlayerEntity {
   jumping: boolean
   mesh: BABYLON.Mesh
   physics: BABYLON.PhysicsAggregate
+  checkpoints: Checkpoint[]
 }
 
 export interface CreatePlayerOptions {
@@ -61,7 +67,8 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
     jumping: false,
     moving: false,
     mesh: box,
-    physics: boxAggregate
+    physics: boxAggregate,
+    checkpoints: []
   }
 
   boxAggregate.body.setCollisionCallbackEnabled(true);

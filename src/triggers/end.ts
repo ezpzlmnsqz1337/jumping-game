@@ -45,8 +45,8 @@ const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
         nickname: player.nickname || defaultNickname,
         timeStr: getCurrentTimerTimeStr(),
         time: getCurrentTimerTime(),
-        checkpoints: 0
-      });
+        checkpoints: player.checkpoints.length
+      });      
     }
   )
 }
