@@ -52,6 +52,7 @@ const updateJumping = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
 }
 
 const updateTime = (htmlEl: HTMLDivElement) => {
+  if (htmlEl.innerText === getCurrentTimerTimeStr()) return
   htmlEl.innerText = getCurrentTimerTimeStr();
 }
 
@@ -184,12 +185,20 @@ const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
     if (!gizmoManager) return;
     gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled;
   });
+
+  gizmoManager.gizmos.positionGizmo!.snapDistance = 0.1;
+  gizmoManager.gizmos.rotationGizmo!.snapDistance = 0.1;
+  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = false;
 }
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
 const updateMeshDetails = (gizmoManager: BABYLON.GizmoManager, gizmoType: GizmoType, htmlElement: HTMLDivElement) => {
-  if (!gizmoManager.attachedMesh) return '[0, 0, 0]';
-  const gizmo = gizmoManager.attachedMesh![gizmoType];
-  htmlElement.innerText = `[ ${gizmo.x.toFixed(2)}, ${gizmo.y.toFixed(2)}, ${gizmo.z.toFixed(2)} ]`;
+  if (!gizmoManager.attachedMesh) return gizmoType === 'rotation' ? '[0, 0, 0, 0]' : '[0, 0, 0]';
+  const gizmo = gizmoManager.attachedMesh![gizmoType === 'rotation' ? 'rotationQuaternion' : gizmoType];
+  if (gizmo) {
+    const value = [ gizmo.x, gizmo.y, gizmo.z ]
+    if (gizmoType === 'rotation') value.push((gizmo as BABYLON.Quaternion).w);
+    htmlElement.innerText =  `[ ${value.map(x => x.toFixed(2)).join(', ')} ]`;    
+  }
 }

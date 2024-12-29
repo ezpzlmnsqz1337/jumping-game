@@ -39,7 +39,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
     height: 0.4,
     depth: 0.4
   }, scene);
-  box.position = opts.startPosition || new BABYLON.Vector3(0,0,0);
+  box.position = opts.startPosition || new BABYLON.Vector3(0, 0, 0);
   box.material = multiMaterial;
 
   // Assign materials to specific faces
@@ -56,7 +56,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
     BABYLON.PhysicsShapeType.BOX,
-    { mass: 10, restitution: 0, friction: 0.7},
+    { mass: 10, restitution: 0, friction: 0.7 },
     scene
   );
 
@@ -73,19 +73,20 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
   boxAggregate.body.setLinearDamping(1);
-  
+
   const observable = boxAggregate.body.getCollisionObservable();
   const observer = observable.add(collisionEvent => {
     if (collisionEvent.collidedAgainst === null) return;
     if (['ground', 'wall'].includes(collisionEvent.collidedAgainst.transformNode.name)) {
       if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
         const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
-        if(upCollission < -0.9 && upCollission > -1.1) {
+        console.log('upCollission', upCollission);
+        if (upCollission < -0.9 && upCollission > -1.1) {
           player.jumping = false;
         }
       }
     }
   });
-  
+
   return player;
 }

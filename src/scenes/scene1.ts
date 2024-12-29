@@ -3,7 +3,6 @@ import { createArcRotateCamera } from '../camera.ts';
 import { createControls } from '../controls.ts';
 import { createGround } from '../entities/ground.ts';
 import { createPlayer } from '../entities/player.ts';
-import { createWalls } from '../entities/walls.ts';
 import { createMultiplayer } from '../multiplayer.ts';
 import { createPhysics } from '../physics.ts';
 import { createShadowGenerator } from '../shadows.ts';
@@ -11,6 +10,15 @@ import { createTimer } from '../entities/timer.ts';
 import { createEndTrigger } from '../triggers/end.ts';
 import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
+import { createStage1 } from './level1/stage1.ts';
+import { createStage2 } from './level1/stage2.ts';
+import { createStage3 } from './level1/stage3.ts';
+import { createStage4 } from './level1/stage4.ts';
+import { getRedTexture } from '../assets/textures.ts';
+import { createStage5 } from './level1/stage5.ts';
+import { createStage6 } from './level1/stage6.ts';
+import { createLongJumps } from './level1/longjumps.ts';
+import { createBorder } from './level1/border.ts';
 
 const ENABLE_EDITOR = true && import.meta.env.DEV;
 
@@ -24,15 +32,18 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const controls = createControls(scene);
   const ground = createGround(scene);
-  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(-7, 1, -7.6) });
-  // const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(7.5, 19.1, -7.6) });
+  // const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(-7, 1, -7.6) });
+  // const player = createPlayer(scene, { startPosition: new BABYLON.Vector3( -10.00, 50.40, -9.00) });
+  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(21.70, 2.00, -14.50) });
+  
   controls.player = player;
 
   const walls = createWalls(scene);
   const timer = createTimer();
   createStartTrigger(scene, { player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.1, 7) });
-  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(0, 22, -12), scaling: new BABYLON.Vector3(5, 0.1, 5) });
-  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-10.00, 42.00, 8.00), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  // testing end trigger
+  // createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
   followCamera.lockedTarget = player.mesh;
 
@@ -73,3 +84,21 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   return scene;
 }
+
+export const createWalls = (scene: BABYLON.Scene) => {
+  const walls = [
+    ...createStage1(scene),
+    ...createStage2(scene),
+    ...createStage3(scene),
+    ...createStage4(scene),
+    ...createStage5(scene),
+    ...createStage6(scene),
+    ...createLongJumps(scene),
+    ...createBorder(scene)
+  ];
+
+  // last wall
+  (walls[walls.length-1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale:1, vScale:1 }, scene);
+
+  return walls;
+};
