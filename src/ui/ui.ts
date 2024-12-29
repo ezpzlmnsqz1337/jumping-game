@@ -77,16 +77,16 @@ const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
   // editor
   const editorDiv = document.querySelector('.editor') as HTMLInputElement;
 
-  const editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;  
+  const editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
   const transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
   const scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
   const rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
 
   const controlsToggle = document.querySelectorAll('.editor > div:not(:first-child)') as NodeListOf<HTMLDivElement>;
-  
-  const positionValue = document.querySelector('.transform-value') as HTMLDivElement;
-  const rotationValue = document.querySelector('.rotation-value') as HTMLDivElement;
-  const scalingValue = document.querySelector('.scaling-value') as HTMLDivElement;
+
+  const positionValueDiv = document.querySelector('.transform-value') as HTMLDivElement;
+  const rotationValueDiv = document.querySelector('.rotation-value') as HTMLDivElement;
+  const scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
 
   editModeCheckBox.setAttribute('checked', 'true');
   transformCheckBox.setAttribute('checked', 'true');
@@ -96,30 +96,56 @@ const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
     return;
   }
 
+  let oldMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
+
+  const updateEditorSelection = (newMesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => {
+    // restore old mesh alpha
+    const oldMaterial = oldMesh?.material;
+    if (oldMaterial) {
+      (oldMaterial as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
+    }
+
+    const material = newMesh?.material;
+    if (material) {
+      oldMesh = newMesh;
+      (material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Blue();
+    }
+  }
+
   // enable all to assign events
   gizmoManager.positionGizmoEnabled = true;
   gizmoManager.rotationGizmoEnabled = true;
   gizmoManager.scaleGizmoEnabled = true;
 
+  gizmoManager.onAttachedToMeshObservable.add(newMesh => {
+    updateMeshDetails(gizmoManager, 'position', positionValueDiv);
+    updateMeshDetails(gizmoManager, 'rotation', rotationValueDiv);
+    updateMeshDetails(gizmoManager, 'scaling', scalingValueDiv);
+
+    if (!newMesh) return;
+
+    updateEditorSelection(newMesh);
+  });
+
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'position', positionValue);
+    updateMeshDetails(gizmoManager, 'position', positionValueDiv);
   });
   gizmoManager.gizmos.positionGizmo?.onDragObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'position', positionValue);
+    updateMeshDetails(gizmoManager, 'position', positionValueDiv);
   });
 
   gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'rotation', rotationValue);
+    updateMeshDetails(gizmoManager, 'rotation', rotationValueDiv);
   });
   gizmoManager.gizmos.rotationGizmo?.onDragObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'rotation', rotationValue);
+    updateMeshDetails(gizmoManager, 'rotation', rotationValueDiv);
   });
 
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'scaling', scalingValue);
+    updateMeshDetails(gizmoManager, 'scaling', scalingValueDiv);
   });
   gizmoManager.gizmos.scaleGizmo?.onDragObservable.add(() => {
-    updateMeshDetails(gizmoManager, 'scaling', scalingValue);
+    updateMeshDetails(gizmoManager, 'scaling', scalingValueDiv);
   });
 
   // leave only transform enabled
@@ -132,6 +158,7 @@ const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
     gizmoManager.attachableMeshes = gizmoManager.attachableMeshes === null ? [] : null;
     gizmoManager.attachToMesh(null);
     controlsToggle.forEach(x => x.style.display = x.style.display === 'none' ? 'flex' : 'none');
+    updateEditorSelection(null);
   });
 
   transformCheckBox.addEventListener('click', () => {
@@ -153,6 +180,7 @@ const bindEditorUI = (gizmoManager?: BABYLON.GizmoManager) => {
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
 const updateMeshDetails = (gizmoManager: BABYLON.GizmoManager, gizmoType: GizmoType, htmlElement: HTMLDivElement) => {
+  if (!gizmoManager.attachedMesh) return '[0, 0, 0]';
   const gizmo = gizmoManager.attachedMesh![gizmoType];
   htmlElement.innerText = `[ ${gizmo.x.toFixed(2)}, ${gizmo.y.toFixed(2)}, ${gizmo.z.toFixed(2)} ]`;
 }
