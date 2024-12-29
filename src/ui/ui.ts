@@ -4,6 +4,7 @@ import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
   const uiTimer = document.querySelector('.timer > .value') as HTMLDivElement;
+  const uiCheckpoints = document.querySelector('.checkpoints > .value') as HTMLDivElement;
 
   const uiPlayerInfo = {
     hSpeed: document.querySelector('.player-info > .horizontal-speed > .value') as HTMLDivElement,
@@ -18,6 +19,7 @@ export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?
     updateMoving(player, uiPlayerInfo.moving);
     updateJumping(player, uiPlayerInfo.jumping);
     updateTime(uiTimer);
+    updateCheckpoints(uiCheckpoints, player.checkpoints.length);
   });
 
   bindEditorUI(gizmoManager);
@@ -51,6 +53,12 @@ const updateJumping = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
 
 const updateTime = (htmlEl: HTMLDivElement) => {
   htmlEl.innerText = getCurrentTimerTimeStr();
+}
+
+const updateCheckpoints = (htmlEl: HTMLDivElement, noOfCheckpoints: number) => {
+  const value = `${noOfCheckpoints}`;
+  if (htmlEl.innerText === value) return;
+  htmlEl.innerText = `${value} checkpoint${noOfCheckpoints === 1 ? '' : 's'}`;
 }
 
 export const updateTimes = (times: TimeEntry[]) => {

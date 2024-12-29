@@ -80,7 +80,7 @@ export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) =>
     if (['ground', 'wall'].includes(collisionEvent.collidedAgainst.transformNode.name)) {
       if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
         const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
-        if(upCollission < -0.999 && upCollission > -1.001) {
+        if(upCollission < -0.9 && upCollission > -1.1) {
           player.jumping = false;
         }
       }
