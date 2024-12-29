@@ -80,6 +80,8 @@ html, body {
   position: fixed;
   left: 1rem;
   top: 1rem;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
 }
 
 .times-list > ol > li{
@@ -95,12 +97,22 @@ html, body {
   color: white;
 }
 
+.editor {
+  background-color: #0000006d;
+  padding: 0 1rem;
+  border-radius: 0.2rem;
+}
+
 .editor > div {
   flex: 1;
-  padding: 0.5rem;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.5rem 0;
   flex-direction: row;
   justify-content: flex-end;
+}
+
+.editor > div > label {
+  width: 5rem;
 }

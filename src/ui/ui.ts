@@ -63,12 +63,12 @@ const updateCheckpoints = (htmlEl: HTMLDivElement, noOfCheckpoints: number) => {
 
 export const updateTimes = (times: TimeEntry[]) => {
   if (times.length === 0) return;
-  document.querySelector('.times-list > div')?.remove();
-  const timesList = document.querySelector('.times-list > ol');
-  if (!timesList) return;
-  timesList.innerHTML = ''
+  const timesListDiv = document.querySelector('.times-list');
+  if (!timesListDiv) return;
+  timesListDiv.innerHTML = ''
+  const timesListOl = document.createElement('ol');
   times.forEach(time => {
-    const timeElement = document.createElement('li');
+    const timesListLi = document.createElement('li');
     let checkpoints = 'No checkpoints!'
     if (time.checkpoints > 0) {
       checkpoints = `${time.checkpoints} checkpoint`
@@ -76,8 +76,9 @@ export const updateTimes = (times: TimeEntry[]) => {
     if (time.checkpoints > 1) {
       checkpoints += 's'
     }
-    timeElement.innerText = `${time.timeStr} - ${checkpoints} - ${time.nickname} `;
-    timesList.appendChild(timeElement);
+    timesListLi.innerText = `${time.timeStr} - ${checkpoints} - ${time.nickname} `;
+    timesListOl.appendChild(timesListLi);
+    timesListDiv.appendChild(timesListOl);
   });
 };
 
