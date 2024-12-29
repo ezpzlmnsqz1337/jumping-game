@@ -29,7 +29,7 @@ interface MultiplayerSession {
 
 let playerMpId = '';
 let players: MultiplayerPlayers = {};
-let mp: MultiplayerSession;
+let mp: MultiplayerSession | null = null;
 
 export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): MultiplayerSession => {
   const ws = io(window.location.origin);

@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { getCurrentTimerTime, getCurrentTimerTimeStr, stopTimer, TimerEntity } from '../entities/timer';
+import { getCurrentTimerTime, getCurrentTimerTimeStr, isTimerActive, stopTimer, TimerEntity } from '../entities/timer';
 import { endTriggerColor } from '../assets/colors';
 import { getMultiplayerSession } from '../multiplayer';
 
@@ -14,6 +14,7 @@ export interface CreateEndTriggerOptions {
 export const createEndTrigger = (scene: BABYLON.Scene, opts: CreateEndTriggerOptions) => {
   const endTriggerMaterial = new BABYLON.StandardMaterial('endTriggerMaterial');
   endTriggerMaterial.diffuseColor = endTriggerColor;
+  endTriggerMaterial.alpha = 0.7;
 
   const endTrigger = BABYLON.MeshBuilder.CreateBox('endTrigger', { size: 1 }, scene);
   endTrigger.isVisible = true;
@@ -21,14 +22,14 @@ export const createEndTrigger = (scene: BABYLON.Scene, opts: CreateEndTriggerOpt
   endTrigger.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
   endTrigger.checkCollisions = true;
   endTrigger.actionManager = new BABYLON.ActionManager(scene);
-  endTrigger.actionManager.registerAction(onEnterTriggerAction(opts.player));
-  endTrigger.actionManager.registerAction(onExitTriggerAction(opts.player));
+  endTrigger.actionManager.registerAction(onEnterTriggerAction(endTrigger, opts.player));
+  endTrigger.actionManager.registerAction(onExitTriggerAction(endTrigger, opts.player));
   endTrigger.material = endTriggerMaterial;
 
   return endTrigger;
 }
 
-const onEnterTriggerAction = (player: PlayerEntity) => {
+const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
   return new BABYLON.ExecuteCodeAction(
     {
       trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
@@ -36,19 +37,21 @@ const onEnterTriggerAction = (player: PlayerEntity) => {
     },
     () => {
       console.log('Player entered the end trigger');
+      (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
+      if (!isTimerActive()) return;
       stopTimer();
       const defaultNickname = `player${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}`;
-      getMultiplayerSession().sendTimeToServer({
+      getMultiplayerSession()?.sendTimeToServer({
         nickname: player.nickname || defaultNickname,
-        timeStr: getCurrentTimerTimeStr(true),
-        time: getCurrentTimerTime(true),
+        timeStr: getCurrentTimerTimeStr(),
+        time: getCurrentTimerTime(),
         checkpoints: 0
       });
     }
   )
 }
 
-const onExitTriggerAction = (player: PlayerEntity) => {
+const onExitTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
   return new BABYLON.ExecuteCodeAction(
     {
       trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
@@ -56,6 +59,7 @@ const onExitTriggerAction = (player: PlayerEntity) => {
     },
     () => {
       console.log('Player exited the end trigger');
+      (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
     }
   )
 }

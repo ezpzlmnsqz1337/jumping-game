@@ -35,14 +35,18 @@ export const stopTimer = () => {
   timer.finishedAt = Date.now();
 }
 
-export const getCurrentTimerTimeStr = (force: boolean = false) => {
-  if (!force && !timer.active) return '0:00.000';
+export const isTimerActive = () => {
+  return timer.active;
+}
+
+export const getCurrentTimerTimeStr = () => {
+  if (!timer.active && !timer.finishedAt) return '00:00.000';
   if (timer.finishedAt) return formatTime(new Date(timer.finishedAt - timer.startedAt));
   return formatTime(new Date(Date.now() - timer.startedAt));
 }
 
-export const getCurrentTimerTime = (force: boolean = false) => {
-  if (!force && !timer.active) return 0;
+export const getCurrentTimerTime = () => {
+  if (!timer.active && !timer.finishedAt) return 0;
   if (timer.finishedAt) return timer.finishedAt - timer.startedAt;
   return Date.now() - timer.startedAt;
 }
