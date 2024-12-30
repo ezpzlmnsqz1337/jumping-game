@@ -1,26 +1,39 @@
 import * as BABYLON from '@babylonjs/core';
-import { createWall } from '../../entities/walls';
+import earcut from 'earcut';
+import { easyColor, hardColor, mediumColor } from '../../assets/colors';
 import { getLightTexture } from '../../assets/textures';
+import { createWall } from '../../entities/walls';
 
-export const createLongJumps = (scene: BABYLON.Scene) => {
+export const createLongJumps = (scene: BABYLON.Scene, numberOfJumps: number = 19) => {
   const initialJumpZ = -45;
-  const spacing = 6;
+  const initialJumpX = 46;
+  const initialJumpLength = 9.5;
+
+  const spacing = 5;
 
   const height = 0.8;
   const depth = 4;
 
   const walls = []
 
-  // first jump 40 - 31,5 = 8,5 units
+  for (let i = 0; i < numberOfJumps; i++) {
+    const nextJumpLengthDelta = (0.1 * i);
+    const jumpLength = (initialJumpLength + nextJumpLengthDelta) * 10;
 
-  // last jump 40 - 30,7 = 9,3 units
+    const jumpLengthText = BABYLON.MeshBuilder.CreateText('', `${jumpLength}`, scene.metadata.fonts.fontMontserratRegular, { size: 1, depth: 0.3 }, scene, earcut) as BABYLON.Mesh;
+    jumpLengthText.position = new BABYLON.Vector3(initialJumpX + 4, 1.2, initialJumpZ + spacing * i);
+    jumpLengthText.rotationQuaternion = new BABYLON.Quaternion(0, -0.7, 0, -0.7);
 
-  for(let i = 0; i < 16; i++) {
+    const material = new BABYLON.StandardMaterial('jumpLengthTextMaterial', scene);
+    material.diffuseColor = jumpLength <= 100 ? easyColor : jumpLength <= 110 ? mediumColor : hardColor;
+    jumpLengthText.material = material;
+
     walls.push(
-      createWall(scene, 'box', { width: 8 - (0.1*i), depth, height }, new BABYLON.Vector3( 23.50, 0.00, initialJumpZ+spacing*i)),
-      createWall(scene, 'box', { width: 8, depth, height }, new BABYLON.Vector3(40, 0.00, initialJumpZ+spacing*i)),
+      createWall(scene, 'box', { width: 8 - nextJumpLengthDelta, depth, height }, new BABYLON.Vector3(initialJumpX - 17.5, 0.00, initialJumpZ + spacing * i)),
+      createWall(scene, 'box', { width: 8, depth, height }, new BABYLON.Vector3(initialJumpX, 0.00, initialJumpZ + spacing * i)),
     )
   }
-  walls.forEach(wall => (wall.material as BABYLON.StandardMaterial).diffuseTexture = getLightTexture({ uScale:1, vScale:1 }, scene));
+
+  walls.forEach(wall => (wall.material as BABYLON.StandardMaterial).diffuseTexture = getLightTexture({ uScale: 1, vScale: 1 }, scene));
   return walls;
 }

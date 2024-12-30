@@ -1,25 +1,24 @@
 import * as BABYLON from '@babylonjs/core';
+import { createSounds } from '../assets/sounds.ts';
 import { createArcRotateCamera } from '../camera.ts';
 import { createControls } from '../controls.ts';
 import { createGround } from '../entities/ground.ts';
 import { createPlayer } from '../entities/player.ts';
+import { createTimer } from '../entities/timer.ts';
 import { createMultiplayer } from '../multiplayer.ts';
 import { createPhysics } from '../physics.ts';
 import { createShadowGenerator } from '../shadows.ts';
-import { createTimer } from '../entities/timer.ts';
 import { createEndTrigger } from '../triggers/end.ts';
 import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
+import { createBorder } from './level1/border.ts';
+import { createLongJumps } from './level1/longjumps.ts';
 import { createStage1 } from './level1/stage1.ts';
 import { createStage2 } from './level1/stage2.ts';
 import { createStage3 } from './level1/stage3.ts';
 import { createStage4 } from './level1/stage4.ts';
-import { getRedTexture } from '../assets/textures.ts';
 import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
-import { createLongJumps } from './level1/longjumps.ts';
-import { createBorder } from './level1/border.ts';
-import { createSounds } from '../assets/sounds.ts';
 
 const ENABLE_EDITOR = true && import.meta.env.DEV;
 
@@ -28,7 +27,11 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   await createPhysics(scene);
 
+  const fontMontserratRegular = await (await fetch('fonts/Montserrat_Regular.json')).json();
+  scene.metadata = { fonts: { fontMontserratRegular } };
+
   scene.sounds = createSounds(scene)
+
 
   // const followCamera = createFollowCamera(scene);
   const followCamera = createArcRotateCamera(scene);

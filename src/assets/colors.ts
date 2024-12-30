@@ -1,5 +1,9 @@
 import * as BABYLON from '@babylonjs/core';
 
-export const playerColor = new BABYLON.Color3(29/255, 150/255, 1);
-export const startTriggerColor = new BABYLON.Color3(150/255, 255/255, 29/255);
-export const endTriggerColor = new BABYLON.Color3(255/255, 50/255, 50/255);
+export const playerColor = new BABYLON.Color3(0.11, 0.58, 1);
+export const startTriggerColor = new BABYLON.Color3(0.58, 1.0, 0.11);
+export const endTriggerColor = new BABYLON.Color3(1, 0.19, 0.19);
+
+export const easyColor = new BABYLON.Color3(0.58, 1.0, 0.11);
+export const mediumColor = new BABYLON.Color3(0.87, 0.76, 0.26);
+export const hardColor = new BABYLON.Color3(1, 0.19, 0.19);
