@@ -103,24 +103,57 @@ html, body {
   top: 1rem;
   flex-direction: column;
   color: #ffffff;
-}
-
-.editor {
   background-color: #0000006d;
   padding: 0 1rem;
   border-radius: 0.2rem;
 }
 
-.editor > div {
+.editor-controls {
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+}
+
+.edit-mode > div,
+.editor-controls > div,
+.editor .camera > div {
   flex: 1;
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  column-gap: 1rem;
+  padding: 0.4rem 0;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .editor > div > label {
   width: 5rem;
+}
+
+.editor-controls > div > span {
+  margin-bottom: 0;
+}
+
+.editor-controls > div input[type="checkbox"] {
+  margin: 0;
+}
+
+.editor-controls > div > div {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.editor .heading {
+  color: #1d96ff;
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
+}
+
+.editor .camera {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor .camera > div > input[type="checkbox"] {
+  margin-right: 0;
 }

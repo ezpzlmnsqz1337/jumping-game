@@ -11,7 +11,7 @@ export const createLongJumps = (scene: BABYLON.Scene, numberOfJumps: number = 19
 
   const spacing = 5;
 
-  const height = 0.8;
+  const height = 0.6;
   const depth = 4;
 
   const walls = []
@@ -21,7 +21,7 @@ export const createLongJumps = (scene: BABYLON.Scene, numberOfJumps: number = 19
     const jumpLength = (initialJumpLength + nextJumpLengthDelta) * 10;
 
     const jumpLengthText = BABYLON.MeshBuilder.CreateText('', `${jumpLength}`, scene.metadata.fonts.fontMontserratRegular, { size: 1, depth: 0.3 }, scene, earcut) as BABYLON.Mesh;
-    jumpLengthText.position = new BABYLON.Vector3(initialJumpX + 4, 1.2, initialJumpZ + spacing * i);
+    jumpLengthText.position = new BABYLON.Vector3(initialJumpX + 4, 1.3, initialJumpZ + spacing * i);
     jumpLengthText.rotationQuaternion = new BABYLON.Quaternion(0, -0.7, 0, -0.7);
 
     const material = new BABYLON.StandardMaterial('jumpLengthTextMaterial', scene);
