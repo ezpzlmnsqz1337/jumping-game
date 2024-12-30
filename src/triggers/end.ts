@@ -46,7 +46,8 @@ const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
         timeStr: getCurrentTimerTimeStr(),
         time: getCurrentTimerTime(),
         checkpoints: player.checkpoints.length
-      });      
+      });
+      trigger.getScene().sounds?.find(x => x.name === 'wicked-sick')?.play();
     }
   )
 }

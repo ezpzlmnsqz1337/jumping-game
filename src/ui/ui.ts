@@ -3,7 +3,7 @@ import { PlayerEntity } from '../entities/player';
 import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
-  const uiTimer = document.querySelector('.timer > .value') as HTMLDivElement;
+  const uiTimer = document.querySelector('.timer > div > .value') as HTMLDivElement;
   const uiCheckpoints = document.querySelector('.checkpoints > .value') as HTMLDivElement;
 
   const uiPlayerInfo = {

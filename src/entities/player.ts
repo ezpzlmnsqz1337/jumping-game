@@ -23,34 +23,19 @@ export interface CreatePlayerOptions {
   color?: BABYLON.Color3
 }
 
-export const createPlayer = (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
-  const boxMaterial = new BABYLON.StandardMaterial('boxMaterial');
-  boxMaterial.diffuseColor = opts.color || playerColor;
-
-  const redMaterial = new BABYLON.StandardMaterial('redMaterial');
-  redMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
-
-  const multiMaterial = new BABYLON.MultiMaterial('multiMaterial', scene);
-  multiMaterial.subMaterials.push(boxMaterial); // Default material
-  multiMaterial.subMaterials.push(redMaterial); // Red material
-
+export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
+  const playerModel = await BABYLON.SceneLoader.ImportMeshAsync('', './assets/models/', 'player.glb', scene);
+  
   const box = BABYLON.MeshBuilder.CreateBox('player', {
     width: 0.4,
     height: 0.4,
-    depth: 0.4
+    depth: 0.4,
   }, scene);
-  box.position = opts.startPosition || new BABYLON.Vector3(0, 0, 0);
-  box.material = multiMaterial;
+  
+  playerModel.meshes.forEach(mesh => mesh.setParent(box));
 
-  // Assign materials to specific faces
-  box.subMeshes = [];
-  const verticesCount = box.getTotalVertices();
-  box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 0, 6, box)); // Face 1
-  box.subMeshes.push(new BABYLON.SubMesh(1, 0, verticesCount, 6, 6, box)); // Face 2 (red)
-  box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 12, 6, box)); // Face 3
-  box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 18, 6, box)); // Face 4
-  box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 24, 6, box)); // Face 5
-  box.subMeshes.push(new BABYLON.SubMesh(0, 0, verticesCount, 30, 6, box)); // Face 6
+  box.visibility = 0;
+  box.position = opts.startPosition || new BABYLON.Vector3(0, 0, 0);
 
   // physics
   const boxAggregate = new BABYLON.PhysicsAggregate(

@@ -26,7 +26,7 @@ export const createWall = (scene: BABYLON.Scene, type: WallType, opts: any, posi
   }
   const wallMaterial = new BABYLON.StandardMaterial('wallMaterial');
   wallMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
-  wallMaterial.diffuseTexture = getDarkTexture({ uScale: 1, vScale: 1 }, scene);
+  wallMaterial.diffuseTexture = getDarkTexture({ uScale: opts.uScale, vScale: opts.vScale }, scene);
   wallMaterial.roughness = 0.3;
   wall.material = wallMaterial;
   wall.metadata = opts;

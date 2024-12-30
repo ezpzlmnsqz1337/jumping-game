@@ -23,7 +23,7 @@ html, body {
   height: 100px;
   width: 100%;
   display: flex;
-  background-color: rgb(29, 150, 255);
+  background-color: #1d96ff;
 }
 
 .player-info > div {
@@ -44,26 +44,25 @@ html, body {
 .player-info > div .value {
   text-transform: uppercase;
   font-size: 1.4rem;
-  background-color: rgb(207, 232, 255);
+  background-color: #cfe8ff;
   padding: 0.2rem 1rem;
 }
 
 .player-info > div .value.no {
-  color: rgb(27, 159, 27);
+  color: #1b9f1b;
 }
 
 .player-info > div .value.yes {
-  color: rgb(193, 56, 18);
+  color: #c13812;
 }
 
 .timer {
-  background-color: #0000006d;
   padding: 0.5rem 1rem;
   position: fixed;
-  color: white;
+  color: #ffffff;
   font-weight: bold;
   font-size: 2rem;
-  bottom: 6.7rem;
+  bottom: 6.5rem;
   left: 0;
   right: 0;
   display: flex;
@@ -73,12 +72,19 @@ html, body {
   align-items: center;
 }
 
-.timer > .checkpoints {
+.timer > div {
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border-radius: 0.2rem;
+}
+
+.timer > div > .checkpoints {
   font-size: 1rem;
 }
 
 .times-list {
-  color: white;
+  color: #ffffff;
   position: fixed;
   left: 1rem;
   top: 1rem;
@@ -96,7 +102,7 @@ html, body {
   right: 1rem;
   top: 1rem;
   flex-direction: column;
-  color: white;
+  color: #ffffff;
 }
 
 .editor {

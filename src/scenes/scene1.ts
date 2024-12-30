@@ -19,6 +19,7 @@ import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
 import { createLongJumps } from './level1/longjumps.ts';
 import { createBorder } from './level1/border.ts';
+import { createSounds } from '../assets/sounds.ts';
 
 const ENABLE_EDITOR = true && import.meta.env.DEV;
 
@@ -27,15 +28,17 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   await createPhysics(scene);
 
+  scene.sounds = createSounds(scene)
+
   // const followCamera = createFollowCamera(scene);
   const followCamera = createArcRotateCamera(scene);
 
   const controls = createControls(scene);
   const ground = createGround(scene);
   // const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(-7, 1, -7.6) });
-  // const player = createPlayer(scene, { startPosition: new BABYLON.Vector3( -10.00, 50.40, -9.00) });
-  const player = createPlayer(scene, { startPosition: new BABYLON.Vector3(21.70, 2.00, -14.50) });
-  
+  // const player = await createPlayer(scene, { startPosition: new BABYLON.Vector3( -10.00, 50.40, -9.00) });
+  const player = await createPlayer(scene, { startPosition: new BABYLON.Vector3(21.70, 2.00, -14.50) });
+
   controls.player = player;
 
   const walls = createWalls(scene);
@@ -43,7 +46,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   createStartTrigger(scene, { player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.1, 7) });
   createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-10.00, 42.00, 8.00), scaling: new BABYLON.Vector3(5, 0.1, 5) });
   // testing end trigger
-  // createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
   followCamera.lockedTarget = player.mesh;
 
@@ -60,7 +63,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   lightGizmo1.light = light1;
 
 
-  createShadowGenerator(scene, light1, [player.mesh, ...walls], [player.mesh, ground, ...walls]);
+  createShadowGenerator(scene, light1, [...(player.mesh.getChildMeshes() as BABYLON.Mesh[]), ...walls], [player.mesh, ground, ...walls]);
 
   // fog
   // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
@@ -98,7 +101,7 @@ export const createWalls = (scene: BABYLON.Scene) => {
   ];
 
   // last wall
-  (walls[walls.length-1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale:1, vScale:1 }, scene);
+  // (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
 
   return walls;
 };

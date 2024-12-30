@@ -164,10 +164,12 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
 const handleCheckpoints = (key: string, player: PlayerEntity) => {
   console.log(key);
   if ('Digit1' === key) {
-    player.checkpoints.push({
-      position: player.mesh.getAbsolutePosition().clone(),
-      rotationQuaternion: player.mesh.rotationQuaternion!.clone()
-    });
+    if (!player.jumping) {
+      player.checkpoints.push({
+        position: player.mesh.getAbsolutePosition().clone(),
+        rotationQuaternion: player.mesh.rotationQuaternion!.clone()
+      });
+    }
   }
   if ('Digit2' === key) {
     console.log(player.checkpoints);

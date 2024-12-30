@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { createScene1 } from './scenes/scene1.ts'
 import './style.css'
+import '@babylonjs/loaders/glTF';
 
 const canvas = document.getElementById('render-canvas') as BABYLON.Nullable<HTMLCanvasElement>;
 
