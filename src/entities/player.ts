@@ -1,4 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
+import * as GUI from '@babylonjs/gui';
+import { PlayerColor } from '../assets/colors';
+import { getModel, ModelId } from '../assets/models';
 
 export interface Checkpoint {
   position: BABYLON.Vector3
@@ -6,7 +9,7 @@ export interface Checkpoint {
 }
 
 export interface PlayerEntity {
-  nickname?: string
+  nickname: string
   moving: boolean
   speed: number
   rotationSpeed: number
@@ -18,19 +21,19 @@ export interface PlayerEntity {
 }
 
 export interface CreatePlayerOptions {
+  nickname: string
   startPosition?: BABYLON.Vector3
-  color?: BABYLON.Color3
+  color?: PlayerColor
 }
 
 export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
-  const playerModel = await BABYLON.SceneLoader.ImportMeshAsync('', './assets/models/', 'player.glb', scene);
-
   const box = BABYLON.MeshBuilder.CreateBox('player', {
     width: 0.4,
     height: 0.4,
     depth: 0.4,
   }, scene);
 
+  const playerModel = await getModel(scene, ModelId.playerOrange)
   playerModel.meshes.forEach(mesh => mesh.setParent(box));
 
   box.visibility = 0;
@@ -52,7 +55,8 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     moving: false,
     mesh: box,
     physics: boxAggregate,
-    checkpoints: []
+    checkpoints: [],
+    nickname: opts.nickname
   }
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
@@ -66,7 +70,7 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     if (['ground', 'wall', 'player-mp'].includes(collidedAgainstNode.name)) {
       if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
         const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
-        console.log('upCollission', upCollission);
+        // console.log('upCollission', upCollission);
         if (upCollission < -0.9 && upCollission > -1.1) {
           player.jumping = false;
         } else {
@@ -81,5 +85,27 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     }
   });
 
+  createNameTag(scene, box, opts.nickname);
+
   return player;
+}
+
+export const createNameTag = (scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) => {
+  // name tag
+  const nickNameTextPlane = BABYLON.MeshBuilder.CreatePlane('nickname', { size: 2 }, scene);
+  nickNameTextPlane.rotation = new BABYLON.Vector3(0, 0, 0);
+  nickNameTextPlane.parent = mesh;
+  nickNameTextPlane.position.y = 0.7;
+  nickNameTextPlane.isPickable = false;
+  nickNameTextPlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(nickNameTextPlane);
+
+  const nickNameText = new GUI.TextBlock("nickNameText", nickname);
+  nickNameText.color = "white";
+  nickNameText.fontSize = "70px";
+  nickNameText.shadowBlur = 0;
+  nickNameText.outlineWidth = 10;
+  nickNameText.outlineColor = "black";
+  advancedTexture.addControl(nickNameText);
 }

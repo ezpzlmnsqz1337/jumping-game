@@ -14,7 +14,7 @@ import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
 import { createBorder } from './level1/border.ts';
 import { createLongJumps } from './level1/longjumps.ts';
-import { createStage1, stage1Camera1 } from './level1/stage1.ts';
+import { createStage1 } from './level1/stage1.ts';
 import { createStage2 } from './level1/stage2.ts';
 import { createStage3 } from './level1/stage3.ts';
 import { createStage4 } from './level1/stage4.ts';
@@ -36,7 +36,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   await createPhysics(scene);
 
   const fontMontserratRegular = await (await fetch('fonts/Montserrat_Regular.json')).json();
-  scene.metadata = { fonts: { fontMontserratRegular } };
+  scene.metadata = { fonts: { fontMontserratRegular }};
 
   scene.sounds = createSounds(scene)
 
@@ -56,7 +56,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
-  const player = await createPlayer(scene, { startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70) });
+  const player = await createPlayer(scene, { startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70), nickname: 'ezpzlmnsqz1337', color: 'yellow' });
 
   controls.player = player;
 
@@ -67,7 +67,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // testing end trigger
   createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
-  camera.lockedTarget = player.mesh;
+  // camera.lockedTarget = player.mesh;
 
   const hemiLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
@@ -108,7 +108,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 }
 
 export const createWalls = (scene: BABYLON.Scene, player: PlayerEntity) => {
-  const walls = [
+  const walls: BABYLON.Mesh[] = [
     ...createStage1(scene, player),
     ...createStage2(scene, player),
     ...createStage3(scene, player),

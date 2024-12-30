@@ -81,7 +81,6 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
 }
 
 export const setCameraOptions = (camera: MyCamera, cameraOptions: CameraOptions) => {
-  console.log('setCameraOptions');
   // camera.moveTo('alpha', cameraOptions.alpha, 0.1);
   // camera.moveTo('beta', cameraOptions.beta, 0.1);
   // camera.moveTo('radius', cameraOptions.radius, 0.1);
