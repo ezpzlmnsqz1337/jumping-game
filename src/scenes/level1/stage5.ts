@@ -1,7 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import { createWall } from '../../entities/walls';
+import { PlayerEntity } from '../../entities/player';
 
-export const createStage5 = (scene: BABYLON.Scene) => {
+export const createStage5 = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const walls = []
 
   walls.push(

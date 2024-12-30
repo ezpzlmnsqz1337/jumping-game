@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
+import { defaultTriggerColor } from '../assets/colors';
 
 export interface CreateTriggerOptions {
   player: PlayerEntity
@@ -12,11 +13,11 @@ export interface CreateTriggerOptions {
 
 export const createTrigger = (scene: BABYLON.Scene, opts: CreateTriggerOptions) => {  
   const material = new BABYLON.StandardMaterial('triggerMaterial');
-  material.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+  material.diffuseColor = defaultTriggerColor;
   material.alpha = 0.7;
 
-  const trigger = BABYLON.MeshBuilder.CreateBox('trigger', { size: 1 }, scene);
-  trigger.isVisible = opts.isVisible || true;
+  const trigger = BABYLON.MeshBuilder.CreateBox('trigger', { size: 1, ...opts }, scene);
+  trigger.isVisible = opts.isVisible || false;
   trigger.position = opts.position || new BABYLON.Vector3(0, 0, 0);
   trigger.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
   trigger.checkCollisions = true;

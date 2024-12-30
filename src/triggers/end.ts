@@ -12,6 +12,7 @@ export const createEndTrigger = (scene: BABYLON.Scene, opts: CreateTriggerOption
 
   const trigger = createTrigger(scene, {
     ...opts,
+    isVisible: true,
     onEnter: onEnterTriggerAction,
     onExit: onExitTriggerAction
   });

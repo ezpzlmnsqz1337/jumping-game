@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { Checkpoint, PlayerEntity } from './entities/player';
+import { getRandomSpawnPoint } from './entities/spawn-point';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -71,6 +72,7 @@ export const createControls = (scene: BABYLON.Scene) => {
   window.addEventListener('keypress', e => {
     const player = controls.player;
     if (!player) return;
+    handleRespawn(e.code, player);
     handleCheckpoints(e.code, player);
   });
 
@@ -162,7 +164,6 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
 }
 
 const handleCheckpoints = (key: string, player: PlayerEntity) => {
-  console.log(key);
   if ('Digit1' === key) {
     if (!player.jumping) {
       player.checkpoints.push({
@@ -172,7 +173,6 @@ const handleCheckpoints = (key: string, player: PlayerEntity) => {
     }
   }
   if ('Digit2' === key) {
-    console.log(player.checkpoints);
     if (player.checkpoints.length > 0) {
       const lastCheckpoint = [...player.checkpoints].pop() as Checkpoint;
       player.physics.body.disablePreStep = true;
@@ -182,5 +182,18 @@ const handleCheckpoints = (key: string, player: PlayerEntity) => {
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;
     }
+  }
+}
+
+const handleRespawn = (key: string, player: PlayerEntity) => {
+  if ('KeyR' === key) {
+    const spawnPoint = getRandomSpawnPoint(player.mesh.getScene().metadata.spawnPoints).mesh;
+    player.physics.body.disablePreStep = true;
+    player.mesh.position = spawnPoint.position.clone();
+    player.mesh.position.y += 1;
+    player.mesh.rotationQuaternion = (spawnPoint.rotationQuaternion || BABYLON.Quaternion.Zero()).clone();
+    player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
+    player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+    player.physics.body.disablePreStep = false;
   }
 }

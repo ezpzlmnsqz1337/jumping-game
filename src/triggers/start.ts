@@ -9,7 +9,9 @@ export const createStartTrigger = (scene: BABYLON.Scene, opts: CreateTriggerOpti
   material.diffuseColor = startTriggerColor;
   material.alpha = 0.7;
 
-  const trigger = createTrigger(scene, { ...opts, 
+  const trigger = createTrigger(scene, {
+    ...opts, 
+    isVisible: true,
     onEnter: onEnterTriggerAction,
     onExit: onExitTriggerAction
   });

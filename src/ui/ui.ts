@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
 import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
+import { MyCamera } from '../camera';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
   const uiTimerDiv = document.querySelector('.timer > div > .value') as HTMLDivElement;
@@ -216,7 +217,7 @@ const bindCameraInfoUI = (scene: BABYLON.Scene) => {
   const cameraRadiusSpan = document.querySelector('.editor .camera-radius .value') as HTMLSpanElement
   const lockTargetCheckBox = document.querySelector('.editor .lock-target-enabled') as HTMLInputElement
 
-  const camera = scene.activeCamera as BABYLON.ArcRotateCamera;
+  const camera = scene.activeCamera as MyCamera;
 
   if (!camera) return;
 
@@ -229,9 +230,15 @@ const bindCameraInfoUI = (scene: BABYLON.Scene) => {
     setInnerText(cameraBetaSpan, camera.beta.toFixed(4));
     setInnerText(cameraRadiusSpan, camera.radius.toFixed(2));
     if (lockTargetCheckBox.checked) {
-      if (!camera.lockedTarget) (camera.lockedTarget = scene.getMeshByName('player'));
+      if (!camera.lockedTarget) {
+        camera.lockedTarget = scene.getMeshByName('player');
+        camera.zoomToMouseLocation = false;
+      }
     } else {
-      if (camera.lockedTarget) (camera.lockedTarget = null);
+      if (camera.lockedTarget) {
+        camera.lockedTarget = null;
+        camera.zoomToMouseLocation = true;
+      }
     }
   });
 }
