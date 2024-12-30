@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core';
-import { playerColor } from '../assets/colors';
 
 export interface Checkpoint {
   position: BABYLON.Vector3
@@ -25,13 +24,13 @@ export interface CreatePlayerOptions {
 
 export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
   const playerModel = await BABYLON.SceneLoader.ImportMeshAsync('', './assets/models/', 'player.glb', scene);
-  
+
   const box = BABYLON.MeshBuilder.CreateBox('player', {
     width: 0.4,
     height: 0.4,
     depth: 0.4,
   }, scene);
-  
+
   playerModel.meshes.forEach(mesh => mesh.setParent(box));
 
   box.visibility = 0;
@@ -62,12 +61,21 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
   const observable = boxAggregate.body.getCollisionObservable();
   const observer = observable.add(collisionEvent => {
     if (collisionEvent.collidedAgainst === null) return;
-    if (['ground', 'wall'].includes(collisionEvent.collidedAgainst.transformNode.name)) {
+    if (!collisionEvent.normal) return;
+    const collidedAgainstNode = collisionEvent.collidedAgainst.transformNode;
+    if (['ground', 'wall', 'player-mp'].includes(collidedAgainstNode.name)) {
       if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
         const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
         console.log('upCollission', upCollission);
         if (upCollission < -0.9 && upCollission > -1.1) {
           player.jumping = false;
+        } else {
+          const power = ['ground', 'wall'].includes(collidedAgainstNode.name) ? 1 : 5;
+          // push player away
+          player.physics.body.applyImpulse(
+            collisionEvent.normal.scale(-power),
+            player.mesh.getAbsolutePosition()
+          );
         }
       }
     }

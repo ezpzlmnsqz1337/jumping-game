@@ -1,66 +1,41 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
-import { getCurrentTimerTime, getCurrentTimerTimeStr, isTimerActive, stopTimer, TimerEntity } from '../entities/timer';
-import { endTriggerColor } from '../assets/colors';
+import { getCurrentTimerTime, getCurrentTimerTimeStr, isTimerActive, stopTimer } from '../entities/timer';
 import { getMultiplayerSession } from '../multiplayer';
+import { createTrigger, CreateTriggerOptions } from './trigger';
+import { endTriggerColor } from '../assets/colors';
 
-export interface CreateEndTriggerOptions {
-  player: PlayerEntity
-  timer: TimerEntity
-  position?: BABYLON.Vector3
-  scaling?:  BABYLON.Vector3
-}
+export const createEndTrigger = (scene: BABYLON.Scene, opts: CreateTriggerOptions) => {
+  const material = new BABYLON.StandardMaterial('triggerMaterial');
+  material.diffuseColor = endTriggerColor;
+  material.alpha = 0.7;
 
-export const createEndTrigger = (scene: BABYLON.Scene, opts: CreateEndTriggerOptions) => {
-  const endTriggerMaterial = new BABYLON.StandardMaterial('endTriggerMaterial');
-  endTriggerMaterial.diffuseColor = endTriggerColor;
-  endTriggerMaterial.alpha = 0.7;
+  const trigger = createTrigger(scene, {
+    ...opts,
+    onEnter: onEnterTriggerAction,
+    onExit: onExitTriggerAction
+  });
+  trigger.material = material;
 
-  const endTrigger = BABYLON.MeshBuilder.CreateBox('endTrigger', { size: 1 }, scene);
-  endTrigger.isVisible = true;
-  endTrigger.position = opts.position || new BABYLON.Vector3(0, 0, 0);
-  endTrigger.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
-  endTrigger.checkCollisions = true;
-  endTrigger.actionManager = new BABYLON.ActionManager(scene);
-  endTrigger.actionManager.registerAction(onEnterTriggerAction(endTrigger, opts.player));
-  endTrigger.actionManager.registerAction(onExitTriggerAction(endTrigger, opts.player));
-  endTrigger.material = endTriggerMaterial;
-
-  return endTrigger;
+  return trigger;
 }
 
 const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  return new BABYLON.ExecuteCodeAction(
-    {
-      trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
-      parameter: player
-    },
-    () => {
-      console.log('Player entered the end trigger');
-      (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
-      if (!isTimerActive()) return;
-      stopTimer();
-      const defaultNickname = `player${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}${Math.floor(Math.random()*10)}`;
-      getMultiplayerSession()?.sendTimeToServer({
-        nickname: player.nickname || defaultNickname,
-        timeStr: getCurrentTimerTimeStr(),
-        time: getCurrentTimerTime(),
-        checkpoints: player.checkpoints.length
-      });
-      trigger.getScene().sounds?.find(x => x.name === 'wicked-sick')?.play();
-    }
-  )
+  console.log('Player entered the end trigger');
+  (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
+  if (!isTimerActive()) return;
+  stopTimer();
+  const defaultNickname = `player${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`;
+  getMultiplayerSession()?.sendTimeToServer({
+    nickname: player.nickname || defaultNickname,
+    timeStr: getCurrentTimerTimeStr(),
+    time: getCurrentTimerTime(),
+    checkpoints: player.checkpoints.length
+  });
+  trigger.getScene().sounds?.find(x => x.name === 'wicked-sick')?.play();
 }
 
 const onExitTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  return new BABYLON.ExecuteCodeAction(
-    {
-      trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
-      parameter: player
-    },
-    () => {
-      console.log('Player exited the end trigger');
-      (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
-    }
-  )
+  console.log('Player exited the end trigger');
+  (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
 }

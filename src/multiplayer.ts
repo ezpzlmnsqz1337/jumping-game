@@ -82,10 +82,20 @@ const updatePlayers = (scene: BABYLON.Scene, playerInfo: PlayerInfo) => {
         height: 0.4,
         depth: 0.4
       }, scene);
+      
+      const boxAggregate = new BABYLON.PhysicsAggregate(
+        players[id].mesh,
+        BABYLON.PhysicsShapeType.BOX,
+        { mass: 10, restitution: 0, friction: 0.7 },
+        scene
+      );
+      
     }
     if (playerInfo.position && playerInfo.rotation) {
+      players[id].mesh.physicsBody!.disablePreStep = true;
       players[id].mesh.position = new BABYLON.Vector3(...playerInfo.position);
       players[id].mesh.rotationQuaternion = new BABYLON.Quaternion(...playerInfo.rotation);
+      players[id].mesh.physicsBody!.disablePreStep = false;
     }
   });
 }
