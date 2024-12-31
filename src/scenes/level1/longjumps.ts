@@ -29,8 +29,8 @@ export const createLongJumps = (scene: BABYLON.Scene, numberOfJumps: number = 19
     jumpLengthText.material = material;
 
     walls.push(
-      createWall(scene, 'box', { width: 8 - nextJumpLengthDelta, depth, height }, new BABYLON.Vector3(initialJumpX - 17.5, 0.00, initialJumpZ + spacing * i)),
-      createWall(scene, 'box', { width: 8, depth, height }, new BABYLON.Vector3(initialJumpX, 0.00, initialJumpZ + spacing * i)),
+      createWall(scene, 'box', { width: 8, depth, height }, new BABYLON.Vector3(initialJumpX, 0.30, initialJumpZ + spacing * i)),
+      createWall(scene, 'box', { width: 8, depth, height }, new BABYLON.Vector3(initialJumpX - nextJumpLengthDelta - 17.5, 0.30, initialJumpZ + spacing * i)),
     )
   }
 
