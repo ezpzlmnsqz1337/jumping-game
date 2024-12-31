@@ -21,6 +21,7 @@ import { createStage3 } from './level1/stage3.ts';
 import { createStage4 } from './level1/stage4.ts';
 import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
+import { createSkybox } from './level1/skybox.ts';
 
 const ENABLE_EDITOR = true && import.meta.env.DEV;
 
@@ -47,6 +48,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const controls = createControls(scene);
   const ground = createGround(scene);
+  const skybox = createSkybox(scene);
   const spawnPoints = [
     createSpawnPoint(scene, new BABYLON.Vector3(-11.80, 0.05, 1)),
     createSpawnPoint(scene, new BABYLON.Vector3(-11.80, 0.05, 0)),

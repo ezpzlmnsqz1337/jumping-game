@@ -74,7 +74,11 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
   camera.angularSensibilityX = 1000; // Adjust this value to change horizontal turning speed
   camera.angularSensibilityY = 1000; // Adjust this value to change vertical turning speed  
   camera.allowUpsideDown = false;
-  
+  camera.lowerRadiusLimit = 2;
+  camera.upperRadiusLimit = 100;
+
+  camera.upperBetaLimit = Math.PI/2;
+
   camera.attachControl(true);
 
   return camera;
