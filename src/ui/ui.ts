@@ -292,7 +292,8 @@ const openLobby = (scene: BABYLON.Scene) => {
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'block';
   settingsButtonDiv.style.display = 'none';
-  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;
+  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;    
+  scene.sounds?.find(x => x.name === 'open-lobby')?.play();
 }
 
 const closeLobby = (scene: BABYLON.Scene) => {
@@ -301,4 +302,5 @@ const closeLobby = (scene: BABYLON.Scene) => {
   lobbyDiv.style.display = 'none';
   settingsButtonDiv.style.display = 'block';
   (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
+  scene.sounds?.find(x => x.name === 'close-lobby')?.play();
 }

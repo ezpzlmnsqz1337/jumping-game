@@ -185,7 +185,7 @@ html, body {
   padding: 2rem;
   z-index: 9999;
   gap: 1rem;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .lobby .heading {
