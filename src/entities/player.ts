@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { PlayerColor } from '../assets/colors';
 import { getModel } from '../assets/models';
-import { MyCamera } from '../camera';
+import { FILTER_GROUP_PLAYER, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from '../collission-groups';
 
 export type PlayerStatus = 'in_lobby' | 'playing' | 'afk';
 export interface Checkpoint {
@@ -20,8 +20,10 @@ export interface PlayerEntity {
   mesh: BABYLON.Mesh
   physics: BABYLON.PhysicsAggregate
   checkpoints: Checkpoint[]
+  lastCheckpointIndex: number
   color: string
   status: PlayerStatus
+  collissionEnabled?: boolean
 }
 
 export interface CreatePlayerOptions {
@@ -60,9 +62,11 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     mesh: box,
     physics: boxAggregate,
     checkpoints: [],
+    lastCheckpointIndex: 0,
     nickname: opts.nickname,
     color: opts.color,
-    status: 'in_lobby'
+    status: 'in_lobby',
+    collissionEnabled: true
   }
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
@@ -93,20 +97,26 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
 
   createNameTag(scene, box, opts.nickname);
 
+  boxAggregate.shape.filterMembershipMask = FILTER_GROUP_PLAYER;
+  const playerMask = player.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;
+  boxAggregate.shape.filterCollideMask = playerMask;
+
   return player;
 }
 
-export const changePlayerColor = async (player: PlayerEntity, color: PlayerColor) => {  
+export const changePlayerColor = async (player: PlayerEntity, color: PlayerColor) => {
   // remove old meshes
-  player.mesh.getChildren().forEach(mesh => mesh.dispose());
-  
+  player.mesh.getChildMeshes().filter(mesh => mesh.name.includes('player')).forEach(mesh => {
+    player.mesh.getScene().removeMesh(mesh, true);
+  });
+
   // load new model
   const playerModel = await getModel(player.mesh.getScene(), `player-${color}.glb`);
   playerModel.meshes.forEach(mesh => {
     if (mesh.parent === null) {
       mesh.setParent(player.mesh);
       // Ensure the new meshes are positioned correctly
-      mesh.position = BABYLON.Vector3.Zero();
+      mesh.position = new BABYLON.Vector3(0, 0.0001, 0);
       mesh.rotationQuaternion = BABYLON.Quaternion.Identity();
       // Apply a 180-degree rotation around the X-axis to flip the model
       const flipX = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.X, Math.PI);
@@ -115,7 +125,7 @@ export const changePlayerColor = async (player: PlayerEntity, color: PlayerColor
       mesh.rotationQuaternion = flipY.multiply(mesh.rotationQuaternion);
     }
   });
-  
+
   // save settings
   player.color = color;
 
@@ -140,4 +150,12 @@ export const createNameTag = (scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname
   nickNameText.outlineWidth = 10;
   nickNameText.outlineColor = "black";
   advancedTexture.addControl(nickNameText);
+}
+
+export const removeNameTag = (player: PlayerEntity) => {
+  player.mesh.getChildMeshes().forEach(mesh => {
+    if (mesh.name === 'nickname') {
+      mesh.getScene().removeMesh(mesh);
+    }
+  });
 }

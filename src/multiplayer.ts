@@ -4,6 +4,7 @@ import { createNameTag, PlayerEntity, PlayerStatus } from './entities/player';
 import { TimeEntry } from './entities/timer';
 import { updateTimes } from './ui/ui';
 import { getModel, ModelId as ModelId } from './assets/models';
+import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
 
 
 interface MultiplayerData {
@@ -25,6 +26,7 @@ interface PlayerInfo {
   nickname?: string
   status: PlayerStatus
   color?: string
+  collissionEnabled?: boolean
 }
 
 interface MultiplayerSession {
@@ -92,16 +94,18 @@ const updatePlayers = async (scene: BABYLON.Scene, playerInfo: MultiplayerPlayer
     const nickname = info.nickname || 'player';
     const color = info.color || 'blue';
     if (!players[id]) (players[id] = { status: 'in_lobby' });
-    // if player changes color, remove him and reload
-    if (players[id].mesh && players[id].color && players[id].color !== color) {
-      players[id].mesh?.physicsBody?.dispose();
-      scene.removeMesh(players[id].mesh, true);
+    // if player changes color, or nickname remove him and skip to next iteration
+    const colorChange = players[id].mesh && players[id].color && players[id].color !== color
+    const nicknameChange = players[id].mesh && players[id].nickname && players[id].nickname !== nickname;
+    if (colorChange || nicknameChange) {
+      removePlayer(scene, id);
       continue;
     }
     // update local player positions based on server response
     players[id].position = info.position;
     players[id].rotation = info.rotation;
     players[id].status = info.status || 'in_lobby';
+    players[id].nickname = nickname;
     players[id].color = color;
 
     // create mesh for another player if player mesh doesn't exist
@@ -128,7 +132,12 @@ const createMpPlayer = async (scene: BABYLON.Scene, nickname: string, color?: st
   box.visibility = 0;
 
   const playerModel = await getModel(scene, `player-${color || 'red'}.glb`);
-  playerModel.meshes.forEach(mesh => mesh.setParent(box));
+  playerModel.meshes.forEach(mesh => {
+    if (mesh.parent === null) {
+      mesh.setParent(box);
+      mesh.position = new BABYLON.Vector3(0, 0.05, 0);
+    }
+  });
 
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
@@ -137,18 +146,47 @@ const createMpPlayer = async (scene: BABYLON.Scene, nickname: string, color?: st
     scene
   );
 
+  boxAggregate.body.setLinearDamping(1);
+  boxAggregate.shape.filterMembershipMask = FILTER_GROUP_PLAYER_MP;
+  boxAggregate.shape.filterCollideMask = FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS;
+
+
   createNameTag(scene, box, nickname);
 
   return box;
 }
 
 const removePlayer = (scene: BABYLON.Scene, id: string) => {
-  console.log(players[id]);
   console.log('Removing player', id)
   if (players[id].mesh) {
     players[id].mesh?.physicsBody?.dispose();
     scene.removeMesh(players[id].mesh, true);
   }
   delete players[id];
-  console.log(players[id]);
+}
+
+export const toggleCollissions = (player: PlayerEntity) => {
+  player.collissionEnabled = !player.collissionEnabled;
+  // player mask
+  const body = player.mesh.physicsBody;
+
+  const playerMask = player.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;
+  const playerMpMask = player.collissionEnabled ? FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS : FILTER_MASK_PLAYER_MP_NO_COLLISSIONS;
+
+  if (!body || !body.shape) return;
+  body.shape.filterCollideMask = playerMask;
+
+  // multipalyer boxes masks
+  player.mesh.getScene().meshes.forEach(mesh => {
+    if (mesh.name !== 'player-mp') return;
+    mesh.getChildMeshes().forEach(x => {
+      if (!x.name.includes('player')) return;
+      const material = x.material as BABYLON.PBRMaterial;
+      material.alpha = player.collissionEnabled ? 1 : 0.5;
+      material.transparencyMode = player.collissionEnabled ? 0 : 2;
+    })
+    const mpBody = mesh.physicsBody;
+    if (!mpBody || !mpBody.shape) return;
+    mpBody.shape.filterCollideMask = playerMpMask;
+  })
 }

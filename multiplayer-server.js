@@ -31,7 +31,6 @@ function playerConnected(socket) {
   gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby'  }
   // update all other players of the new player
   io.emit(EventType.PLAYER_CONNECTED, socket.id)
-  console.log(Object.keys(gameInfo.players))
 }
 
 function playerDisconnected(socket) {
@@ -40,8 +39,13 @@ function playerDisconnected(socket) {
   delete gameInfo.players[socket.id]
   // emit a message to all players to remove this player
   io.emit(EventType.PLAYER_DISCONNECTED, socket.id)
-  console.log(Object.keys(gameInfo.players))
 }
+
+const logPlayers = () => {
+  console.log('Players:', gameInfo.players)
+  setTimeout(logPlayers, 5000)
+}
+logPlayers()
 
 // events
 const EventType = Object.freeze({

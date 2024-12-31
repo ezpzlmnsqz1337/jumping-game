@@ -23,7 +23,8 @@ import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
 import { createSkybox } from './level1/skybox.ts';
 
-const ENABLE_EDITOR = true && import.meta.env.DEV;
+const ENABLE_EDITOR = true || import.meta.env.DEV;
+const ENABLE_MULTIPLAYER = true || !import.meta.env.DEV;
 
 const cameraPosition: CameraOptions = {
   position: new BABYLON.Vector3(13.29, 20.68, 26.17),
@@ -110,7 +111,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   }
 
   // multiplayer
-  if (!import.meta.env.DEV) { // if not running in dev mode
+  if (ENABLE_MULTIPLAYER) { // if not running in dev mode
     createMultiplayer(scene, player);
   }
 

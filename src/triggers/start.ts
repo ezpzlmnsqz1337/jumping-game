@@ -24,6 +24,7 @@ const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
   console.log('Player entered the start trigger');
   (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
   player.checkpoints = [];
+  player.lastCheckpointIndex = 0;
   resetTimer();
 }
 

@@ -1,6 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import { Checkpoint, PlayerEntity } from './entities/player';
 import { getRandomSpawnPoint } from './entities/spawn-point';
+import { toggleCollissions } from './multiplayer';
+import { confirmLobby } from './ui/ui';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -63,17 +65,22 @@ export const createControls = (scene: BABYLON.Scene) => {
 
   scene.onBeforeRenderObservable.add(() => {
     const player = controls.player;
-    if (!player) return;
+    if (!player || player.status === 'in_lobby') return;
     handleWSADMovement(keyStatus, player);
     handleTurning(keyStatus, player);
     handleJumping(keyStatus, player);
   });
 
   window.addEventListener('keypress', e => {
-    const player = controls.player;
-    if (!player) return;
-    handleRespawn(e.code, player);
-    handleCheckpoints(e.code, player);
+    const player = controls.player as PlayerEntity;
+    if (e.code === 'Enter') {
+      confirmLobby(scene, player);
+    }
+    if (player && player.status !== 'in_lobby') {
+      handleRespawn(e.code, player);
+      handleCheckpoints(e.code, player);
+      handleCollissions(e.code, player);
+    }
   });
 
   return controls;
@@ -170,17 +177,26 @@ const handleCheckpoints = (key: string, player: PlayerEntity) => {
         position: player.mesh.getAbsolutePosition().clone(),
         rotationQuaternion: player.mesh.rotationQuaternion!.clone()
       });
+      player.lastCheckpointIndex = player.checkpoints.length - 1;
     }
   }
   if ('Digit2' === key) {
-    if (player.checkpoints.length > 0) {
-      const lastCheckpoint = [...player.checkpoints].pop() as Checkpoint;
-      player.physics.body.disablePreStep = true;
-      player.mesh.position = lastCheckpoint.position.clone();
-      player.mesh.rotationQuaternion = lastCheckpoint.rotationQuaternion.clone();
-      player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
-      player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
-      player.physics.body.disablePreStep = false;
+    if (player.checkpoints.length > 0) {  
+      loadCheckpoint(player, player.checkpoints[player.lastCheckpointIndex]);
+    }
+  }
+  if ('Digit3' === key) {
+    const newCheckpointIndex = player.lastCheckpointIndex - 1;
+    if (player.checkpoints.length > 0 && newCheckpointIndex >= 0) {
+      player.lastCheckpointIndex = newCheckpointIndex;
+      loadCheckpoint(player, player.checkpoints[newCheckpointIndex]);
+    }
+  }
+  if ('Digit4' === key) {
+    const newCheckpointIndex = player.lastCheckpointIndex + 1;
+    if (player.checkpoints.length > newCheckpointIndex) {
+      player.lastCheckpointIndex = newCheckpointIndex;
+      loadCheckpoint(player, player.checkpoints[newCheckpointIndex]);
     }
   }
 }
@@ -196,4 +212,17 @@ const handleRespawn = (key: string, player: PlayerEntity) => {
     player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
     player.physics.body.disablePreStep = false;
   }
+}
+
+const loadCheckpoint = (player: PlayerEntity, checkpoint: Checkpoint) => {
+  player.physics.body.disablePreStep = true;
+  player.mesh.position = checkpoint.position.clone();
+  player.mesh.rotationQuaternion = checkpoint.rotationQuaternion.clone();
+  player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
+  player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+  player.physics.body.disablePreStep = false;
+}
+
+const handleCollissions = (key: string, player: PlayerEntity) => {
+  if ('KeyC' === key) toggleCollissions(player);
 }

@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { getDarkTexture } from '../assets/textures.ts';
+import { FILTER_GROUP_WALL } from '../collission-groups.ts';
 
 export type WallType = 'box' | 'sphere' | 'cylinder';
 
@@ -34,6 +35,7 @@ export const createWall = (scene: BABYLON.Scene, type: WallType, opts: any, posi
   if (rotation) wall.rotationQuaternion = rotation;
 
   const wallAggregate = new BABYLON.PhysicsAggregate(wall, physicsShapeType, { mass: 0, friction: 1 }, scene);
+  wallAggregate.shape.filterMembershipMask = FILTER_GROUP_WALL;
 
   return wall;
 };

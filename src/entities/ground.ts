@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { getDarkTexture } from '../assets/textures.ts';
+import { FILTER_GROUP_GROUND } from '../collission-groups.ts';
 
 export const createGround = (scene: BABYLON.Scene) => {
   const groundMaterial = new BABYLON.StandardMaterial('groundMaterial');
@@ -15,6 +16,7 @@ export const createGround = (scene: BABYLON.Scene) => {
   ground.material = groundMaterial;
 
   const groundAggregate = new BABYLON.PhysicsAggregate(ground, BABYLON.PhysicsShapeType.BOX, { mass: 0, friction: 1 }, scene);
+  groundAggregate.shape.filterMembershipMask = FILTER_GROUP_GROUND;
 
   return ground;
 }

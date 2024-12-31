@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { changePlayerColor, PlayerEntity } from '../entities/player';
+import { changePlayerColor, createNameTag, PlayerEntity, PlayerStatus, removeNameTag } from '../entities/player';
 import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
 import { MyCamera } from '../camera';
 import { getGameSettings } from '../storage';
@@ -74,7 +74,7 @@ export const updateTimes = (times: TimeEntry[]) => {
   const timesListOl = document.createElement('ol');
   times.forEach(time => {
     const timesListLi = document.createElement('li');
-    
+
     timesListLi.innerText = `${time.timeStr} - ${time.nickname} (CP: ${time.checkpoints}) `;
     timesListOl.appendChild(timesListLi);
     timesListDiv.appendChild(timesListOl);
@@ -254,7 +254,7 @@ const setInnerText = (element: HTMLElement, text: string) => {
 const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
   const playerColorsDivs = document.querySelectorAll('.lobby .player-color > .colors > div') as NodeListOf<HTMLDivElement>;
-  const enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;  
+  const enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;
 
   const gameSettings = getGameSettings();
 
@@ -270,20 +270,18 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   });
 
   enterButton.addEventListener('click', () => {
-    const nickname = nicknameInput.value;
-    if (!nickname || !(nicknameInput.value.length > 3)) return;
-    localStorage.setItem('color', player.color as PlayerColor);
-    localStorage.setItem('nickname', nickname);
-    (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
-    closeLobby(scene);
+    confirmLobby(scene, player);
   });
 
-  bindLobbyButtonUI(scene);
+  bindLobbyButtonUI(scene, player);
 };
 
-const bindLobbyButtonUI = (scene: BABYLON.Scene) => {
+const bindLobbyButtonUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
-  settingsButtonDiv.addEventListener('click', () => openLobby(scene));
+  settingsButtonDiv.addEventListener('click', () => {
+    openLobby(scene);
+    player.status = 'in_lobby';
+  });
   settingsButtonDiv.style.display = 'none';
 }
 
@@ -292,7 +290,7 @@ const openLobby = (scene: BABYLON.Scene) => {
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'block';
   settingsButtonDiv.style.display = 'none';
-  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;    
+  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;
   scene.sounds?.find(x => x.name === 'open-lobby')?.play();
 }
 
@@ -303,4 +301,28 @@ const closeLobby = (scene: BABYLON.Scene) => {
   settingsButtonDiv.style.display = 'block';
   (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
   scene.sounds?.find(x => x.name === 'close-lobby')?.play();
+  (document.querySelector('#render-canvas') as HTMLCanvasElement).focus();
+}
+
+const isLobbyOpen = () => {
+  return (document.querySelector('.lobby-wrapper') as HTMLDivElement).style.display === 'block';
+}
+
+const updatePlayerNickname = (player: PlayerEntity, nickname: string) => {
+  player.nickname = nickname;
+  removeNameTag(player);
+  createNameTag(player.mesh.getScene(), player.mesh, nickname);
+}
+
+export const confirmLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
+  const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
+
+  const nickname = nicknameInput.value.substring(0, 15);
+  if (!nickname || !(nicknameInput.value.length > 3)) return;
+  localStorage.setItem('color', player.color as PlayerColor);
+  localStorage.setItem('nickname', nickname);
+  (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
+  player.status = 'playing';
+  updatePlayerNickname(player, nickname);
+  closeLobby(scene);
 }
