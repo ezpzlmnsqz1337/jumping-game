@@ -89,7 +89,11 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   lightGizmo1.light = light1;
 
 
-  createShadowGenerator(scene, light1, [...(player.mesh.getChildMeshes() as BABYLON.Mesh[]), ...walls], [player.mesh, ground, ...walls]);
+  const cg = createShadowGenerator(scene, light1, [...walls], [player.mesh, ground, ...walls]);
+
+  scene.onNewMeshAddedObservable.add(mesh => {
+    if (mesh.name === 'player-body') cg.addShadowCaster(mesh);
+  });
 
   // fog
   // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;

@@ -120,6 +120,7 @@ const bindMeshInfoUI = (gizmoManager: BABYLON.Nullable<BABYLON.GizmoManager>, ed
     return;
   }
 
+  const meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
   const transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
   const scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
   const rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
@@ -136,6 +137,7 @@ const bindMeshInfoUI = (gizmoManager: BABYLON.Nullable<BABYLON.GizmoManager>, ed
   gizmoManager.scaleGizmoEnabled = true;
 
   gizmoManager.onAttachedToMeshObservable.add(newMesh => {
+    meshNameSpan.innerText = newMesh?.name || 'None';
     updateMeshDetails(gizmoManager, 'position', positionValueDiv);
     updateMeshDetails(gizmoManager, 'rotation', rotationValueDiv);
     updateMeshDetails(gizmoManager, 'scaling', scalingValueDiv);

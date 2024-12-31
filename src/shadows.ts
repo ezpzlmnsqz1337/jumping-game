@@ -16,4 +16,5 @@ export const createShadowGenerator = (scene: BABYLON.Scene,
   // shadowGenerator.useCloseExponentialShadowMap = true;
   // shadowGenerator.usePercentageCloserFiltering  = true;
   
+  return shadowGenerator;
 };

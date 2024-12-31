@@ -277,14 +277,12 @@ html, body {
   align-self: center;
   outline: 0;
   border-style: none;
-
 }
 
 .lobby > .enter:hover {
   cursor: pointer;
   background-color: #005cac;
 }
-
 
 .ui-buttons {
   position: fixed;

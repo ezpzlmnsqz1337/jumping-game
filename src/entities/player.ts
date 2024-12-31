@@ -97,27 +97,29 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
 }
 
 export const changePlayerColor = async (player: PlayerEntity, color: PlayerColor) => {  
-  player.physics.body.disablePreStep = true;
-  // move player to 0,0,0
-  const oldPosition = player.mesh.position.clone();
-  const oldRotation = player.mesh.rotationQuaternion!.clone();
-
-  player.mesh.position = new BABYLON.Vector3(0, 0, 0);
-  player.mesh.rotationQuaternion = new BABYLON.Quaternion();
   // remove old meshes
   player.mesh.getChildren().forEach(mesh => mesh.dispose());
   
   // load new model
   const playerModel = await getModel(player.mesh.getScene(), `player-${color}.glb`);
-  playerModel.meshes.forEach(mesh => mesh.setParent(player.mesh));
-  
-  // move back to old position
-  player.mesh.position = oldPosition.clone();
-  player.mesh.rotationQuaternion = oldRotation.clone();
-  player.physics.body.disablePreStep = false;
+  playerModel.meshes.forEach(mesh => {
+    if (mesh.parent === null) {
+      mesh.setParent(player.mesh);
+      // Ensure the new meshes are positioned correctly
+      mesh.position = BABYLON.Vector3.Zero();
+      mesh.rotationQuaternion = BABYLON.Quaternion.Identity();
+      // Apply a 180-degree rotation around the X-axis to flip the model
+      const flipX = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.X, Math.PI);
+      const flipY = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI);
+      mesh.rotationQuaternion = flipX.multiply(mesh.rotationQuaternion);
+      mesh.rotationQuaternion = flipY.multiply(mesh.rotationQuaternion);
+    }
+  });
   
   // save settings
   player.color = color;
+
+  createNameTag(player.mesh.getScene(), player.mesh, player.nickname);
 }
 
 export const createNameTag = (scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) => {
