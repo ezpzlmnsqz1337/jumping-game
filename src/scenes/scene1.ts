@@ -9,6 +9,7 @@ import { createTimer } from '../entities/timer.ts';
 import { createMultiplayer } from '../multiplayer.ts';
 import { createPhysics } from '../physics.ts';
 import { createShadowGenerator } from '../shadows.ts';
+import { getGameSettings } from '../storage.ts';
 import { createEndTrigger } from '../triggers/end.ts';
 import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
@@ -41,6 +42,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   scene.sounds = createSounds(scene)
 
   const camera = createCamera(scene, cameraPosition); // stage1Camera1);
+  const gameSettings = getGameSettings();
+  console.log(gameSettings);
 
   const controls = createControls(scene);
   const ground = createGround(scene);
@@ -56,7 +59,11 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
-  const player = await createPlayer(scene, { startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70), nickname: 'ezpzlmnsqz1337', color: 'yellow' });
+  const player = await createPlayer(scene, {
+    startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),
+    nickname: gameSettings.nickname,
+    color: gameSettings.color
+  });
 
   controls.player = player;
 

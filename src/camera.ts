@@ -68,7 +68,7 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
     cameraOptions.position,
     scene
   );
-  // camera.useAutoRotationBehavior = true;
+  camera.useAutoRotationBehavior = true;
   camera.wheelDeltaPercentage = 0.01;
   camera.speed = 0.1;
   camera.angularSensibilityX = 1000; // Adjust this value to change horizontal turning speed

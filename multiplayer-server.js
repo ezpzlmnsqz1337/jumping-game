@@ -28,7 +28,7 @@ const gameInfo = {
 function playerConnected(socket) {
   console.log('player connected', socket.id)
   // create a new player and add it to our players object
-  gameInfo.players[socket.id] = { position: null, rotation: null }
+  gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby'  }
   // update all other players of the new player
   io.emit(EventType.PLAYER_CONNECTED, socket.id)
   console.log(Object.keys(gameInfo.players))

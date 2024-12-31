@@ -1,8 +1,10 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { PlayerColor } from '../assets/colors';
-import { getModel, ModelId } from '../assets/models';
+import { getModel } from '../assets/models';
+import { MyCamera } from '../camera';
 
+export type PlayerStatus = 'in_lobby' | 'playing' | 'afk';
 export interface Checkpoint {
   position: BABYLON.Vector3
   rotationQuaternion: BABYLON.Quaternion
@@ -18,12 +20,14 @@ export interface PlayerEntity {
   mesh: BABYLON.Mesh
   physics: BABYLON.PhysicsAggregate
   checkpoints: Checkpoint[]
+  color: string
+  status: PlayerStatus
 }
 
 export interface CreatePlayerOptions {
   nickname: string
-  startPosition?: BABYLON.Vector3
-  color?: PlayerColor
+  color: PlayerColor
+  startPosition: BABYLON.Vector3
 }
 
 export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptions) => {
@@ -33,7 +37,7 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     depth: 0.4,
   }, scene);
 
-  const playerModel = await getModel(scene, ModelId.playerOrange)
+  const playerModel = await getModel(scene, `player-${opts.color}.glb`);
   playerModel.meshes.forEach(mesh => mesh.setParent(box));
 
   box.visibility = 0;
@@ -56,7 +60,9 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
     mesh: box,
     physics: boxAggregate,
     checkpoints: [],
-    nickname: opts.nickname
+    nickname: opts.nickname,
+    color: opts.color,
+    status: 'in_lobby'
   }
 
   boxAggregate.body.setCollisionCallbackEnabled(true);
@@ -88,6 +94,30 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
   createNameTag(scene, box, opts.nickname);
 
   return player;
+}
+
+export const changePlayerColor = async (player: PlayerEntity, color: PlayerColor) => {  
+  player.physics.body.disablePreStep = true;
+  // move player to 0,0,0
+  const oldPosition = player.mesh.position.clone();
+  const oldRotation = player.mesh.rotationQuaternion!.clone();
+
+  player.mesh.position = new BABYLON.Vector3(0, 0, 0);
+  player.mesh.rotationQuaternion = new BABYLON.Quaternion();
+  // remove old meshes
+  player.mesh.getChildren().forEach(mesh => mesh.dispose());
+  
+  // load new model
+  const playerModel = await getModel(player.mesh.getScene(), `player-${color}.glb`);
+  playerModel.meshes.forEach(mesh => mesh.setParent(player.mesh));
+  
+  // move back to old position
+  player.mesh.position = oldPosition.clone();
+  player.mesh.rotationQuaternion = oldRotation.clone();
+  player.physics.body.disablePreStep = false;
+  
+  // save settings
+  player.color = color;
 }
 
 export const createNameTag = (scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) => {

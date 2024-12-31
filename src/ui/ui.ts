@@ -1,7 +1,9 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from '../entities/player';
+import { changePlayerColor, PlayerEntity } from '../entities/player';
 import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
 import { MyCamera } from '../camera';
+import { getGameSettings } from '../storage';
+import { PlayerColor } from '../assets/colors';
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
   const uiTimerDiv = document.querySelector('.timer > div > .value') as HTMLDivElement;
@@ -23,6 +25,7 @@ export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?
     updateCheckpoints(uiCheckpointsDiv, player.checkpoints.length);
   });
 
+  bindLobbyUI(scene, player);
   bindEditorUI(scene, gizmoManager);
 };
 
@@ -71,14 +74,8 @@ export const updateTimes = (times: TimeEntry[]) => {
   const timesListOl = document.createElement('ol');
   times.forEach(time => {
     const timesListLi = document.createElement('li');
-    let checkpoints = 'No checkpoints!'
-    if (time.checkpoints > 0) {
-      checkpoints = `${time.checkpoints} checkpoint`
-    }
-    if (time.checkpoints > 1) {
-      checkpoints += 's'
-    }
-    timesListLi.innerText = `${time.timeStr} - ${checkpoints} - ${time.nickname} `;
+    
+    timesListLi.innerText = `${time.timeStr} - ${time.nickname} (CP: ${time.checkpoints}) `;
     timesListOl.appendChild(timesListLi);
     timesListDiv.appendChild(timesListOl);
   });
@@ -250,4 +247,56 @@ const arrayToString = (arr: number[]) => {
 const setInnerText = (element: HTMLElement, text: string) => {
   if (element.innerText === text) return;
   element.innerText = text;
+}
+
+const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
+  const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
+  const playerColorsDivs = document.querySelectorAll('.lobby .player-color > .colors > div') as NodeListOf<HTMLDivElement>;
+  const enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;  
+
+  const gameSettings = getGameSettings();
+
+  nicknameInput.value = gameSettings.nickname;
+
+  playerColorsDivs.forEach(div => {
+    div.classList.toggle('selected', div.classList.contains(gameSettings.color));
+    div.addEventListener('click', async () => {
+      playerColorsDivs.forEach(x => x.classList.remove('selected'));
+      div.classList.add('selected');
+      await changePlayerColor(player, div.classList[0] as PlayerColor);
+    });
+  });
+
+  enterButton.addEventListener('click', () => {
+    const nickname = nicknameInput.value;
+    if (!nickname || !(nicknameInput.value.length > 3)) return;
+    localStorage.setItem('color', player.color as PlayerColor);
+    localStorage.setItem('nickname', nickname);
+    (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
+    closeLobby(scene);
+  });
+
+  bindLobbyButtonUI(scene);
+};
+
+const bindLobbyButtonUI = (scene: BABYLON.Scene) => {
+  const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
+  settingsButtonDiv.addEventListener('click', () => openLobby(scene));
+  settingsButtonDiv.style.display = 'none';
+}
+
+const openLobby = (scene: BABYLON.Scene) => {
+  const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
+  const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
+  lobbyDiv.style.display = 'block';
+  settingsButtonDiv.style.display = 'none';
+  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;
+}
+
+const closeLobby = (scene: BABYLON.Scene) => {
+  const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
+  const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
+  lobbyDiv.style.display = 'none';
+  settingsButtonDiv.style.display = 'block';
+  (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
 }
