@@ -65,8 +65,10 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
   const player = await createPlayer(scene, {
-    // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),
-    startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7),
+    // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70), // stage 3
+    // startPosition: new BABYLON.Vector3(2.60, 23.00, -12.00), // stage 4
+    startPosition: new BABYLON.Vector3(1.60, 32.20, -12.94), // stage 4 top
+    // startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7), // top
     nickname: gameSettings.nickname,
     color: gameSettings.color
   });

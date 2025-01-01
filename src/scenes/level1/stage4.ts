@@ -1,6 +1,40 @@
 import * as BABYLON from '@babylonjs/core';
 import { createWall } from '../../entities/walls';
 import { PlayerEntity } from '../../entities/player';
+import { CameraOptions, MyCamera, setCameraOptions } from '../../camera';
+import { createTrigger } from '../../triggers/trigger';
+
+// front
+export const stage4Camera1: CameraOptions = {
+  position: new BABYLON.Vector3(8.45, 25.39, -12.14),
+  alpha: 0,
+  beta: 1.0646,
+  radius: 6
+};
+
+// left
+export const stage4Camera2: CameraOptions = {
+  position: new BABYLON.Vector3(-5.17, 30.62, -22.25),
+  alpha: 4.2592,
+  beta: 0.8755,
+  radius: 12
+};
+
+// right
+export const stage4Camera3: CameraOptions = {
+  position: new BABYLON.Vector3(-1.54, 34.70, -2.79),
+  alpha: 1.4415,
+  beta: 0.8745,
+  radius: 12
+};
+
+// final
+export const stage4Camera4: CameraOptions = {
+  position: new BABYLON.Vector3(12.37, 20.50, -8.56),
+  alpha: 1.6465,
+  beta: 1.1284,
+  radius: 6
+};
 
 export const createStage4 = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const walls = []
@@ -20,5 +54,62 @@ export const createStage4 = (scene: BABYLON.Scene, player: PlayerEntity) => {
     createWall(scene, 'box', { width: 0.8, depth: 0.5, height: 0.2 }, new BABYLON.Vector3(2.43, 29.70, -12.77), new BABYLON.Quaternion(0.00, -0.60, 0.00, 0.80)),
     createWall(scene, 'box', { width: 0.8, depth: 0.5, height: 0.2 }, new BABYLON.Vector3(1.34, 30.90, -14.23), new BABYLON.Quaternion(0.00, -0.24, 0.00, 0.97))
   )
+
+    // front camera trigger
+    createTrigger(scene, {
+      player,
+      position: new BABYLON.Vector3(3.50, 27.10, -10.46),
+      width: 3,
+      depth: 5,
+      height: 10,
+      onEnter: showFrontCamera,
+      onExit: onExitTriggerAction
+    });
+
+    // left camera trigger
+    createTrigger(scene, {
+      player,
+      position: new BABYLON.Vector3( -1.50, 25.50, -15.66),
+      isVisible: true,
+      width: 6,
+      depth: 3,
+      height: 6,
+      onEnter: showCameraLeft,
+      onExit: onExitTriggerAction
+    });
+
+    // right camera trigger
+    createTrigger(scene, {
+      player,
+      position: new BABYLON.Vector3(-1.77, 27.10, -10.45),      
+      width: 3,
+      depth: 3,
+      height: 9,
+      onEnter: showCameraRight,
+      onExit: onExitTriggerAction
+    });    
+    
   return walls;
+}  
+  
+const showFrontCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage4Camera1);
+}
+
+const showCameraLeft = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage4Camera2);
+}
+
+const showCameraRight = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage4Camera3);
+}
+
+const onExitTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+
 }
