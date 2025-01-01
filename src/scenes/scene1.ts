@@ -22,15 +22,17 @@ import { createStage4 } from './level1/stage4.ts';
 import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
 import { createSkybox } from './level1/skybox.ts';
+import { getRedTexture } from '../assets/textures.ts';
+import { createSlide } from './level1/slide.ts';
 
 const ENABLE_EDITOR = true || import.meta.env.DEV;
 const ENABLE_MULTIPLAYER = true || !import.meta.env.DEV;
 
 const cameraPosition: CameraOptions = {
-  position: new BABYLON.Vector3(13.29, 20.68, 26.17),
-  alpha: 7.3822,
-  beta: 1.3079,
-  radius: 48.54
+  position: new BABYLON.Vector3(0, 0, 0),
+  alpha: 1,
+  beta: 1,
+  radius: 6
 }
 
 export const createScene1 = async (engine: BABYLON.Engine) => {
@@ -63,7 +65,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
   const player = await createPlayer(scene, {
-    startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),
+    // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),.w,
+    startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7),
     nickname: gameSettings.nickname,
     color: gameSettings.color
   });
@@ -134,11 +137,12 @@ export const createWalls = (scene: BABYLON.Scene, player: PlayerEntity) => {
     ...createStage5(scene, player),
     ...createStage6(scene, player),
     ...createLongJumps(scene),
-    ...createBorder(scene)
+    ...createBorder(scene),
+    ...createSlide(scene, player),
   ];
 
   // last wall
-  // (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
+  (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
 
   return walls;
 };

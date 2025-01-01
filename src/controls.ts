@@ -106,31 +106,36 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
       player.speed * 0.5 :
       player.speed;
 
-    if (keyStatus.KeyW && !keyStatus.KeyS) {
-      player.physics.body.applyImpulse(
-        forward.scale(-speed),
-        player.mesh.getAbsolutePosition()
-      );
-    }
-    if (keyStatus.KeyS && !keyStatus.KeyW) {
-      player.physics.body.applyImpulse(
-        forward.scale(speed),
-        player.mesh.getAbsolutePosition()
-      );
-    }
-    if (keyStatus.KeyA && !keyStatus.KeyD) {
-      player.physics.body.applyImpulse(
-        right.scale(speed),
-        player.mesh.getAbsolutePosition()
-      );
-    }
-    if (keyStatus.KeyD && !keyStatus.KeyA) {
-      player.physics.body.applyImpulse(
-        right.scale(-speed),
-        player.mesh.getAbsolutePosition()
-      );
+    const { x, z } = player.physics.body.getLinearVelocity();
+    const hSpeed = new BABYLON.Vector3(x, 0, z).length();
+    if (hSpeed < 20) {
+      if (keyStatus.KeyW && !keyStatus.KeyS) {
+        player.physics.body.applyImpulse(
+          forward.scale(-speed),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+      if (keyStatus.KeyS && !keyStatus.KeyW) {
+        player.physics.body.applyImpulse(
+          forward.scale(speed),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+      if (keyStatus.KeyA && !keyStatus.KeyD) {
+        player.physics.body.applyImpulse(
+          right.scale(speed),
+          player.mesh.getAbsolutePosition()
+        );
+      }
+      if (keyStatus.KeyD && !keyStatus.KeyA) {
+        player.physics.body.applyImpulse(
+          right.scale(-speed),
+          player.mesh.getAbsolutePosition()
+        );
+      }
     }
   }
+
   if (player.physics.body.getLinearVelocity().length() === 0) {
     player.moving = false;
   }
@@ -157,7 +162,7 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
     player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, -rotationSpeed, 0));
     if (keyStatus.KeyA && player.jumping) {
       player.physics.body.applyImpulse(
-        forward.scale(-0.05),
+        forward.scale(-0.7),
         player.mesh.getAbsolutePosition()
       );
     }
@@ -165,7 +170,7 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
     player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, rotationSpeed, 0));
     if (keyStatus.KeyD && player.jumping) {
       player.physics.body.applyImpulse(
-        forward.scale(-0.05),
+        forward.scale(-0.7),
         player.mesh.getAbsolutePosition()
       );
     }
