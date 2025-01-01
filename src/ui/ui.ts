@@ -274,24 +274,30 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   });
 
   bindLobbyButtonUI(scene, player);
+
+  // close lobby if player not a new player
+  if(!gameSettings.newlyCreated) {
+    confirmLobby(scene, player);
+  }
 };
 
 const bindLobbyButtonUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   settingsButtonDiv.addEventListener('click', () => {
-    openLobby(scene);
+    openLobby(scene, player);
     player.status = 'in_lobby';
   });
   settingsButtonDiv.style.display = 'none';
 }
 
-const openLobby = (scene: BABYLON.Scene) => {
+export const openLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'block';
   settingsButtonDiv.style.display = 'none';
   (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;
   scene.sounds?.find(x => x.name === 'open-lobby')?.play();
+  player.status = 'in_lobby';
 }
 
 const closeLobby = (scene: BABYLON.Scene) => {

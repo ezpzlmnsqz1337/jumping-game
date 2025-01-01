@@ -98,6 +98,10 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
     if (mesh.name === 'player-body') cg.addShadowCaster(mesh);
   });
 
+  scene.onBeforeRenderObservable.add(() => {
+    camera.moveToTarget();
+  });
+
   // fog
   // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
   // scene.fogStart = 20;

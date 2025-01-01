@@ -46,7 +46,7 @@ export const stage3Camera5: CameraOptions = {
 
 // final part camera
 export const stage3Camera6: CameraOptions = {
-  position: new BABYLON.Vector3( 19.86, 28.25, -9.14),
+  position: new BABYLON.Vector3(19.86, 28.25, -9.14),
   alpha: 6.8884,
   beta: 0.8010,
   radius: 9.41
@@ -149,7 +149,7 @@ export const createStage3 = (scene: BABYLON.Scene, player: PlayerEntity) => {
   // left wall camera trigger up
   createTrigger(scene, {
     player,
-    position: new BABYLON.Vector3( 13.84, 21.40, -8.79),
+    position: new BABYLON.Vector3(13.84, 21.40, -8.79),
     width: 2,
     depth: 3,
     height: 2,
@@ -172,47 +172,40 @@ export const createStage3 = (scene: BABYLON.Scene, player: PlayerEntity) => {
 }
 
 const showBackWallCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera1);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera1);
 }
+
 const showLeftWallCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera2);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera2);
 }
+
 const showLeftWallCameraUp = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera5);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera5);
 }
+
 const showRightWallCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera3);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera3);
 }
+
 const showFrontWallCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera4);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera4);
 }
 
 const showFinalPartCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  setTimeout(() => {
-    const camera = player.mesh.getScene().activeCamera as MyCamera;
-    if (!camera) return
-    setCameraOptions(camera, stage3Camera6);
-  }, 300);
+  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  if (!camera) return
+  setCameraOptions(camera, stage3Camera6);
+
 }
 
 const onExitTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {

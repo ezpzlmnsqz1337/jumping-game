@@ -135,7 +135,7 @@ const createMpPlayer = async (scene: BABYLON.Scene, nickname: string, color?: st
   playerModel.meshes.forEach(mesh => {
     if (mesh.parent === null) {
       mesh.setParent(box);
-      mesh.position = new BABYLON.Vector3(0, 0.05, 0);
+      mesh.position = new BABYLON.Vector3(0, 0.0001, 0);
     }
   });
 

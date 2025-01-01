@@ -3,7 +3,66 @@ import * as BABYLON from '@babylonjs/core';
 type CameraProperty = 'alpha' | 'beta' | 'radius' | 'position.x' | 'position.y' | 'position.z';
 
 export class MyCamera extends BABYLON.ArcRotateCamera {
-  moveTo(property: CameraProperty, targetval: number, speed: number) {
+  movingToTarget: boolean = false;
+  targetAlpha: number = 0;
+  targetBeta: number = 0;
+  targetRadius: number = 0;
+  goLeft: boolean = false;
+
+  setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+    this.targetAlpha = targetAlpha % (Math.PI * 2);
+    this.targetBeta = targetBeta;
+    this.targetRadius = targetRadius;
+    const diff = this.targetAlpha - this.alpha;
+    this.goLeft = diff > 0 ? diff > Math.PI : diff > -Math.PI;
+    this.movingToTarget = true;
+  }
+
+  moveToTarget() {
+    if (!this.movingToTarget) return;
+    if (this.alpha < 0) this.alpha = Math.PI * 2 + this.alpha;
+    if (this.alpha > Math.PI * 2) this.alpha = this.alpha % (Math.PI * 2);
+
+    const factor = 0.01;
+
+    if (this.targetAlpha !== this.alpha) {
+      if (this.goLeft) {
+        this.alpha -= factor;
+      } else {
+        this.alpha += factor;
+      }
+
+      if (Math.abs(this.targetAlpha - this.alpha) < factor) {
+        this.alpha = this.targetAlpha;
+      }
+    }
+
+    if (this.targetBeta > this.beta + factor) {
+      this.beta += factor;
+    } else if (this.targetBeta < this.beta - factor) {
+      this.beta -= factor;
+    } else {
+      this.beta = this.targetBeta;
+    }
+
+    if (this.targetRadius > this.radius + factor * 10) {
+      this.radius += factor * 10;
+    } else if (this.targetRadius < this.radius - factor * 10) {
+      this.radius -= factor * 10;
+    } else {
+      this.radius = this.targetRadius;
+    }
+
+    if (
+      this.targetAlpha === this.alpha &&
+      this.targetBeta === this.beta &&
+      this.targetRadius === this.radius
+    ) {
+      this.movingToTarget = false;
+    }
+  }
+
+  moveToOld(property: CameraProperty, targetval: number, speed: number) {
     // not working :(
     const targetPropertyPath = property.split(".");
     let value: any = this;
@@ -77,7 +136,7 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
   camera.lowerRadiusLimit = 2;
   camera.upperRadiusLimit = 100;
 
-  camera.upperBetaLimit = Math.PI/2;
+  camera.upperBetaLimit = Math.PI / 2;
 
   camera.attachControl(true);
 
@@ -85,6 +144,12 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
 }
 
 export const setCameraOptions = (camera: MyCamera, cameraOptions: CameraOptions) => {
+  camera.setMoveToTarget(
+    cameraOptions.alpha,
+    cameraOptions.beta,
+    cameraOptions.radius,
+    50
+  )
   // camera.moveTo('alpha', cameraOptions.alpha, 0.1);
   // camera.moveTo('beta', cameraOptions.beta, 0.1);
   // camera.moveTo('radius', cameraOptions.radius, 0.1);
@@ -92,10 +157,10 @@ export const setCameraOptions = (camera: MyCamera, cameraOptions: CameraOptions)
   // camera.moveTo('position.y', cameraOptions.position.y, 0.1);
   // camera.moveTo('position.z', cameraOptions.position.z, 0.1);  
 
-  camera.alpha = cameraOptions.alpha;
-  camera.beta = cameraOptions.beta;
-  camera.radius = cameraOptions.radius;
-  camera.position.x = cameraOptions.position.x;
-  camera.position.y = cameraOptions.position.y;
-  camera.position.z = cameraOptions.position.z; 
+  // camera.alpha = cameraOptions.alpha;
+  // camera.beta = cameraOptions.beta;
+  // camera.radius = cameraOptions.radius;
+  // camera.position.x = cameraOptions.position.x;
+  // camera.position.y = cameraOptions.position.y;
+  // camera.position.z = cameraOptions.position.z;
 }

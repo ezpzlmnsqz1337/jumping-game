@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { Checkpoint, PlayerEntity } from './entities/player';
 import { getRandomSpawnPoint } from './entities/spawn-point';
 import { toggleCollissions } from './multiplayer';
-import { confirmLobby } from './ui/ui';
+import { confirmLobby, openLobby } from './ui/ui';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -73,6 +73,9 @@ export const createControls = (scene: BABYLON.Scene) => {
 
   window.addEventListener('keypress', e => {
     const player = controls.player as PlayerEntity;
+    if (e.code === 'KeyL') {
+      openLobby(scene, player);
+    }
     if (e.code === 'Enter') {
       confirmLobby(scene, player);
     }
