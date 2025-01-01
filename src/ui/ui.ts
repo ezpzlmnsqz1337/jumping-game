@@ -255,6 +255,9 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
   const playerColorsDivs = document.querySelectorAll('.lobby .player-color > .colors > div') as NodeListOf<HTMLDivElement>;
   const enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;
+  
+  const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
+  lobbyDiv.style.display = 'block';
 
   const gameSettings = getGameSettings();
 
@@ -281,31 +284,43 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   }
 };
 
+let lastCameraRadius = 0;
 const bindLobbyButtonUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   settingsButtonDiv.addEventListener('click', () => {
     openLobby(scene, player);
-    player.status = 'in_lobby';
   });
   settingsButtonDiv.style.display = 'none';
 }
 
 export const openLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
+  if (isLobbyOpen()) return;
+  console.log('openLobby');
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'block';
   settingsButtonDiv.style.display = 'none';
-  (scene.activeCamera as MyCamera).useAutoRotationBehavior = true;
+  const camera = scene.activeCamera as MyCamera;
+  camera.useAutoRotationBehavior = true;
+  lastCameraRadius = camera.radius;
+  camera.setMoveToTarget(camera.alpha+0.01, camera.beta+0.01, 3, 50);
   scene.sounds?.find(x => x.name === 'open-lobby')?.play();
   player.status = 'in_lobby';
+
 }
 
 const closeLobby = (scene: BABYLON.Scene) => {
+  if (!isLobbyOpen()) return;
+  console.log('closeLobby');
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'none';
-  settingsButtonDiv.style.display = 'block';
-  (scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
+  settingsButtonDiv.style.display = 'block';  
+  const camera = scene.activeCamera as MyCamera;
+  camera.useAutoRotationBehavior = false;
+  console.log('setting last camera radius3', lastCameraRadius, camera.radius);
+  const radius = lastCameraRadius > 0 ? lastCameraRadius : 6;
+  camera.setMoveToTarget(camera.alpha+0.01, camera.beta+0.01, radius, 50);
   scene.sounds?.find(x => x.name === 'close-lobby')?.play();
   (document.querySelector('#render-canvas') as HTMLCanvasElement).focus();
 }
@@ -321,6 +336,7 @@ const updatePlayerNickname = (player: PlayerEntity, nickname: string) => {
 }
 
 export const confirmLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
+  if (!isLobbyOpen()) return;
   const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
 
   const nickname = nicknameInput.value.substring(0, 15);

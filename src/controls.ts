@@ -3,6 +3,7 @@ import { Checkpoint, PlayerEntity } from './entities/player';
 import { getRandomSpawnPoint } from './entities/spawn-point';
 import { toggleCollissions } from './multiplayer';
 import { confirmLobby, openLobby } from './ui/ui';
+import { MyCamera } from './camera';
 
 export interface KeyStatus {
   KeyW: boolean,
