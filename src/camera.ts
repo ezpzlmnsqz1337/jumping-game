@@ -2,6 +2,38 @@ import * as BABYLON from '@babylonjs/core';
 
 type CameraProperty = 'alpha' | 'beta' | 'radius' | 'position.x' | 'position.y' | 'position.z';
 
+export class MyFollowCamera extends BABYLON.FollowCamera {
+  automaticCameraEnabled: boolean = true;
+
+  setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+    this.rotationOffset = (targetAlpha / Math.PI * 180) - 180;
+    this.heightOffset = targetBeta * Math.PI / 10 + 1;
+    return;
+  }
+
+  moveToTarget() {
+    return;
+  }
+}
+
+export const createFollowCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions) => {
+  const camera = new MyFollowCamera('followCamera', cameraOptions.position, scene);
+  camera.radius = cameraOptions.radius;
+  camera.heightOffset = 2;
+  camera.rotationOffset = 0;
+  camera.cameraAcceleration = 0.1;
+  camera.maxCameraSpeed = 5;
+  
+  camera.upperHeightOffsetLimit = 5;
+  camera.lowerHeightOffsetLimit = 0.5;
+  camera.speed = 0.1;  
+  camera.lowerRadiusLimit = 2;
+  camera.upperRadiusLimit = 50;
+
+  camera.attachControl(true);
+  return camera;
+}
+
 export class MyCamera extends BABYLON.ArcRotateCamera {
   movingToTarget: boolean = false;
   targetAlpha: number = 0;
@@ -9,7 +41,10 @@ export class MyCamera extends BABYLON.ArcRotateCamera {
   targetRadius: number = 0;
   goLeft: boolean = false;
 
+  automaticCameraEnabled: boolean = true;
+
   setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+    if (!this.automaticCameraEnabled) return;
     this.targetAlpha = targetAlpha % (Math.PI * 2);
     this.targetBeta = targetBeta;
     this.targetRadius = targetRadius;
@@ -19,11 +54,15 @@ export class MyCamera extends BABYLON.ArcRotateCamera {
   }
 
   moveToTarget() {
+    if (!this.automaticCameraEnabled) {
+      this.movingToTarget = false;
+      return;
+    }
     if (!this.movingToTarget) return;
     if (this.alpha < 0) this.alpha = Math.PI * 2 + this.alpha;
     if (this.alpha > Math.PI * 2) this.alpha = this.alpha % (Math.PI * 2);
 
-    const factor = 0.01;
+    const factor = 0.01 * this._scene.getAnimationRatio();
 
     if (this.targetAlpha !== this.alpha) {
       if (this.goLeft) {
@@ -62,54 +101,54 @@ export class MyCamera extends BABYLON.ArcRotateCamera {
     }
   }
 
-  moveToOld(property: CameraProperty, targetval: number, speed: number) {
-    // not working :(
-    const targetPropertyPath = property.split(".");
-    let value: any = this;
+  // moveToOld(property: CameraProperty, targetval: number, speed: number) {
+  //   // not working :(
+  //   const targetPropertyPath = property.split(".");
+  //   let value: any = this;
 
-    // Resolve the property path
-    for (let index = 0; index < targetPropertyPath.length; index++) {
-      if (value[targetPropertyPath[index]] === undefined) {
-        console.error(`Property ${targetPropertyPath[index]} not found on camera`);
-        return;
-      }
-      value = value[targetPropertyPath[index]];
-    }
-    console.log(`Animating property: ${property} from ${value} to ${targetval}`);
+  //   // Resolve the property path
+  //   for (let index = 0; index < targetPropertyPath.length; index++) {
+  //     if (value[targetPropertyPath[index]] === undefined) {
+  //       console.error(`Property ${targetPropertyPath[index]} not found on camera`);
+  //       return;
+  //     }
+  //     value = value[targetPropertyPath[index]];
+  //   }
+  //   console.log(`Animating property: ${property} from ${value} to ${targetval}`);
 
-    const ease = new BABYLON.CubicEase();
-    ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+  //   const ease = new BABYLON.CubicEase();
+  //   ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
 
-    const animation = new BABYLON.Animation(
-      'cameraAnimation', // name
-      property, // targetProperty
-      speed, // frame per second
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT, // animation type
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT // loop mode
-    );
+  //   const animation = new BABYLON.Animation(
+  //     'cameraAnimation', // name
+  //     property, // targetProperty
+  //     speed, // frame per second
+  //     BABYLON.Animation.ANIMATIONTYPE_FLOAT, // animation type
+  //     BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT // loop mode
+  //   );
 
-    const keys = [
-      { frame: 0, value: value },
-      { frame: 120, value: targetval }
-    ];
+  //   const keys = [
+  //     { frame: 0, value: value },
+  //     { frame: 120, value: targetval }
+  //   ];
 
-    animation.setKeys(keys);
-    animation.setEasingFunction(ease);
+  //   animation.setKeys(keys);
+  //   animation.setEasingFunction(ease);
 
-    this.animations = [];
-    this.animations.push(animation);
+  //   this.animations = [];
+  //   this.animations.push(animation);
 
-    const scene = this.getScene();
-    if (scene) {
-      if (scene) {
-        scene.stopAnimation(this); // Ensure any previous animations are stopped
-        scene.beginDirectAnimation(this, [animation], 0, 120, false);
-        console.log('Animation started');
-      } else {
-        console.error('Scene not found');
-      }
-    }
-  }
+  //   const scene = this.getScene();
+  //   if (scene) {
+  //     if (scene) {
+  //       scene.stopAnimation(this); // Ensure any previous animations are stopped
+  //       scene.beginDirectAnimation(this, [animation], 0, 120, false);
+  //       console.log('Animation started');
+  //     } else {
+  //       console.error('Scene not found');
+  //     }
+  //   }
+  // }
 }
 
 export interface CameraOptions {
@@ -143,7 +182,7 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
   return camera;
 }
 
-export const setCameraOptions = (camera: MyCamera, cameraOptions: CameraOptions) => {
+export const setCameraOptions = (camera: MyCamera | MyFollowCamera, cameraOptions: CameraOptions) => {
   camera.setMoveToTarget(
     cameraOptions.alpha,
     cameraOptions.beta,

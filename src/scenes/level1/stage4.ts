@@ -70,7 +70,6 @@ export const createStage4 = (scene: BABYLON.Scene, player: PlayerEntity) => {
     createTrigger(scene, {
       player,
       position: new BABYLON.Vector3( -1.50, 25.50, -15.66),
-      isVisible: true,
       width: 6,
       depth: 3,
       height: 6,

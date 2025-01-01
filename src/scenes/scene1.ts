@@ -1,12 +1,14 @@
 import * as BABYLON from '@babylonjs/core';
 import { createSounds } from '../assets/sounds.ts';
-import { CameraOptions, createCamera, MyCamera } from '../camera.ts';
+import { getRedTexture } from '../assets/textures.ts';
+import { CameraOptions, createCamera, createFollowCamera } from '../camera.ts';
 import { createControls } from '../controls.ts';
 import { createGround } from '../entities/ground.ts';
 import { createPlayer, PlayerEntity } from '../entities/player.ts';
 import { createSpawnPoint, getRandomSpawnPoint } from '../entities/spawn-point.ts';
 import { createTimer } from '../entities/timer.ts';
 import { createMultiplayer } from '../multiplayer.ts';
+import { createOptimizations, createPerformanceMonitor } from '../performance.ts';
 import { createPhysics } from '../physics.ts';
 import { createShadowGenerator } from '../shadows.ts';
 import { getGameSettings } from '../storage.ts';
@@ -15,18 +17,17 @@ import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
 import { createBorder } from './level1/border.ts';
 import { createLongJumps } from './level1/longjumps.ts';
+import { createSkybox } from './level1/skybox.ts';
+import { createSlide } from './level1/slide.ts';
 import { createStage1 } from './level1/stage1.ts';
 import { createStage2 } from './level1/stage2.ts';
 import { createStage3 } from './level1/stage3.ts';
 import { createStage4 } from './level1/stage4.ts';
 import { createStage5 } from './level1/stage5.ts';
 import { createStage6 } from './level1/stage6.ts';
-import { createSkybox } from './level1/skybox.ts';
-import { getRedTexture } from '../assets/textures.ts';
-import { createSlide } from './level1/slide.ts';
 
-const ENABLE_EDITOR = true || import.meta.env.DEV;
-const ENABLE_MULTIPLAYER = true || !import.meta.env.DEV;
+const ENABLE_EDITOR = false || import.meta.env.DEV;
+const ENABLE_MULTIPLAYER = false || !import.meta.env.DEV;
 
 const cameraPosition: CameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
@@ -46,6 +47,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   scene.sounds = createSounds(scene)
 
   const camera = createCamera(scene, cameraPosition); // stage1Camera1);
+  const followCamera = createFollowCamera(scene, cameraPosition);
+
   const gameSettings = getGameSettings();
   console.log(gameSettings);
 
@@ -65,10 +68,12 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
   const player = await createPlayer(scene, {
+    // startPosition, // default
     // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70), // stage 3
     // startPosition: new BABYLON.Vector3(2.60, 23.00, -12.00), // stage 4
-    startPosition: new BABYLON.Vector3(1.60, 32.20, -12.94), // stage 4 top
-    // startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7), // top
+    // startPosition: new BABYLON.Vector3(1.60, 32.20, -12.94), // stage 4 top
+    startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7), // top
+    // startPosition: new BABYLON.Vector3(-40.59, 0.20, 6.00), // top
     nickname: gameSettings.nickname,
     color: gameSettings.color
   });
@@ -80,9 +85,12 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   createStartTrigger(scene, { player, timer, position: new BABYLON.Vector3(-8, 0, -2), scaling: new BABYLON.Vector3(5, 0.1, 7) });
   createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-10.00, 42.00, 8.00), scaling: new BABYLON.Vector3(5, 0.1, 5) });
   // testing end trigger
-  createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+  // createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
   camera.lockedTarget = player.mesh;
+  followCamera.lockedTarget = player.mesh;
+  
+  scene.activeCamera = camera;
 
   const hemiLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
@@ -104,6 +112,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   });
 
   scene.onBeforeRenderObservable.add(() => {
+    if(scene.activeCamera?.name === 'followCamera') return;
     camera.moveToTarget();
   });
 
@@ -146,6 +155,10 @@ export const createWalls = (scene: BABYLON.Scene, player: PlayerEntity) => {
   // last wall
   (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
   // (scene.activeCamera as MyCamera).lockedTarget = walls[walls.length - 1].position;
+
+  const optimizations = createOptimizations(scene);
+
+  const perfMonitor = createPerformanceMonitor(scene);
 
   return walls;
 };

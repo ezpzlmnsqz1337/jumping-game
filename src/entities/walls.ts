@@ -34,7 +34,7 @@ export const createWall = (scene: BABYLON.Scene, type: WallType, opts: any, posi
   wall.position = position;
   if (rotation) wall.rotationQuaternion = rotation;
 
-  const wallAggregate = new BABYLON.PhysicsAggregate(wall, physicsShapeType, { mass: 0, friction: opts.friction || 1 }, scene);
+  const wallAggregate = new BABYLON.PhysicsAggregate(wall, physicsShapeType, { mass: 0, friction: opts.friction || 0.4 }, scene);
   wallAggregate.shape.filterMembershipMask = FILTER_GROUP_WALL;
 
   return wall;

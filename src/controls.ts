@@ -2,8 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { Checkpoint, PlayerEntity } from './entities/player';
 import { getRandomSpawnPoint } from './entities/spawn-point';
 import { toggleCollissions } from './multiplayer';
-import { confirmLobby, openLobby } from './ui/ui';
-import { MyCamera } from './camera';
+import { confirmLobby, isLobbyOpen, openLobby, toggleFollowCamera } from './ui/ui';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -67,18 +66,22 @@ export const createControls = (scene: BABYLON.Scene) => {
   scene.onBeforeRenderObservable.add(() => {
     const player = controls.player;
     if (!player || player.status === 'in_lobby') return;
-    handleWSADMovement(keyStatus, player);
-    handleTurning(keyStatus, player);
+    const deltaTime = scene.getAnimationRatio();
+    handleWSADMovement(keyStatus, player, deltaTime);
+    handleTurning(keyStatus, player, deltaTime);
     handleJumping(keyStatus, player);
   });
 
   window.addEventListener('keypress', e => {
-    const player = controls.player as PlayerEntity;
+    const player = controls.player as PlayerEntity;    
+    if (e.code === 'Enter') {
+      confirmLobby(scene, player);
+    }
     if (e.code === 'KeyL') {
       openLobby(scene, player);
     }
-    if (e.code === 'Enter') {
-      confirmLobby(scene, player);
+    if (e.code === 'KeyF') {
+      if(!isLobbyOpen()) toggleFollowCamera(scene);
     }
     if (player && player.status !== 'in_lobby') {
       handleRespawn(e.code, player);
@@ -90,7 +93,7 @@ export const createControls = (scene: BABYLON.Scene) => {
   return controls;
 }
 
-const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
+const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity, deltaTime: number) => {
   if (
     keyStatus.KeyW ||
     keyStatus.KeyS ||
@@ -103,8 +106,8 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
     const speed = (keyStatus.KeyS || keyStatus.KeyW) &&
       (keyStatus.KeyA || keyStatus.KeyD) ||
       player.jumping ?
-      player.speed * 0.5 :
-      player.speed;
+      player.speed * 0.5 * deltaTime:
+      player.speed * deltaTime;
 
     const { x, z } = player.physics.body.getLinearVelocity();
     const hSpeed = new BABYLON.Vector3(x, 0, z).length();
@@ -142,7 +145,7 @@ const handleWSADMovement = (keyStatus: KeyStatus, player: PlayerEntity) => {
 }
 
 const handleJumping = (keyStatus: KeyStatus, player: PlayerEntity) => {
-  const jumpingPower = player.jumpingPower || 70;
+  const jumpingPower = player.jumpingPower;
 
   if (keyStatus.Space && !player.jumping) {
     player.jumping = true;
@@ -151,18 +154,20 @@ const handleJumping = (keyStatus: KeyStatus, player: PlayerEntity) => {
       BABYLON.Vector3.Up().scale(jumpingPower),
       player.mesh.getAbsolutePosition()
     );
+    player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
   }
 }
 
-const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
-  const rotationSpeed = player.rotationSpeed || 4;
+const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity, deltaTime: number) => {
+  const rotationSpeed = player.rotationSpeed;
   const forward = player.mesh.getDirection(BABYLON.Axis.Z);
+  const strafeBoostSpeed = player.strafeBoostSpeed * (deltaTime < 1 ? deltaTime * 1.2 : deltaTime);
 
   if (keyStatus.Comma && !keyStatus.Period) {
     player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, -rotationSpeed, 0));
     if (keyStatus.KeyA && player.jumping) {
       player.physics.body.applyImpulse(
-        forward.scale(-0.7),
+        forward.scale(-strafeBoostSpeed),
         player.mesh.getAbsolutePosition()
       );
     }
@@ -170,7 +175,7 @@ const handleTurning = (keyStatus: KeyStatus, player: PlayerEntity) => {
     player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, rotationSpeed, 0));
     if (keyStatus.KeyD && player.jumping) {
       player.physics.body.applyImpulse(
-        forward.scale(-0.7),
+        forward.scale(-strafeBoostSpeed),
         player.mesh.getAbsolutePosition()
       );
     }
@@ -190,7 +195,7 @@ const handleCheckpoints = (key: string, player: PlayerEntity) => {
     }
   }
   if ('Digit2' === key) {
-    if (player.checkpoints.length > 0) {  
+    if (player.checkpoints.length > 0) {
       loadCheckpoint(player, player.checkpoints[player.lastCheckpointIndex]);
     }
   }
@@ -233,5 +238,7 @@ const loadCheckpoint = (player: PlayerEntity, checkpoint: Checkpoint) => {
 }
 
 const handleCollissions = (key: string, player: PlayerEntity) => {
-  if ('KeyC' === key) toggleCollissions(player);
+  if ('KeyC' === key) {
+    toggleCollissions(player);
+  }
 }

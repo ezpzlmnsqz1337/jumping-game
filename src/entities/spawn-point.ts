@@ -9,7 +9,7 @@ export const createSpawnPoint = (scene: BABYLON.Scene, position: BABYLON.Vector3
   const box = BABYLON.MeshBuilder.CreateBox('spawnPoint', {
     width: 0.4,
     height: 0.1,
-    depth: 0.4,
+    depth: 0.4,    
   }, scene);
 
   box.visibility = 0;

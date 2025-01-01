@@ -15,6 +15,7 @@ export interface PlayerEntity {
   moving: boolean
   speed: number
   rotationSpeed: number
+  strafeBoostSpeed: number
   jumpingPower: number
   jumping: boolean
   mesh: BABYLON.Mesh
@@ -49,13 +50,14 @@ export const createPlayer = async (scene: BABYLON.Scene, opts: CreatePlayerOptio
   const boxAggregate = new BABYLON.PhysicsAggregate(
     box,
     BABYLON.PhysicsShapeType.BOX,
-    { mass: 10, restitution: 0, friction: 0.7 },
+    { mass: 10, restitution: 0, friction: 0.5 },
     scene
   );
 
   const player: PlayerEntity = {
-    speed: 1.3,
+    speed: 2.3,
     rotationSpeed: 4,
+    strafeBoostSpeed: 1.4,
     jumpingPower: 60,
     jumping: false,
     moving: false,

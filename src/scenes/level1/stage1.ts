@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { createWall } from '../../entities/walls';
 import { createTrigger } from '../../triggers/trigger';
 import { PlayerEntity } from '../../entities/player';
-import { CameraOptions, MyCamera, setCameraOptions } from '../../camera';
+import { CameraOptions, MyCamera, MyFollowCamera, setCameraOptions } from '../../camera';
 
 export const stage1Camera1: CameraOptions = {
   position: new BABYLON.Vector3(-17.85, 3.04, -4.01),
@@ -40,7 +40,7 @@ export const createStage1 = (scene: BABYLON.Scene, player: PlayerEntity) => {
 }
 
 const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  const camera = player.mesh.getScene().activeCamera as MyCamera;
+  const camera = player.mesh.getScene().activeCamera as MyCamera | MyFollowCamera;
   if (!camera) return
   setCameraOptions(camera, stage1Camera1);
 }

@@ -20,7 +20,7 @@
       </div>
     </div>
   </div>
-  <div class="editor">
+  <div class="editor" style="display: none">
     <div class="edit-mode">
       <div class="heading">
         <div>Editor</div>
@@ -81,6 +81,20 @@
       </div>
     </div>
   </div>
+  <div class="game-settings">
+    <div class="automatic-camera" >
+      <label for="automatic-camera-enabled">Auto camera</label>
+      <input type="checkbox" class="automatic-camera-enabled"></input>
+    </div>
+    <div class="followCamera">
+      <label for="follow-camera-enabled">Follow camera</label>
+      <input type="checkbox" class="follow-camera-enabled"></input>
+    </div>
+    <div class="collissions">
+      <label for="collissions-enabled">Collissions</label>
+      <input type="checkbox" class="collissions-enabled"></input>
+    </div>
+  </div>
   <div class="player-info">
     <div class="horizontal-speed">
       <span class="label">Horizontal</span>
@@ -102,9 +116,31 @@
   <div class="ui-buttons">
     <div class="settings">🛠</div>
   </div>
-  <div class="lobby-wrapper">
+  <div class="lobby-wrapper" style="display: none">
     <div class="lobby">
       <div class="heading">Lobby</div>
+      <div class="controls">
+        <div class="heading">Controls</div>
+        <div class="keyboard-controls">
+          <div class="legend">
+            <div class="movement"><span class="icon"></span>W, S, A, D - movement</div>
+            <div class="jumping"><span class="icon"></span>Space - jump</div>
+            <div class="turning"><span class="icon"></span>&gt;, &lt; - turn right, turn left</div>
+            <div class="arrow-keys"><span class="icon"></span>Arrow keys - camera position</div>
+            <div class="checkpoints"><span class="icon"></span>1 - create checkpoint</div>
+            <div class="checkpoints"><span class="icon"></span>2 - load last checkpoint</div>
+            <div class="checkpoints"><span class="icon"></span>3 - load previous checkpoint</div>
+            <div class="checkpoints"><span class="icon"></span>4 - load next checkpoint</div>
+          </div>
+          <img class="keyboard" src="assets/images/keyboard-controls.png" alt="Keyboard controls" />
+          <div class="legend">
+            <div class="reset"><span class="icon"></span>R - respawn</div>
+            <div class="collissions"><span class="icon"></span>C - enable/disable collissions</div>
+            <div class="follow-camera"><span class="icon"></span>F - toggle follow camera</div>
+            <div class="open-lobby"><span class="icon"></span>L - open lobby</div>
+          </div>
+        </div>
+      </div>
       <div class="nickname">
         <div class="heading">Nickname</div>
         <input type="text" class="nickname-input" maxlength="15" />
@@ -123,6 +159,11 @@
       </div>
       <button class="enter">Enter</button>
     </div>
+  </div>
+  <div class="performance">
+    <div class="fps">
+      <div class="heading">FPS</div>
+      <div class="value">0</div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

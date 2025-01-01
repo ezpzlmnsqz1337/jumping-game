@@ -1,9 +1,12 @@
 import * as BABYLON from '@babylonjs/core';
 import { changePlayerColor, createNameTag, PlayerEntity, PlayerStatus, removeNameTag } from '../entities/player';
 import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
-import { MyCamera } from '../camera';
+import { MyCamera, MyFollowCamera } from '../camera';
 import { getGameSettings } from '../storage';
 import { PlayerColor } from '../assets/colors';
+import { toggleCollissions } from '../multiplayer';
+
+export const renderingCanvas = document.querySelector('#render-canvas') as HTMLCanvasElement;
 
 export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) => {
   const uiTimerDiv = document.querySelector('.timer > div > .value') as HTMLDivElement;
@@ -27,6 +30,7 @@ export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?
 
   bindLobbyUI(scene, player);
   bindEditorUI(scene, gizmoManager);
+  bindGameSettingsUI(scene, player);
 };
 
 const updateHorizontalSpeed = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
@@ -66,8 +70,10 @@ const updateCheckpoints = (htmlEl: HTMLDivElement, noOfCheckpoints: number) => {
   htmlEl.innerText = `${value} checkpoint${noOfCheckpoints === 1 ? '' : 's'}`;
 }
 
+let noOfTimes = 0;
 export const updateTimes = (times: TimeEntry[]) => {
-  if (times.length === 0) return;
+  if (times.length === 0 || noOfTimes === times.length) return;
+  noOfTimes = times.length;
   const timesListDiv = document.querySelector('.times-list');
   if (!timesListDiv) return;
   timesListDiv.innerHTML = ''
@@ -322,10 +328,10 @@ const closeLobby = (scene: BABYLON.Scene) => {
   const radius = lastCameraRadius > 0 ? lastCameraRadius : 6;
   camera.setMoveToTarget(camera.alpha+0.01, camera.beta+0.01, radius, 50);
   scene.sounds?.find(x => x.name === 'close-lobby')?.play();
-  (document.querySelector('#render-canvas') as HTMLCanvasElement).focus();
+  renderingCanvas.focus();
 }
 
-const isLobbyOpen = () => {
+export const isLobbyOpen = () => {
   return (document.querySelector('.lobby-wrapper') as HTMLDivElement).style.display === 'block';
 }
 
@@ -347,4 +353,41 @@ export const confirmLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
   player.status = 'playing';
   updatePlayerNickname(player, nickname);
   closeLobby(scene);
+}
+
+let followCameraEnabled = false;
+const bindGameSettingsUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
+  const camera = scene.activeCamera as MyCamera | MyFollowCamera;
+  const automaticCameraCheckBox = document.querySelector('.automatic-camera-enabled') as HTMLInputElement;
+
+  automaticCameraCheckBox.setAttribute('checked', 'true');
+
+  automaticCameraCheckBox.addEventListener('click', () => {
+    (scene.cameras as MyCamera[] | MyFollowCamera[]).forEach(camera => {
+      camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
+    });
+    renderingCanvas.focus();
+  });
+
+  const followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
+
+  followCameraCheckBox.addEventListener('click', () => {
+    toggleFollowCamera(scene); 
+  });
+
+  const collissions = document.querySelector('.collissions-enabled') as HTMLInputElement;
+  collissions.setAttribute('checked', player.collissionEnabled ? 'true' : 'false');
+
+  collissions.addEventListener('click', () => {
+    toggleCollissions(player);
+  });
+}
+
+export const toggleFollowCamera = (scene: BABYLON.Scene) => {
+  const followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
+
+  scene.activeCamera = followCameraEnabled ? scene.getCameraByName('mainArcRotateCamera') : scene.getCameraByName('followCamera');
+  followCameraEnabled = !followCameraEnabled;
+  followCameraCheckBox.checked = followCameraEnabled;
+  renderingCanvas.focus();
 }

@@ -16,12 +16,15 @@ html, body {
   --purple: color(srgb-linear 0.34 0.01 1.00);
   --pink: color(srgb-linear 1.00 0.04 0.15);
   --orange: color(srgb-linear 1.00 0.25 0.03);
+  --light-blue: #00eaf2;
+  --magenta: #f234f7;
 }
 
 #render-canvas {
   width: 100%;
   height: 100%;
   touch-action: none;
+  outline: none;
 }
 
 .player-info {
@@ -193,10 +196,6 @@ html, body {
   color: #1d96ff;
 }
 
-.lobby > .heading {
-  margin-bottom: 5rem;
-}
-
 .lobby > .nickname {
   display: flex;
   flex-direction: column;
@@ -300,4 +299,63 @@ html, body {
 .ui-buttons > .settings:hover {
   color: #1d96ff;
   cursor: pointer;
+}
+
+.performance {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  color: #ffffff;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.game-settings {
+  position: fixed;
+  top: 0;
+  right: 0;
+  color: #ffffff;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-settings > div {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.controls {
+  margin-top: 1rem;
+}
+
+.controls > .heading {
+  text-align: center;
+}
+
+.keyboard-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.keyboard-controls > .keyboard {
+  width: 40%;
+}
+
+.keyboard-controls > .legend {
+  font-size: 1.1rem;
+  
+}
+
+.keyboard-controls > .legend div {
+  padding: 0.5rem 1rem;
 }

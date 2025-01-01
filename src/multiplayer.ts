@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import io, { Socket } from 'socket.io-client';
 import { createNameTag, PlayerEntity, PlayerStatus } from './entities/player';
 import { TimeEntry } from './entities/timer';
-import { updateTimes } from './ui/ui';
+import { renderingCanvas, updateTimes } from './ui/ui';
 import { getModel, ModelId as ModelId } from './assets/models';
 import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
 
@@ -53,7 +53,7 @@ export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): M
   });
 
   ws.on('game:info', async (data: MultiplayerData) => {
-    await updatePlayers(scene, data.gameInfo.players);
+    updatePlayers(scene, data.gameInfo.players);
     updateTimes(data.gameInfo.times);
   });
 
@@ -189,4 +189,8 @@ export const toggleCollissions = (player: PlayerEntity) => {
     if (!mpBody || !mpBody.shape) return;
     mpBody.shape.filterCollideMask = playerMpMask;
   })
+
+  const collissions = document.querySelector('.collissions-enabled') as HTMLInputElement;
+  collissions.checked = !!player.collissionEnabled;
+  renderingCanvas.focus();
 }

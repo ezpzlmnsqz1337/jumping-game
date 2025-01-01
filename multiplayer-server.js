@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const app = express()
 const server = createServer(app)
 const io = new Server(server)
-const port = 3000
+const port = 13370
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -21,14 +21,19 @@ server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 const gameInfo = {
   players: {},
-  times: []
+  times: [
+    { nickname: 'ezpzlmnsqz1337', time: 184055, timeStr: '03:04.055', checkpoints: 15 },
+    { nickname: 'ezpzlmnsqz1337', time: 203082, timeStr: '03:23.082', checkpoints: 17 },
+    { nickname: 'ezpzlmnsqz1337', time: 202316, timeStr: '03:22.316', checkpoints: 24 },
+    { nickname: 'ezpzlmnsqz1337', time: 274392, timeStr: '04:34.392', checkpoints: 25 }
+  ]
 }
 
 // event handlers
 function playerConnected(socket) {
   console.log('player connected', socket.id)
   // create a new player and add it to our players object
-  gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby'  }
+  gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby' }
   // update all other players of the new player
   io.emit(EventType.PLAYER_CONNECTED, socket.id)
 }
