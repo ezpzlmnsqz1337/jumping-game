@@ -8,7 +8,7 @@ export const createBorder = (scene: BABYLON.Scene) => {
   const yMin = -50.25;
   const yMax = 0;
 
-  const height = 5;
+  const height = 9.5;
 
   const walls = []
 

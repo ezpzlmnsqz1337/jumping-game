@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { createSounds } from '../assets/sounds.ts';
-import { CameraOptions, createCamera } from '../camera.ts';
+import { CameraOptions, createCamera, MyCamera } from '../camera.ts';
 import { createControls } from '../controls.ts';
 import { createGround } from '../entities/ground.ts';
 import { createPlayer, PlayerEntity } from '../entities/player.ts';
@@ -65,7 +65,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const startPosition = getRandomSpawnPoint(spawnPoints).mesh.position.clone();
   startPosition.y += 1;
   const player = await createPlayer(scene, {
-    // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),.w,
+    // startPosition: new BABYLON.Vector3(12.50, 12.60, -11.70),
     startPosition: new BABYLON.Vector3(-12.60, 43.50, 7.7),
     nickname: gameSettings.nickname,
     color: gameSettings.color
@@ -80,7 +80,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // testing end trigger
   createEndTrigger(scene, { player, timer, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
 
-  // camera.lockedTarget = player.mesh;
+  camera.lockedTarget = player.mesh;
 
   const hemiLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
@@ -143,6 +143,7 @@ export const createWalls = (scene: BABYLON.Scene, player: PlayerEntity) => {
 
   // last wall
   (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
+  // (scene.activeCamera as MyCamera).lockedTarget = walls[walls.length - 1].position;
 
   return walls;
 };
