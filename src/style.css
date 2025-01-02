@@ -19,6 +19,8 @@ body {
   --orange: #ff8930;
   --light-blue: #00eaf2;
   --magenta: #f234f7;
+  --gray: #999999;
+  --dark-gray: #595959;
 }
 
 #render-canvas {
@@ -78,7 +80,7 @@ body {
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 100;
+  z-index: 10;
   flex-direction: column;
   align-items: center;
 }
@@ -320,8 +322,8 @@ body {
 
 .game-settings {
   position: fixed;
-  top: 0;
-  right: 0;
+  top: 1rem;
+  right: 1rem;
   color: #ffffff;
   background-color: #0000006d;
   padding: 0.5rem 1rem;
@@ -405,4 +407,76 @@ body {
 
 .keyboard-controls>.legend>.open-lobby>.icon {
   color: var(--magenta);
+}
+
+.keyboard-controls>.legend>.open-chat>.icon {
+  color: var(--dark-gray);
+}
+
+.chat {
+  position: fixed;
+  bottom: 7rem;
+  left: 1rem;
+  color: #ffffff;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.chat>.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-width: 30rem;
+  max-height: 20rem;
+  margin-bottom: 1rem;
+}
+
+.chat>.chat-messages>div {
+  word-break: break-all;
+}
+
+.chat>.chat-messages .blue {
+  color: var(--blue);
+}
+
+.chat>.chat-messages .red {
+  color: var(--red);
+}
+
+.chat>.chat-messages .yellow {
+  color: var(--yellow);
+}
+
+.chat>.chat-messages .green {
+  color: var(--green);
+}
+
+.chat>.chat-messages .purple {
+  color: var(--purple);
+}
+
+.chat>.chat-messages .pink {
+  color: var(--pink);
+}
+
+.chat>.chat-messages .orange {
+  color: var(--orange);
+}
+
+.chat>.chat-messages .gray {
+  color: var(--gray);
+}
+
+.chat>input {
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  border: 0.1rem solid var(--blue);
+  color: #ffffff;
+  width: 100%;
 }

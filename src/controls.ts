@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { Checkpoint, PlayerEntity } from './entities/player';
 import { getRandomSpawnPoint } from './entities/spawn-point';
 import { toggleCollissions } from './multiplayer';
-import { confirmLobby, isLobbyOpen, openLobby, toggleFollowCamera } from './ui/ui';
+import { confirmLobby, openLobby, sendChatMessage, toggleChat, toggleFollowCamera } from './ui/ui';
 
 export interface KeyStatus {
   KeyW: boolean,
@@ -65,7 +65,7 @@ export const createControls = (scene: BABYLON.Scene) => {
 
   scene.onBeforeRenderObservable.add(() => {
     const player = controls.player;
-    if (!player || player.status === 'in_lobby') return;
+    if (!player || ['in_lobby', 'in_chat'].includes(player.status)) return;
     const deltaTime = scene.getAnimationRatio();
     handleWSADMovement(keyStatus, player, deltaTime);
     handleTurning(keyStatus, player, deltaTime);
@@ -76,17 +76,17 @@ export const createControls = (scene: BABYLON.Scene) => {
     const player = controls.player as PlayerEntity;    
     if (e.code === 'Enter') {
       confirmLobby(scene, player);
+      sendChatMessage(player);
     }
     if (e.code === 'KeyL') {
       openLobby(scene, player);
     }
-    if (e.code === 'KeyF') {
-      if(!isLobbyOpen()) toggleFollowCamera(scene);
-    }
-    if (player && player.status !== 'in_lobby') {
+    if (player && !['in_lobby', 'in_chat'].includes(player.status)) {
       handleRespawn(e.code, player);
       handleCheckpoints(e.code, player);
       handleCollissions(e.code, player);
+      handleFollowCamera(e.code, player);
+      handleOpenChat(e.code, player);
     }
   });
 
@@ -240,5 +240,17 @@ const loadCheckpoint = (player: PlayerEntity, checkpoint: Checkpoint) => {
 const handleCollissions = (key: string, player: PlayerEntity) => {
   if ('KeyC' === key) {
     toggleCollissions(player);
+  }
+}
+
+const handleFollowCamera = (key: string, player: PlayerEntity) => {
+  if ('KeyF' === key) {
+    toggleFollowCamera(player.mesh.getScene());
+  }
+}
+
+const handleOpenChat = (key: string, player: PlayerEntity) => {
+  if ('KeyT' === key) {
+    toggleChat(player);
   }
 }

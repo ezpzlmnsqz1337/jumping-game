@@ -134,6 +134,7 @@
           </div>
           <img class="keyboard" src="assets/images/keyboard-controls.png" alt="Keyboard controls" />
           <div class="legend">
+            <div class="open-chat"><span class="icon">T</span> - open chat</div>
             <div class="reset"><span class="icon">R</span> - respawn</div>
             <div class="collissions"><span class="icon">C</span> - enable/disable collissions</div>
             <div class="follow-camera"><span class="icon">F</span> - toggle follow camera</div>
@@ -164,6 +165,11 @@
     <div class="fps">
       <div class="heading">FPS</div>
       <div class="value">0</div>
+    </div>
+  </div>
+  <div class="chat">
+    <div class="chat-messages"></div>
+    <input type="text" class="chat-input" maxlength="200"/>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

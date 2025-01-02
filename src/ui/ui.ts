@@ -1,10 +1,10 @@
 import * as BABYLON from '@babylonjs/core';
-import { changePlayerColor, createNameTag, PlayerEntity, PlayerStatus, removeNameTag } from '../entities/player';
-import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
-import { MyCamera, MyFollowCamera } from '../camera';
-import { getGameSettings } from '../storage';
 import { PlayerColor } from '../assets/colors';
-import { toggleCollissions } from '../multiplayer';
+import { MyCamera, MyFollowCamera } from '../camera';
+import { changePlayerColor, createNameTag, PlayerEntity, removeNameTag } from '../entities/player';
+import { getCurrentTimerTimeStr, TimeEntry } from '../entities/timer';
+import { ChatMessage, getMultiplayerSession, toggleCollissions } from '../multiplayer';
+import { getGameSettings } from '../storage';
 
 export const renderingCanvas = document.querySelector('#render-canvas') as HTMLCanvasElement;
 
@@ -31,6 +31,7 @@ export const bindUI = (scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?
   bindLobbyUI(scene, player);
   bindEditorUI(scene, gizmoManager);
   bindGameSettingsUI(scene, player);
+  bindChatUI(player);
 };
 
 const updateHorizontalSpeed = (player: PlayerEntity, htmlEl: HTMLDivElement) => {
@@ -88,10 +89,13 @@ export const updateTimes = (times: TimeEntry[]) => {
 };
 
 const bindEditorUI = (scene: BABYLON.Scene, gizmoManager?: BABYLON.GizmoManager) => {
+  if (!gizmoManager) return;
   // editor
   const editorDiv = document.querySelector('.editor') as HTMLInputElement;
   const editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
   const controlsToggle = document.querySelectorAll('.editor > .editor-controls') as NodeListOf<HTMLDivElement>;
+
+  editorDiv.style.display = 'block';
 
   editModeCheckBox.setAttribute('checked', 'true');
 
@@ -261,7 +265,7 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
   const playerColorsDivs = document.querySelectorAll('.lobby .player-color > .colors > div') as NodeListOf<HTMLDivElement>;
   const enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;
-  
+
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'block';
 
@@ -285,7 +289,7 @@ const bindLobbyUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   bindLobbyButtonUI(scene, player);
 
   // close lobby if player not a new player
-  if(!gameSettings.newlyCreated) {
+  if (!gameSettings.newlyCreated) {
     confirmLobby(scene, player);
   }
 };
@@ -301,6 +305,7 @@ const bindLobbyButtonUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
 
 export const openLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
   if (isLobbyOpen()) return;
+  if (player.status === 'in_chat') return;
   console.log('openLobby');
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
@@ -309,7 +314,7 @@ export const openLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const camera = scene.activeCamera as MyCamera;
   camera.useAutoRotationBehavior = true;
   lastCameraRadius = camera.radius;
-  camera.setMoveToTarget(camera.alpha+0.01, camera.beta+0.01, 3, 50);
+  camera.setMoveToTarget(camera.alpha + 0.01, camera.beta + 0.01, 3, 50);
   scene.sounds?.find(x => x.name === 'open-lobby')?.play();
   player.status = 'in_lobby';
 
@@ -321,12 +326,12 @@ const closeLobby = (scene: BABYLON.Scene) => {
   const settingsButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
   const lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
   lobbyDiv.style.display = 'none';
-  settingsButtonDiv.style.display = 'block';  
+  settingsButtonDiv.style.display = 'block';
   const camera = scene.activeCamera as MyCamera;
   camera.useAutoRotationBehavior = false;
   console.log('setting last camera radius3', lastCameraRadius, camera.radius);
   const radius = lastCameraRadius > 0 ? lastCameraRadius : 6;
-  camera.setMoveToTarget(camera.alpha+0.01, camera.beta+0.01, radius, 50);
+  camera.setMoveToTarget(camera.alpha + 0.01, camera.beta + 0.01, radius, 50);
   scene.sounds?.find(x => x.name === 'close-lobby')?.play();
   renderingCanvas.focus();
 }
@@ -343,6 +348,7 @@ const updatePlayerNickname = (player: PlayerEntity, nickname: string) => {
 
 export const confirmLobby = (scene: BABYLON.Scene, player: PlayerEntity) => {
   if (!isLobbyOpen()) return;
+  if (player.status === 'in_chat') return;
   const nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
 
   const nickname = nicknameInput.value.substring(0, 15);
@@ -372,7 +378,7 @@ const bindGameSettingsUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
   const followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
 
   followCameraCheckBox.addEventListener('click', () => {
-    toggleFollowCamera(scene); 
+    toggleFollowCamera(scene);
   });
 
   const collissions = document.querySelector('.collissions-enabled') as HTMLInputElement;
@@ -385,9 +391,102 @@ const bindGameSettingsUI = (scene: BABYLON.Scene, player: PlayerEntity) => {
 
 export const toggleFollowCamera = (scene: BABYLON.Scene) => {
   const followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
+  const arcRotateCamera = scene.getCameraByName('mainArcRotateCamera');
+  const followCamera = scene.getCameraByName('followCamera');
 
-  scene.activeCamera = followCameraEnabled ? scene.getCameraByName('mainArcRotateCamera') : scene.getCameraByName('followCamera');
+  if (followCameraEnabled) {
+    followCamera?.storeState();
+    scene.activeCamera = arcRotateCamera;
+    arcRotateCamera?.restoreState();
+  } else {
+    arcRotateCamera?.storeState();
+    scene.activeCamera = followCamera;
+    followCamera?.restoreState();
+  }
+
   followCameraEnabled = !followCameraEnabled;
   followCameraCheckBox.checked = followCameraEnabled;
   renderingCanvas.focus();
+}
+
+const chatDiv = document.querySelector('.chat') as HTMLDivElement;
+const chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
+const bindChatUI = (player: PlayerEntity) => {
+  chatDiv.style.display = 'none';
+  chatInput.style.display = 'none';
+
+  chatInput.addEventListener('blur', () => {
+    stopChat(player);
+  });
+}
+
+const chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+export const sendChatMessage = (player: PlayerEntity) => {
+  if (player.status !== 'in_chat') return;
+  const text = chatInput.value;
+  if (!text) return;
+  const mp = getMultiplayerSession();
+  addChatMessage({
+    id: '',
+    nickname: player.nickname,
+    text,
+    color: player.color
+  });
+  chatInput.value = '';
+  if (mp) mp.sendChatMessage(text);
+  stopChat(player);
+}
+
+export const addChatMessage = (message: ChatMessage) => {
+  const messageDiv = document.createElement('div') as HTMLDivElement;
+  const nicknameSpan = document.createElement('span') as HTMLSpanElement;
+  nicknameSpan.classList.add(message.color);
+  const textSpan = document.createElement('span') as HTMLSpanElement;
+  nicknameSpan.innerText = `[${message.nickname}]: `;
+  textSpan.innerText = message.text;
+  messageDiv.appendChild(nicknameSpan);
+  messageDiv.appendChild(textSpan);
+  chatMessagesDiv.appendChild(messageDiv);
+  chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+  restartChatTimeout();
+}
+
+export const toggleChat = (player: PlayerEntity) => {
+  if (isLobbyOpen()) return;
+  if (player.status === 'in_chat') {
+    stopChat(player);
+  } else {
+    startChat(player);
+  }
+}
+
+export const startChat = (player: PlayerEntity) => {
+  showChat();
+  chatInput.style.display = 'block';
+  chatInput.focus();
+  player.status = 'in_chat';
+}
+
+export const stopChat = (player: PlayerEntity) => {
+  chatInput.style.display = 'none';
+  renderingCanvas.focus();
+  player.status = 'playing';
+  restartChatTimeout();
+}
+
+const showChat = () => {
+  chatDiv.style.display = 'block';
+}
+
+const hideChat = () => {
+  chatDiv.style.display = 'none';
+}
+
+let chatTimeout: NodeJS.Timeout;
+export const restartChatTimeout = () => {
+  clearTimeout(chatTimeout);
+  showChat();
+  chatTimeout = setTimeout(() => {
+    hideChat();
+  }, 30000);
 }

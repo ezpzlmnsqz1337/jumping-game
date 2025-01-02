@@ -1,10 +1,10 @@
 import * as BABYLON from '@babylonjs/core';
 import io, { Socket } from 'socket.io-client';
+import { getModel } from './assets/models';
+import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
 import { createNameTag, PlayerEntity, PlayerStatus } from './entities/player';
 import { TimeEntry } from './entities/timer';
-import { renderingCanvas, updateTimes } from './ui/ui';
-import { getModel, ModelId as ModelId } from './assets/models';
-import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
+import { addChatMessage, renderingCanvas, updateTimes } from './ui/ui';
 
 
 interface MultiplayerData {
@@ -29,9 +29,18 @@ interface PlayerInfo {
   collissionEnabled?: boolean
 }
 
+export interface ChatMessage {
+  id: string
+  nickname: string
+  color: string
+  text: string
+}
+
+
 interface MultiplayerSession {
   ws: Socket
   sendTimeToServer: (timeEntry: TimeEntry) => void
+  sendChatMessage: (message: string) => void
 }
 
 let localPlayerId = '';
@@ -57,6 +66,10 @@ export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): M
     updateTimes(data.gameInfo.times);
   });
 
+  ws.on('chat:update', async (message: ChatMessage) => {
+    addChatMessage(message);
+  });
+
   scene.onBeforeRenderObservable.add(() => {
     sendPlayerInfo(ws, player);
   });
@@ -65,6 +78,9 @@ export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): M
     ws: ws,
     sendTimeToServer: (timeEntry: TimeEntry) => {
       ws.emit('add:time', timeEntry);
+    },
+    sendChatMessage: (text: string) => { 
+      ws.emit('chat:message', { playerId: localPlayerId, text });
     }
   }
 

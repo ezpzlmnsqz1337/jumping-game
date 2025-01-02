@@ -4,7 +4,7 @@ import { PlayerColor } from '../assets/colors';
 import { getModel } from '../assets/models';
 import { FILTER_GROUP_PLAYER, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from '../collission-groups';
 
-export type PlayerStatus = 'in_lobby' | 'playing' | 'afk';
+export type PlayerStatus = 'in_lobby' | 'playing' | 'afk' | 'in_chat';
 export interface Checkpoint {
   position: BABYLON.Vector3
   rotationQuaternion: BABYLON.Quaternion

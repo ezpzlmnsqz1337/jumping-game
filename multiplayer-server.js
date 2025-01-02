@@ -31,23 +31,37 @@ const gameInfo = {
 
 // event handlers
 function playerConnected(socket) {
-  console.log('player connected', socket.id)
+  console.log('player connected', socket.id);
   // create a new player and add it to our players object
-  gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby' }
+  gameInfo.players[socket.id] = { position: null, rotation: null, status: 'in_lobby' };
   // update all other players of the new player
-  io.emit(EventType.PLAYER_CONNECTED, socket.id)
+  io.emit(EventType.PLAYER_CONNECTED, socket.id);
+  broadCastChatMessage(socket, 'server', 'Player connected.');
 }
 
 function playerDisconnected(socket) {
-  console.log('Player disconnected', socket.id)
+  console.log('Player disconnected', socket.id);
   // remove this player from our players object
-  delete gameInfo.players[socket.id]
+  delete gameInfo.players[socket.id];
   // emit a message to all players to remove this player
-  io.emit(EventType.PLAYER_DISCONNECTED, socket.id)
+  io.emit(EventType.PLAYER_DISCONNECTED, socket.id);
+  broadCastChatMessage(socket, 'server', 'Player disconnected.');
+}
+
+const broadCastChatMessage = (socket, playerId, text) => {
+  const player = gameInfo.players[playerId];
+  const nickname = player ? player.nickname : 'Server';
+  const color = player ? player.color : 'gray';
+  socket.broadcast.emit(EventType.CHAT_UPDATE, {
+    playerId: playerId || 'server',
+    nickname,
+    color,
+    text
+  });
 }
 
 const logPlayers = () => {
-  console.log('Players:', gameInfo.players)
+  console.log('Players:', Object.values(gameInfo.players).map(player => [player.nickname, player.status]));
   setTimeout(logPlayers, 5000)
 }
 logPlayers()
@@ -60,7 +74,9 @@ const EventType = Object.freeze({
   PLAYER_INFO: 'player:info',
   PLAYER_ID: 'player:id',
   GAME_INFO: 'game:info',
-  ADD_TIME: 'add:time'
+  ADD_TIME: 'add:time',
+  CHAT_MESSAGE: 'chat:message',
+  CHAT_UPDATE: 'chat:update',
 })
 
 let broadcasting = false;
@@ -87,6 +103,11 @@ io.on('connection', socket => {
   });
 
   socket.emit(EventType.PLAYER_ID, socket.id);
+
+  socket.on(EventType.CHAT_MESSAGE, message => {
+    console.log('Chat message:', message);
+    broadCastChatMessage(socket, message.playerId, message.text);
+  });
 
   socket.on('disconnect', () => {
     playerDisconnected(socket);
