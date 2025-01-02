@@ -2,20 +2,21 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   overflow: hidden;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  --blue: color(srgb-linear 0.01 0.30 1.00);
-  --red: color(srgb-linear 1.00 0.01 0.01);
-  --green: color(srgb-linear 0.19 1.00 0.03);
-  --yellow: color(srgb-linear 1.00 0.98 0.00);
-  --purple: color(srgb-linear 0.34 0.01 1.00);
-  --pink: color(srgb-linear 1.00 0.04 0.15);
-  --orange: color(srgb-linear 1.00 0.25 0.03);
+  --blue: #1995ff;
+  --red: #ff1919;
+  --green: #79ff30;
+  --yellow: #fffd00;
+  --purple: #9e19ff;
+  --pink: #ff386c;
+  --orange: #ff8930;
   --light-blue: #00eaf2;
   --magenta: #f234f7;
 }
@@ -36,7 +37,7 @@ html, body {
   background-color: var(--blue);
 }
 
-.player-info > div {
+.player-info>div {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -45,24 +46,24 @@ html, body {
   gap: 0.5rem;
 }
 
-.player-info > div .label {
+.player-info>div .label {
   text-transform: uppercase;
   font-size: 1.6rem;
   font-weight: bold;
 }
 
-.player-info > div .value {
+.player-info>div .value {
   text-transform: uppercase;
   font-size: 1.4rem;
   background-color: #cfe8ff;
   padding: 0.2rem 1rem;
 }
 
-.player-info > div .value.no {
+.player-info>div .value.no {
   color: #1b9f1b;
 }
 
-.player-info > div .value.yes {
+.player-info>div .value.yes {
   color: #c13812;
 }
 
@@ -82,14 +83,14 @@ html, body {
   align-items: center;
 }
 
-.timer > div {
+.timer>div {
   background-color: #0000006d;
   padding: 0.5rem 1rem;
   text-align: center;
   border-radius: 0.2rem;
 }
 
-.timer > div > .checkpoints {
+.timer>div>.checkpoints {
   font-size: 1rem;
 }
 
@@ -102,7 +103,7 @@ html, body {
   padding: 0.5rem 1rem;
 }
 
-.times-list > ol > li{
+.times-list>ol>li {
   padding: 0.3rem;
 }
 
@@ -124,9 +125,9 @@ html, body {
   color: #ffffff;
 }
 
-.edit-mode > div,
-.editor-controls > div,
-.editor .camera > div {
+.edit-mode>div,
+.editor-controls>div,
+.editor .camera>div {
   flex: 1;
   display: flex;
   column-gap: 1rem;
@@ -135,19 +136,19 @@ html, body {
   justify-content: space-between;
 }
 
-.editor > div > label {
+.editor>div>label {
   width: 5rem;
 }
 
-.editor-controls > div > span {
+.editor-controls>div>span {
   margin-bottom: 0;
 }
 
-.editor-controls > div input[type="checkbox"] {
+.editor-controls>div input[type="checkbox"] {
   margin: 0;
 }
 
-.editor-controls > div > div {
+.editor-controls>div>div {
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -164,7 +165,7 @@ html, body {
   flex-direction: column;
 }
 
-.editor .camera > div > input[type="checkbox"] {
+.editor .camera>div>input[type="checkbox"] {
   margin-right: 0;
 }
 
@@ -196,7 +197,7 @@ html, body {
   color: #1d96ff;
 }
 
-.lobby > .nickname {
+.lobby>.nickname {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -204,7 +205,7 @@ html, body {
   align-items: center;
 }
 
-.lobby > .nickname > input {
+.lobby>.nickname>input {
   padding: 0.7rem 1rem;
   font-size: 3rem;
   width: 60%;
@@ -212,7 +213,7 @@ html, body {
   border: 0.2rem solid #1d96ff;
 }
 
-.lobby > .player-color {
+.lobby>.player-color {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -220,14 +221,14 @@ html, body {
   align-items: center;
 }
 
-.lobby > .player-color > .colors {
+.lobby>.player-color>.colors {
   margin-top: 2rem;
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
 }
 
-.lobby > .player-color > .colors > div {
+.lobby>.player-color>.colors>div {
   height: 7rem;
   width: 7rem;
   opacity: 0.3;
@@ -235,36 +236,42 @@ html, body {
   transform: scale(1);
 }
 
-.lobby > .player-color > .colors > div.blue {
+.lobby>.player-color>.colors>div.blue {
   background-color: var(--blue);
 }
-.lobby > .player-color > .colors > div.red {
+
+.lobby>.player-color>.colors>div.red {
   background-color: var(--red);
 }
-.lobby > .player-color > .colors > div.green {
+
+.lobby>.player-color>.colors>div.green {
   background-color: var(--green);
 }
-.lobby > .player-color > .colors > div.yellow {
+
+.lobby>.player-color>.colors>div.yellow {
   background-color: var(--yellow);
 }
-.lobby > .player-color > .colors > div.purple {
+
+.lobby>.player-color>.colors>div.purple {
   background-color: var(--purple);
 }
-.lobby > .player-color > .colors > div.pink {
+
+.lobby>.player-color>.colors>div.pink {
   background-color: var(--pink);
 }
-.lobby > .player-color > .colors > div.orange {
+
+.lobby>.player-color>.colors>div.orange {
   background-color: var(--orange);
 }
 
-.lobby > .player-color > .colors > div:hover,
-.lobby > .player-color > .colors > div.selected {
+.lobby>.player-color>.colors>div:hover,
+.lobby>.player-color>.colors>div.selected {
   cursor: pointer;
   transform: scale(1.1);
   opacity: 1;
 }
 
-.lobby > .enter {
+.lobby>.enter {
   font-size: 2rem;
   color: #ffffff;
   padding: 1rem 2rem;
@@ -278,7 +285,7 @@ html, body {
   border-style: none;
 }
 
-.lobby > .enter:hover {
+.lobby>.enter:hover {
   cursor: pointer;
   background-color: #005cac;
 }
@@ -292,11 +299,11 @@ html, body {
   z-index: 9999;
 }
 
-.ui-buttons > div {
+.ui-buttons>div {
   padding: 0.5rem 1rem;
 }
 
-.ui-buttons > .settings:hover {
+.ui-buttons>.settings:hover {
   color: #1d96ff;
   cursor: pointer;
 }
@@ -324,7 +331,7 @@ html, body {
   gap: 0.5rem;
 }
 
-.game-settings > div {
+.game-settings>div {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
@@ -335,7 +342,7 @@ html, body {
   margin-top: 1rem;
 }
 
-.controls > .heading {
+.controls>.heading {
   text-align: center;
 }
 
@@ -347,15 +354,55 @@ html, body {
   align-items: center;
 }
 
-.keyboard-controls > .keyboard {
+.keyboard-controls>.keyboard {
   width: 40%;
 }
 
-.keyboard-controls > .legend {
+.keyboard-controls>.legend {
   font-size: 1.1rem;
-  
+
 }
 
-.keyboard-controls > .legend div {
+.keyboard-controls>.legend div {
   padding: 0.5rem 1rem;
+}
+
+.keyboard-controls>.legend div>.icon {
+  font-weight: bold;
+}
+
+.keyboard-controls>.legend>.movement>.icon {
+  color: var(--blue);
+}
+
+.keyboard-controls>.legend>.jumping>.icon {
+  color: var(--red);
+}
+
+.keyboard-controls>.legend>.turning>.icon {
+  color: var(--yellow);
+}
+
+.keyboard-controls>.legend>.arrow-keys>.icon {
+  color: var(--green);
+}
+
+.keyboard-controls>.legend>.checkpoints>.icon {
+  color: var(--purple);
+}
+
+.keyboard-controls>.legend>.reset>.icon {
+  color: var(--pink);
+}
+
+.keyboard-controls>.legend>.collissions>.icon {
+  color: var(--orange);
+}
+
+.keyboard-controls>.legend>.follow-camera>.icon {
+  color: var(--light-blue);
+}
+
+.keyboard-controls>.legend>.open-lobby>.icon {
+  color: var(--magenta);
 }

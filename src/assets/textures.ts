@@ -9,7 +9,7 @@ export interface TextureOptions {
 }
 
 export const createTexture = (category: TextureCategory, type: TextureType, opts: TextureOptions, scene: BABYLON.Scene) => {
-  const t = new BABYLON.Texture(`${window.location.href}assets/textures/${category}/${type}.png`, scene);
+  const t = new BABYLON.Texture(`${window.location.origin}/assets/textures/${category}/${type}.png`, scene);
   t.uScale = opts.uScale || 1;
   t.vScale = opts.vScale || 1;
   return t;

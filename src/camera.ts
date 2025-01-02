@@ -6,6 +6,7 @@ export class MyFollowCamera extends BABYLON.FollowCamera {
   automaticCameraEnabled: boolean = true;
 
   setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+    if (!this.automaticCameraEnabled) return;
     this.rotationOffset = (targetAlpha / Math.PI * 180) - 180;
     this.heightOffset = targetBeta * Math.PI / 10 + 1;
     return;
@@ -174,6 +175,9 @@ export const createCamera = (scene: BABYLON.Scene, cameraOptions: CameraOptions)
   camera.allowUpsideDown = false;
   camera.lowerRadiusLimit = 2;
   camera.upperRadiusLimit = 100;
+  
+  camera.collisionRadius = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  camera.checkCollisions = true;
 
   camera.upperBetaLimit = Math.PI / 2;
 
