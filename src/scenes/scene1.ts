@@ -16,6 +16,7 @@ import { createEndTrigger } from '../triggers/end.ts';
 import { createStartTrigger } from '../triggers/start.ts';
 import { bindUI } from '../ui/ui.ts';
 import { createBorder } from './level1/border.ts';
+import { createBall } from './level1/football.ts';
 import { createLongJumps } from './level1/longjumps.ts';
 import { createSkybox } from './level1/skybox.ts';
 import { createSlide } from './level1/slide.ts';
@@ -116,6 +117,12 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
     camera.moveToTarget();
   });
 
+  // football
+  const mpObjects = [
+    createBall(scene, new BABYLON.Vector3(-12.60, 43.50, 9.7)),
+    createBall(scene, new BABYLON.Vector3(-12.60, 43.50, 5.7))
+  ];
+
   // fog
   // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
   // scene.fogStart = 20;
@@ -130,7 +137,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   // multiplayer
   if (ENABLE_MULTIPLAYER) { // if not running in dev mode
-    createMultiplayer(scene, player);
+    createMultiplayer(scene, player, mpObjects);
   }
 
   // UI
@@ -151,6 +158,8 @@ export const createWalls = (scene: BABYLON.Scene, player: PlayerEntity) => {
     ...createBorder(scene),
     ...createSlide(scene, player),
   ];
+
+  
 
   // last wall
   (walls[walls.length - 1].material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);

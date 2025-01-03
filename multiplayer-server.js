@@ -21,6 +21,7 @@ server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 const gameInfo = {
   players: {},
+  objects: {},
   times: [
     { nickname: 'ezpzlmnsqz1337', time: 184055, timeStr: '03:04.055', checkpoints: 15 },
     { nickname: 'ezpzlmnsqz1337', time: 203082, timeStr: '03:23.082', checkpoints: 17 },
@@ -60,11 +61,13 @@ const broadCastChatMessage = (socket, playerId, text) => {
   });
 }
 
-const logPlayers = () => {
+const logData = () => {
   console.log('Players:', Object.values(gameInfo.players).map(player => [player.nickname, player.status]));
-  setTimeout(logPlayers, 5000)
+  console.log('Objects:', Object.entries(gameInfo.objects).map(([name, data]) => ({name, ...data})));
+  console.log('');
+  setTimeout(logData, 5000)
 }
-logPlayers()
+logData()
 
 // events
 const EventType = Object.freeze({
@@ -77,6 +80,7 @@ const EventType = Object.freeze({
   ADD_TIME: 'add:time',
   CHAT_MESSAGE: 'chat:message',
   CHAT_UPDATE: 'chat:update',
+  OBJECTS_INFO: 'objects:info',
 })
 
 let broadcasting = false;
@@ -85,11 +89,16 @@ let stopRequested = false;
 io.on('connection', socket => {
   if (!broadcasting) {
     broadcastPlayerInfo(socket);
+    broadcastPlayerInfo(socket);
   }
   playerConnected(socket);
 
   socket.on(EventType.PLAYER_INFO, playerInfo => {
     gameInfo.players[socket.id] = playerInfo;
+  });
+
+  socket.on(EventType.OBJECTS_INFO, objectInfo => {
+    gameInfo.objects = objectInfo;
   });
 
   socket.on(EventType.ADD_TIME, time => {

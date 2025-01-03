@@ -14,11 +14,23 @@ interface MultiplayerData {
 interface MultiplayerGameInfo {
   times: TimeEntry[]
   players: MultiplayerPlayers
+  objects: MultiplayerObjects
 }
 
 interface MultiplayerPlayers {
   [key: string]: PlayerInfo
 }
+
+interface MultiplayerObjects {
+  [key: string]: ObjectInfo
+}
+
+interface ObjectInfo {
+  position?: number[]
+  rotation?: number[]
+  mesh?: BABYLON.Mesh
+}
+
 interface PlayerInfo {
   position?: number[]
   rotation?: number[]
@@ -45,10 +57,12 @@ interface MultiplayerSession {
 
 let localPlayerId = '';
 let players: MultiplayerPlayers = {};
+let objects: MultiplayerObjects = {};
 let mp: MultiplayerSession | null = null;
 let updating = false; // avoid running multiple updatePlayers at the same time
+let updatingObjects = false;
 
-export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): MultiplayerSession => {
+export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity, objects: BABYLON.Mesh[]): MultiplayerSession => {
   const ws = io(window.location.origin);
   // socket status
   ws.on('connect', () => console.log('connected'));
@@ -63,6 +77,7 @@ export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): M
 
   ws.on('game:info', async (data: MultiplayerData) => {
     updatePlayers(scene, data.gameInfo.players);
+    updateObjects(scene, data.gameInfo.objects);
     updateTimes(data.gameInfo.times);
   });
 
@@ -72,6 +87,7 @@ export const createMultiplayer = (scene: BABYLON.Scene, player: PlayerEntity): M
 
   scene.onBeforeRenderObservable.add(() => {
     sendPlayerInfo(ws, player);
+    sendObjectInfo(ws, objects);
   });
 
   mp = {
@@ -209,4 +225,41 @@ export const toggleCollissions = (player: PlayerEntity) => {
   const collissions = document.querySelector('.collissions-enabled') as HTMLInputElement;
   collissions.checked = !!player.collissionEnabled;
   renderingCanvas.focus();
+}
+
+const sendObjectInfo = (ws: Socket, meshes: BABYLON.Mesh[]) => {
+  ws.emit('objects:info', meshes.reduce((acc: any, cur) => {
+    acc[cur.name] = {
+      position: [cur.position.x, cur.position.y, cur.position.z],
+      rotation: [cur.rotationQuaternion?.x, cur.rotationQuaternion?.y, cur.rotationQuaternion?.z, cur.rotationQuaternion?.w]
+    }
+    return acc;
+  }, {}));
+};
+
+const updateObjects = (scene: BABYLON.Scene, objectInfo: MultiplayerObjects) => {
+  if (updatingObjects) return;
+  updatingObjects = true;
+
+  for (let [id, info] of Object.entries(objectInfo)) {
+    if (!objects[id]) (objects[id] = {});
+    // update local player positions based on server response
+    objects[id].position = info.position;
+    objects[id].rotation = info.rotation;
+
+    // create mesh for another player if player mesh doesn't exist
+    if (!objects[id].mesh) {
+      const mesh = scene.getMeshByName(id);
+      if (!mesh) continue;
+      objects[id].mesh = mesh as BABYLON.Mesh;
+    }
+    if (info.position && info.rotation) {
+      objects[id].mesh.physicsBody!.disablePreStep = true;
+      objects[id].mesh.position = new BABYLON.Vector3(...info.position);
+      objects[id].mesh.rotationQuaternion = new BABYLON.Quaternion(...info.rotation);
+      objects[id].mesh.physicsBody!.disablePreStep = false;
+    }
+  }
+
+  updatingObjects = false;
 }
