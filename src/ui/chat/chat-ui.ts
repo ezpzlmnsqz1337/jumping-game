@@ -1,20 +1,26 @@
-import gameRoot from "../game-root";
-import { ChatMessage } from "../multiplayer-session";
-import { AbstractUI } from "./abstract-ui";
-import { renderingCanvas } from "./ui-manager";
-
-export const chatDiv = document.querySelector('.chat') as HTMLDivElement;
-export const chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
-export const chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+import * as BABYLON from '@babylonjs/core';
+import { PlayerEntity } from '../../entities/player';
+import gameRoot from '../../game-root';
+import { ChatMessage } from '../../multiplayer-session';
+import { AbstractUI } from './../abstract-ui';
+import { renderingCanvas } from './../ui-manager';
 
 export const HIDE_CHAT_TIMEOUT_MS = 30000;
 
 export class ChatUI extends AbstractUI {
+  chatDiv!: HTMLDivElement;
+  chatMessagesDiv!: HTMLDivElement;
+  chatInput!: HTMLInputElement;
+
   hideChatTimeout!: NodeJS.Timeout;
-  
+
+  constructor(scene: BABYLON.Scene, player: PlayerEntity) {
+    super(scene, 'chat', player);
+  }
+
   sendChatMessage() {
     if (this.player.status !== 'in_chat') return;
-    const text = chatInput.value;
+    const text = this.chatInput.value;
     if (!text) return;
     const mp = gameRoot.multiplayer;
     this.addChatMessage({
@@ -23,11 +29,11 @@ export class ChatUI extends AbstractUI {
       text,
       color: this.player.color
     });
-    chatInput.value = '';
+    this.chatInput.value = '';
     if (mp) mp.sendChatMessage(text);
     this.stopChat();
   }
-  
+
   addChatMessage(message: ChatMessage) {
     const messageDiv = document.createElement('div') as HTMLDivElement;
     const nicknameSpan = document.createElement('span') as HTMLSpanElement;
@@ -37,11 +43,11 @@ export class ChatUI extends AbstractUI {
     textSpan.innerText = message.text;
     messageDiv.appendChild(nicknameSpan);
     messageDiv.appendChild(textSpan);
-    chatMessagesDiv.appendChild(messageDiv);
-    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    this.chatMessagesDiv.appendChild(messageDiv);
+    this.chatMessagesDiv.scrollTop = this.chatMessagesDiv.scrollHeight;
     this.restartChatTimeout();
   }
-  
+
   toggleChat() {
     if (this.player.status === 'in_lobby') return;
     if (this.player.status === 'in_chat') {
@@ -50,29 +56,29 @@ export class ChatUI extends AbstractUI {
       this.startChat();
     }
   }
-  
+
   startChat() {
     this.showChat();
-    chatInput.style.display = 'block';
-    chatInput.focus();
+    this.chatInput.style.display = 'block';
+    this.chatInput.focus();
     this.player.status = 'in_chat';
   }
-  
+
   stopChat() {
-    chatInput.style.display = 'none';
+    this.chatInput.style.display = 'none';
     renderingCanvas.focus();
     this.player.status = 'playing';
     this.restartChatTimeout();
   }
-  
+
   showChat() {
-    chatDiv.style.display = 'block';
+    this.chatDiv.style.display = 'block';
   }
-  
+
   hideChat() {
-    chatDiv.style.display = 'none';
+    this.chatDiv.style.display = 'none';
   }
-  
+
   restartChatTimeout() {
     clearTimeout(this.hideChatTimeout);
     this.showChat();
@@ -81,11 +87,16 @@ export class ChatUI extends AbstractUI {
     }, HIDE_CHAT_TIMEOUT_MS);
   }
 
-  bindUI() : void {
-    chatDiv.style.display = 'none';
-    chatInput.style.display = 'none';
-  
-    chatInput.addEventListener('blur', () => {
+  async bindUI() {
+    await super.bindUI();
+    this.chatDiv = document.querySelector('.chat') as HTMLDivElement;
+    this.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
+    this.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+
+    this.chatDiv.style.display = 'none';
+    this.chatInput.style.display = 'none';
+
+    this.chatInput.addEventListener('blur', () => {
       this.stopChat();
     });
   }

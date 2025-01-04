@@ -1,0 +1,9 @@
+.performance {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  color: #ffffff;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}

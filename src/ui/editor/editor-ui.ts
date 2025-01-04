@@ -1,24 +1,32 @@
 import * as BABYLON from '@babylonjs/core';
-import { AbstractUI } from "./abstract-ui";
-import { MyCamera } from '../camera';
+import { MyCamera } from '../../camera';
+import { PlayerEntity } from '../../entities/player';
+import { AbstractUI } from "../abstract-ui";
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
-export const editorDiv = document.querySelector('.editor') as HTMLInputElement;
-export const editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
-export const controlsToggle = document.querySelectorAll('.editor > .editor-controls') as NodeListOf<HTMLDivElement>;
-
-export const meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
-export const transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
-export const scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
-export const rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
-
-export const positionValueDiv = document.querySelector('.transform-value') as HTMLDivElement;
-export const rotationValueDiv = document.querySelector('.rotation-value') as HTMLDivElement;
-export const scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
-
 export class EditorUI extends AbstractUI {
+  editorDiv!: HTMLInputElement;
+  editModeCheckBox!: HTMLInputElement;
+  controlsToggle!: NodeListOf<HTMLDivElement>;
+
+  meshNameSpan!: HTMLDivElement;
+  transformCheckBox!: HTMLInputElement;
+  scalingCheckBox!: HTMLInputElement;
+  rotationCheckBox!: HTMLInputElement;
+
+  positionValueDiv!: HTMLDivElement;
+  rotationValueDiv!: HTMLDivElement;
+  scalingValueDiv!: HTMLDivElement;
+
+  gizmoManager?: BABYLON.GizmoManager;
+
   oldMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
+
+  constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
+    super(scene, 'editor', player);
+    this.gizmoManager = gizmoManager;
+  }
 
   updateMeshDetails(gizmoType: GizmoType, htmlElement: HTMLDivElement) {
     if (!this.gizmoManager?.attachedMesh) return gizmoType === 'rotation' ? '[0, 0, 0, 0]' : '[0, 0, 0]';
@@ -33,11 +41,11 @@ export class EditorUI extends AbstractUI {
 
   bindMeshInfoUI() {
     if (!this.gizmoManager) {
-      editorDiv.style.display = 'none';
+      this.editorDiv.style.display = 'none';
       return;
     }
 
-    transformCheckBox.setAttribute('checked', 'true');
+    this.transformCheckBox.setAttribute('checked', 'true');
 
     // enable all to assign events
     this.gizmoManager.positionGizmoEnabled = true;
@@ -45,10 +53,10 @@ export class EditorUI extends AbstractUI {
     this.gizmoManager.scaleGizmoEnabled = true;
 
     this.gizmoManager.onAttachedToMeshObservable.add(newMesh => {
-      meshNameSpan.innerText = newMesh?.name || 'None';
-      this.updateMeshDetails('position', positionValueDiv);
-      this.updateMeshDetails('rotation', rotationValueDiv);
-      this.updateMeshDetails('scaling', scalingValueDiv);
+      this.meshNameSpan.innerText = newMesh?.name || 'None';
+      this.updateMeshDetails('position', this.positionValueDiv);
+      this.updateMeshDetails('rotation', this.rotationValueDiv);
+      this.updateMeshDetails('scaling', this.scalingValueDiv);
 
       if (!newMesh) return;
 
@@ -56,24 +64,24 @@ export class EditorUI extends AbstractUI {
     });
 
     this.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(() => {
-      this.updateMeshDetails('position', positionValueDiv);
+      this.updateMeshDetails('position', this.positionValueDiv);
     });
     this.gizmoManager.gizmos.positionGizmo?.onDragObservable.add(() => {
-      this.updateMeshDetails('position', positionValueDiv);
+      this.updateMeshDetails('position', this.positionValueDiv);
     });
 
     this.gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(() => {
-      this.updateMeshDetails('rotation', rotationValueDiv);
+      this.updateMeshDetails('rotation', this.rotationValueDiv);
     });
     this.gizmoManager.gizmos.rotationGizmo?.onDragObservable.add(() => {
-      this.updateMeshDetails('rotation', rotationValueDiv);
+      this.updateMeshDetails('rotation', this.rotationValueDiv);
     });
 
     this.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(() => {
-      this.updateMeshDetails('scaling', scalingValueDiv);
+      this.updateMeshDetails('scaling', this.scalingValueDiv);
     });
     this.gizmoManager.gizmos.scaleGizmo?.onDragObservable.add(() => {
-      this.updateMeshDetails('scaling', scalingValueDiv);
+      this.updateMeshDetails('scaling', this.scalingValueDiv);
     });
 
     // leave only transform enabled
@@ -81,17 +89,17 @@ export class EditorUI extends AbstractUI {
     this.gizmoManager.rotationGizmoEnabled = false;
     this.gizmoManager.scaleGizmoEnabled = false;
 
-    transformCheckBox.addEventListener('click', () => {
+    this.transformCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
       this.gizmoManager.positionGizmoEnabled = !this.gizmoManager.positionGizmoEnabled;
     });
 
-    scalingCheckBox.addEventListener('click', () => {
+    this.scalingCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
       this.gizmoManager.scaleGizmoEnabled = !this.gizmoManager.scaleGizmoEnabled;
     });
 
-    rotationCheckBox.addEventListener('click', () => {
+    this.rotationCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
       this.gizmoManager.rotationGizmoEnabled = !this.gizmoManager.rotationGizmoEnabled;
     });
@@ -149,26 +157,34 @@ export class EditorUI extends AbstractUI {
     });
   }
 
-
-  bindUI(): void {
+  async bindUI() {
     if (!this.gizmoManager) return;
+    await super.bindUI();
+    this.editorDiv = document.querySelector('.editor') as HTMLInputElement;
+    this.editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
+    this.controlsToggle = document.querySelectorAll('.editor > .editor-controls') as NodeListOf<HTMLDivElement>;
 
-    editorDiv.style.display = 'block';
-    editModeCheckBox.setAttribute('checked', 'true');
+    this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
+    this.transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
+    this.scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
+    this.rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
 
-    editModeCheckBox.addEventListener('click', () => {
+    this.positionValueDiv = document.querySelector('.transform-value') as HTMLDivElement;
+    this.rotationValueDiv = document.querySelector('.rotation-value') as HTMLDivElement;
+    this.scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
+
+    this.editorDiv.style.display = 'block';
+    this.editModeCheckBox.setAttribute('checked', 'true');
+
+    this.editModeCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
       this.gizmoManager.attachableMeshes = this.gizmoManager.attachableMeshes === null ? [] : null;
       this.gizmoManager.attachToMesh(null);
-      controlsToggle.forEach(x => x.style.display = x.style.display === 'none' ? 'flex' : 'none');
+      this.controlsToggle.forEach(x => x.style.display = x.style.display === 'none' ? 'flex' : 'none');
       this.updateEditorSelection(null);
     });
 
     this.bindMeshInfoUI();
     this.bindCameraInfoUI();
   }
-
-  updateUI(): void {
-  }
-
 }

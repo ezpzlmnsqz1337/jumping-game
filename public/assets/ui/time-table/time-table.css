@@ -1,0 +1,12 @@
+.time-table {
+  color: #ffffff;
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+}
+
+.time-table>ol>li {
+  padding: 0.3rem;
+}

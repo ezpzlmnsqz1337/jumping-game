@@ -5,7 +5,7 @@ import { CreateTriggerOptions, Trigger } from './trigger';
 
 export class StartTrigger extends Trigger {
   constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    super(scene, opts);
+    super(scene, { ...opts, isVisible: true });
     (this.mesh.material as BABYLON.StandardMaterial).diffuseColor = startTriggerColor;
   }
 

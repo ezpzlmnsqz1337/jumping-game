@@ -4,12 +4,26 @@ import { PlayerEntity } from '../entities/player';
 export class AbstractUI {
   scene: BABYLON.Scene;
   player: PlayerEntity;
-  gizmoManager?: BABYLON.GizmoManager;
+  name: string;
 
-  constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
+  constructor(scene: BABYLON.Scene, name: string, player: PlayerEntity) {
     this.scene = scene;
     this.player = player;
-    this.gizmoManager = gizmoManager;
+    this.name = name;
+  }
+
+  loadCss() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `assets/ui/${this.name}/${this.name}.css`;
+    document.head.appendChild(link);
+  }
+
+  async loadHtml() {
+    const response = await fetch(`assets/ui/${this.name}/${this.name}.html`, {
+      method: 'GET'
+    });
+    document.body.insertAdjacentHTML('beforeend', await response.text());
   }
 
   arrayToString(arr: number[]) {
@@ -21,7 +35,10 @@ export class AbstractUI {
     element.innerText = text;
   }
 
-  bindUI(): void {}
+  async bindUI() {
+    this.loadCss();
+    await this.loadHtml();
+  }
 
-  updateUI(data?: any): void {}
+  updateUI(data?: any) {}
 }

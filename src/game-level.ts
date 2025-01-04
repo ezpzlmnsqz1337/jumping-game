@@ -50,7 +50,6 @@ export class GameLevel {
     const spawnPoint = this.getRandomSpawnPoint().mesh;
     if (spawnPoint) {
       player.physics.body.disablePreStep = true;
-      console.log('Movint to spawn point: ', spawnPoint);
       player.mesh!.position = spawnPoint.position.clone();
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
@@ -92,7 +91,6 @@ export class GameLevel {
 
   getRandomSpawnPoint() {
     const index = Math.round(Math.random() * (this.spawnPoints.length - 1));
-    console.log('getting spawn point: ', this.spawnPoints[index]);
     return this.spawnPoints[index];
   }
 }

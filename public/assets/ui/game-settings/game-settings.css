@@ -1,0 +1,19 @@
+.game-settings {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  color: #ffffff;
+  background-color: #0000006d;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-settings>div {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 1rem;
+}

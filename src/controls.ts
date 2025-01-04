@@ -248,7 +248,7 @@ export class GameControls {
 
   handleFollowCamera(key: string) {
     if ('KeyF' === key) {
-      gameRoot.uiManager?.gameOptionsUI.toggleFollowCamera();
+      gameRoot.uiManager?.gameSettingsUI.toggleFollowCamera();
     }
   }
 

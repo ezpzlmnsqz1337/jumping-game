@@ -91,7 +91,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   // UI
   gameRoot.uiManager = new UIManager(scene, gameRoot.player, gizmoManager);
-  gameRoot.uiManager.bindUI();
+  await gameRoot.uiManager.bindUI();
 
   return scene;
 }
