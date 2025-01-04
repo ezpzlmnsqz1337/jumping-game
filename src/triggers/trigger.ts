@@ -1,49 +1,59 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player';
 import { defaultTriggerColor } from '../assets/colors';
+import { GameLevel } from '../game-level';
 
 export interface CreateTriggerOptions {
-  player: PlayerEntity
+  level: GameLevel
   position?: BABYLON.Vector3
   scaling?: BABYLON.Vector3
   isVisible?: boolean
   [key: string]: any
 }
 
+export class Trigger {
+  level: GameLevel;
+  mesh: BABYLON.Mesh;
 
-export const createTrigger = (scene: BABYLON.Scene, opts: CreateTriggerOptions) => {  
-  const material = new BABYLON.StandardMaterial('triggerMaterial');
-  material.diffuseColor = defaultTriggerColor;
-  material.alpha = 0.7;
+  constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
+    this.level = opts.level;
 
-  const trigger = BABYLON.MeshBuilder.CreateBox('trigger', { size: 1, ...opts }, scene);
-  trigger.isVisible = opts.isVisible || false;
-  trigger.position = opts.position || new BABYLON.Vector3(0, 0, 0);
-  trigger.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
-  trigger.checkCollisions = true;
+    const material = new BABYLON.StandardMaterial('triggerMaterial');
+    material.diffuseColor = defaultTriggerColor;
+    material.alpha = 0.7;
 
-  trigger.actionManager = new BABYLON.ActionManager(scene);
-  trigger.actionManager.registerAction(onEnterTriggerAction(trigger, opts.player, opts.onEnter));
-  trigger.actionManager.registerAction(onExitTriggerAction(trigger, opts.player, opts.onExit));
-  trigger.material = material;
+    this.mesh = BABYLON.MeshBuilder.CreateBox('trigger', { size: 1, ...opts }, scene);
+    this.mesh.isVisible = opts.isVisible || false;
+    this.mesh.position = opts.position || new BABYLON.Vector3(0, 0, 0);
+    this.mesh.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
+    this.mesh.checkCollisions = true;
 
-  return trigger;
-}
+    this.mesh.actionManager = new BABYLON.ActionManager(scene);
+    this.mesh.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        { 
+          trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+          parameter: this.level.player
+        },
+        () => this.onEnter(this.mesh, this.level.player as PlayerEntity)
+      ));
+    this.mesh.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        { 
+          trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
+          parameter: this.level.player
+        },
+        () => this.onExit(this.mesh, this.level.player as PlayerEntity)
+      )
+    );
+    this.mesh.material = material;
+  }
 
-const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity, onEnter: (trigger: BABYLON.Mesh, player: PlayerEntity) => void) => {
-  return new BABYLON.ExecuteCodeAction(
-    { trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
-      parameter: player
-    },
-    () => onEnter(trigger, player)
-  )
-}
+  onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
+    console.log(`Player ${player.nickname} entered the trigger ${trigger.name}`);    
+  }
 
-const onExitTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity, onExit: (trigger: BABYLON.Mesh, player: PlayerEntity) => void) => {
-  return new BABYLON.ExecuteCodeAction(
-    { trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
-      parameter: player
-    },
-    () => onExit(trigger, player)
-  )
+  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
+    console.log(`Player ${player.nickname} exitted the trigger ${trigger.name}`);    
+  }
 }

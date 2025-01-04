@@ -1,28 +1,17 @@
 import * as BABYLON from '@babylonjs/core';
+import { GameEntity } from './game-entity';
+import { GameLevel } from '../game-level';
 
-export interface SpawnPointEntity {
-  mesh: BABYLON.Mesh
-}
+export class SpawnPointEntity extends GameEntity {
+  constructor(name: string, level: GameLevel, scene: BABYLON.Scene, position: BABYLON.Vector3) {
+    super(name, level, scene);
+    this.mesh = BABYLON.MeshBuilder.CreateBox(name, {
+      width: 0.4,
+      height: 0.1,
+      depth: 0.4,
+    }, scene);
 
-export const createSpawnPoint = (scene: BABYLON.Scene, position: BABYLON.Vector3) => {
-
-  const box = BABYLON.MeshBuilder.CreateBox('spawnPoint', {
-    width: 0.4,
-    height: 0.1,
-    depth: 0.4,    
-  }, scene);
-
-  box.visibility = 0;
-  box.position = position;
-
-  const spawnPointEntity = {
-    mesh: box
-  };
-
-  return spawnPointEntity;
-}
-
-export const getRandomSpawnPoint = (spawnPoints: SpawnPointEntity[]) => {
-  const index = Math.round(Math.random() * (spawnPoints.length-1));
-  return spawnPoints[index]
+    this.mesh.visibility = 0;
+    this.mesh.position = position;
+  }
 }
