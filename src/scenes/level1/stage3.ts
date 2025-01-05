@@ -131,7 +131,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
     depth: 9.6,
     height: 2
   });
-  trigger2.onEnter = showRightWallCamera;
+  trigger4.onEnter = showRightWallCamera;
 
   // front wall camera trigger
   const trigger5 = new Trigger(scene, {

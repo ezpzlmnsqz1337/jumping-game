@@ -84,14 +84,14 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
     gizmoManager = new BABYLON.GizmoManager(scene);
   }
 
+  // UI
+  gameRoot.uiManager = new UIManager(scene, gameRoot.player, gizmoManager);
+  await gameRoot.uiManager.bindUI();
+
   // multiplayer
   if (ENABLE_MULTIPLAYER) { // if not running in dev mode
     gameRoot.multiplayer = new MultiplayerSession(scene, gameRoot.player, mpObjects);
   }
-
-  // UI
-  gameRoot.uiManager = new UIManager(scene, gameRoot.player, gizmoManager);
-  await gameRoot.uiManager.bindUI();
 
   return scene;
 }

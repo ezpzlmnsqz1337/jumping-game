@@ -17,3 +17,17 @@
   flex-direction: row;
   gap: 1rem;
 }
+
+@media only screen and (max-width: 1000px) {
+  .game-settings {
+    display: block;
+    top: 0;
+    right: 0;
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+  
+  .game-settings>div {
+    gap: 0.5rem;
+  }
+}

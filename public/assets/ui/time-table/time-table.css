@@ -10,3 +10,21 @@
 .time-table>ol>li {
   padding: 0.3rem;
 }
+
+@media only screen and (max-width: 1000px) {
+  .time-table {
+    left: 0;
+    top: 0;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .time-table>ol {
+    padding: 0 0 0 1rem;
+    margin: 0.3rem 0;
+  }
+  
+  .time-table>ol>li {
+    padding: 0.15rem;
+  }
+}

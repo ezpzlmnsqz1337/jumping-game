@@ -3,7 +3,7 @@ import * as BABYLON from '@babylonjs/core';
 type CameraProperty = 'alpha' | 'beta' | 'radius' | 'position.x' | 'position.y' | 'position.z';
 
 export class MyFollowCamera extends BABYLON.FollowCamera {
-  automaticCameraEnabled: boolean = true;
+  automaticCameraEnabled: boolean = false;
 
   setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
     if (!this.automaticCameraEnabled) return;

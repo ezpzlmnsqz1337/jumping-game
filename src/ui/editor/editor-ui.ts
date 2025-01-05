@@ -6,7 +6,7 @@ import { AbstractUI } from "../abstract-ui";
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
 export class EditorUI extends AbstractUI {
-  editorDiv!: HTMLInputElement;
+  editorDiv!: HTMLDivElement;
   editModeCheckBox!: HTMLInputElement;
   controlsToggle!: NodeListOf<HTMLDivElement>;
 
@@ -160,7 +160,7 @@ export class EditorUI extends AbstractUI {
   async bindUI() {
     if (!this.gizmoManager) return;
     await super.bindUI();
-    this.editorDiv = document.querySelector('.editor') as HTMLInputElement;
+    this.editorDiv = document.querySelector('.editor') as HTMLDivElement;
     this.editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
     this.controlsToggle = document.querySelectorAll('.editor > .editor-controls') as NodeListOf<HTMLDivElement>;
 
@@ -174,7 +174,7 @@ export class EditorUI extends AbstractUI {
     this.scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
 
     this.editorDiv.style.display = 'block';
-    this.editModeCheckBox.setAttribute('checked', 'true');
+    this.editModeCheckBox.checked =  true;
 
     this.editModeCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
@@ -186,5 +186,6 @@ export class EditorUI extends AbstractUI {
 
     this.bindMeshInfoUI();
     this.bindCameraInfoUI();
+    this.rootElement = this.editorDiv;
   }
 }

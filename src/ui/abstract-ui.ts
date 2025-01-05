@@ -5,6 +5,7 @@ export class AbstractUI {
   scene: BABYLON.Scene;
   player: PlayerEntity;
   name: string;
+  rootElement!: HTMLElement;
 
   constructor(scene: BABYLON.Scene, name: string, player: PlayerEntity) {
     this.scene = scene;
@@ -41,4 +42,9 @@ export class AbstractUI {
   }
 
   updateUI(data?: any) {}
+
+  show(show: boolean) {
+    if (!this.rootElement) return;
+    this.rootElement.style.display = show ? 'block' : 'none';
+  }
 }

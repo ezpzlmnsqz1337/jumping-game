@@ -15,11 +15,12 @@ export class TimeTableUI extends AbstractUI {
   async bindUI() {
     await super.bindUI();
     this.timesListDiv = document.querySelector('.time-table') as HTMLDivElement;
+    this.rootElement = this.timesListDiv;
   }
 
-  updateUI(times: TimeEntry[]): void {
-    if (times.length === 0 || this.noOfTimes === times.length) return;
-    this.noOfTimes = times.length;
+  updateUI(times: Map<string, TimeEntry>): void {
+    if (times.size === 0 || this.noOfTimes === times.size) return;
+    this.noOfTimes = times.size;
     
     if (!this.timesListDiv) return;
     this.timesListDiv.innerHTML = ''

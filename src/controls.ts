@@ -242,7 +242,7 @@ export class GameControls {
 
   handleCollissions(key: string) {
     if ('KeyC' === key) {
-      gameRoot.multiplayer?.toggleCollissions();
+      gameRoot.uiManager?.gameSettingsUI.toggleCollissions();
     }
   }
 

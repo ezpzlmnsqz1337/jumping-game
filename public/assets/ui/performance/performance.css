@@ -1,9 +1,16 @@
 .performance {
   position: fixed;
-  bottom: 0;
-  left: 0;
+  bottom: 11rem;
+  right: 0;
   color: #ffffff;
   background-color: #0000006d;
   padding: 0.5rem 1rem;
   font-size: 1rem;
+}
+
+@media only screen and (max-width: 1000px) {
+  .performance {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
 }

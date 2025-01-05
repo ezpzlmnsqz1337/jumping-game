@@ -39,7 +39,7 @@ export class PlayerEntity extends GameEntity {
     this.changeColor(color);
 
     this.mesh.visibility = 0;
-    this.mesh.position = new BABYLON.Vector3(0, 3, 0);
+    this.mesh.position = new BABYLON.Vector3(0, 0.001, 0);
 
     // physics
     this.physics = new BABYLON.PhysicsAggregate(
@@ -91,6 +91,7 @@ export class PlayerEntity extends GameEntity {
   }
 
   changeNickname(nickname: string) {
+    this.nickname = nickname;
     GameEntity.removeNameTag(this.scene, this.mesh!);
     GameEntity.createNameTag(this.scene, this.mesh!, nickname);
   }

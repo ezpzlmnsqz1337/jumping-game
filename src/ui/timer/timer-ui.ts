@@ -29,10 +29,16 @@ export class TimerUI extends AbstractUI {
     this.uiCheckpointsDiv = document.querySelector('.checkpoints > .value') as HTMLDivElement;
 
     this.scene.onBeforeRenderObservable.add(() => this.updateUI());
+    this.rootElement = document.querySelector('.timer') as HTMLDivElement;
   }
 
   updateUI(): void {
     this.updateTime();
     this.updateCheckpoints(this.player.checkpoints.length);
+  }
+
+  show(show: boolean) {
+    if (!this.rootElement) return;
+    this.rootElement.style.display = show ? 'flex' : 'none';
   }
 }

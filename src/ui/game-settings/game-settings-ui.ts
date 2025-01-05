@@ -6,6 +6,8 @@ import { AbstractUI } from '../abstract-ui';
 import { renderingCanvas } from '../ui-manager';
 
 export class GameSettingsUI extends AbstractUI {
+  gameSettingsDiv!: HTMLDivElement;
+  playerInfoCheckBox! : HTMLInputElement;
   automaticCameraCheckBox! : HTMLInputElement;
   followCameraCheckBox! : HTMLInputElement;
   collissionsCheckBox! : HTMLInputElement;
@@ -32,24 +34,43 @@ export class GameSettingsUI extends AbstractUI {
 
     this.followCameraEnabled = !this.followCameraEnabled;
     this.followCameraCheckBox.checked = this.followCameraEnabled;
+
+    this.automaticCameraCheckBox.checked = (this.scene.activeCamera as any).automaticCameraEnabled;
+    
     renderingCanvas.focus();
+  }
+
+  toggleCollissions() {
+    gameRoot.multiplayer?.toggleCollissions();
+    this.collissionsCheckBox.checked = this.player.collissionEnabled;
+    renderingCanvas.focus();
+  }
+
+  toggleAutomaticCamera() {
+    const camera = this.scene.activeCamera as MyCamera | MyFollowCamera;
+    camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
+    this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
+    renderingCanvas.focus();
+  }
+
+  togglePlayerInfo() {
+    gameRoot.uiManager?.playerInfoUI.show(this.playerInfoCheckBox.checked);
   }
 
   async bindUI() {
     await super.bindUI();
+    this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLInputElement;
     this.automaticCameraCheckBox = document.querySelector('.automatic-camera-enabled') as HTMLInputElement;
     this.followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
     this.collissionsCheckBox = document.querySelector('.collissions-enabled') as HTMLInputElement;
+    this.playerInfoCheckBox = document.querySelector('.player-info-enabled') as HTMLInputElement;
 
     const camera = this.scene.activeCamera as MyCamera | MyFollowCamera;
 
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
 
     this.automaticCameraCheckBox.addEventListener('click', () => {
-      (this.scene.cameras as MyCamera[] | MyFollowCamera[]).forEach(camera => {
-        camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
-      });
-      renderingCanvas.focus();
+      this.toggleAutomaticCamera();
     });
 
     this.followCameraCheckBox.addEventListener('click', () => {
@@ -59,8 +80,14 @@ export class GameSettingsUI extends AbstractUI {
     this.collissionsCheckBox.checked = this.player.collissionEnabled;
 
     this.collissionsCheckBox.addEventListener('click', () => {
-      gameRoot.multiplayer?.toggleCollissions();
-      this.collissionsCheckBox.checked = this.player.collissionEnabled;
+      this.toggleCollissions();
     });
+
+    this.playerInfoCheckBox.checked = true;
+    this.playerInfoCheckBox.addEventListener('click', () => {
+      this.togglePlayerInfo();
+    });
+    
+    this.rootElement = this.gameSettingsDiv;
   }
 }

@@ -97,7 +97,11 @@ export class Level1 extends GameLevel {
         position: new BABYLON.Vector3(-10.00, 42.00, 8.00),
         scaling: new BABYLON.Vector3(5, 0.1, 5)
       }),
-      // createEndTrigger(scene, { level: this, position: new BABYLON.Vector3(-14, 0, -8), scaling: new BABYLON.Vector3(5, 0.1, 5) });
+      new EndTrigger(scene, {
+        level: this,
+        position: new BABYLON.Vector3(-14, 0, -8),
+        scaling: new BABYLON.Vector3(5, 0.1, 5)
+      }),
     ];
   }
 

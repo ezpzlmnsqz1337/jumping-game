@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# multiplayer server
+multiplayer-server/build
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

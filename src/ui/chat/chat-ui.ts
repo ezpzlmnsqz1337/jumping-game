@@ -62,6 +62,7 @@ export class ChatUI extends AbstractUI {
     this.chatInput.style.display = 'block';
     this.chatInput.focus();
     this.player.status = 'in_chat';
+    setTimeout(() => this.chatInput.value = '');
   }
 
   stopChat() {
@@ -92,6 +93,7 @@ export class ChatUI extends AbstractUI {
     this.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     this.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     this.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    this.rootElement = this.chatDiv;
 
     this.chatDiv.style.display = 'none';
     this.chatInput.style.display = 'none';

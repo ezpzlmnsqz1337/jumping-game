@@ -4,6 +4,7 @@ import { AbstractUI } from './../abstract-ui';
 
 
 export class PerformanceUI extends AbstractUI {
+  performanceDiv!: HTMLDivElement;
   fpsCounerDiv!: HTMLDivElement;
 
   fpsUpdateIntervalMs = 1000; // Update every second
@@ -18,10 +19,12 @@ export class PerformanceUI extends AbstractUI {
   async bindUI() {
     await super.bindUI();
 
+    this.performanceDiv = document.querySelector('.performance') as HTMLDivElement;
     this.fpsCounerDiv = document.querySelector('.performance .fps .value') as HTMLDivElement;
 
     this.perfMonitor.enable();
     this.scene.onBeforeRenderObservable.add(() => this.updateUI());
+    this.rootElement = this.performanceDiv;
   }
 
   updateUI(): void {

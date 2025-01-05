@@ -5,6 +5,7 @@ import { PlayerEntity } from '../../entities/player';
 import { getGameSettings } from '../../storage';
 import { AbstractUI } from './../abstract-ui';
 import { renderingCanvas } from './../ui-manager';
+import gameRoot from '../../game-root';
 
 export class LobbyUI extends AbstractUI {
   nicknameInput!: HTMLInputElement;
@@ -15,6 +16,7 @@ export class LobbyUI extends AbstractUI {
 
   open = true;
   lastCameraRadius: number;
+  switchCameraOnClose = false;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'lobby', player);
@@ -28,14 +30,19 @@ export class LobbyUI extends AbstractUI {
     this.lobbyDiv.style.display = 'block';
     this.lobbyButtonDiv.style.display = 'none';
     this.open = true;
-    
+
+    if (this.scene.activeCamera!.name === 'followCamera') {
+      gameRoot.uiManager?.gameSettingsUI.toggleFollowCamera();
+      this.switchCameraOnClose = true;
+    };
     const camera = this.scene.activeCamera as MyCamera;
     camera.useAutoRotationBehavior = true;
     this.lastCameraRadius = camera.radius;
     camera.setMoveToTarget(camera.alpha + 0.01, camera.beta + 0.01, 3, 50);
 
     this.scene.sounds?.find(x => x.name === 'open-lobby')?.play();
-    this.player.status = 'in_lobby';  
+    this.player.status = 'in_lobby'; 
+    this.showOtherUIs(false); 
   }
   
   closeLobby() {
@@ -52,7 +59,12 @@ export class LobbyUI extends AbstractUI {
     camera.setMoveToTarget(camera.alpha + 0.01, camera.beta + 0.01, radius, 50);
     this.scene.sounds?.find(x => x.name === 'close-lobby')?.play();
     this.player.status = 'playing';
-    
+    this.showOtherUIs(true);
+
+    if (this.switchCameraOnClose) {
+      this.switchCameraOnClose = false;
+      gameRoot.uiManager?.gameSettingsUI.toggleFollowCamera();
+    }
     renderingCanvas.focus();
   }
   
@@ -110,5 +122,13 @@ export class LobbyUI extends AbstractUI {
     if (!gameSettings.newlyCreated) {
       this.confirmLobby();
     }
+  }
+
+  showOtherUIs(show: boolean) {
+    gameRoot.uiManager?.timerUI.show(show);
+    gameRoot.uiManager?.timeTableUI.show(show);
+    gameRoot.uiManager?.gameSettingsUI.show(show);
+    gameRoot.uiManager?.editorUI.show(show);
+    gameRoot.uiManager?.performanceUI.show(show);
   }
 }
