@@ -16,6 +16,8 @@ import { createStage3 } from './stage3';
 import { createStage4 } from './stage4';
 import { createStage5 } from './stage5';
 import { createStage6 } from './stage6';
+import { TeleportTrigger } from '../../triggers/teleport';
+import { GameEntity } from '../../entities/game-entity';
 
 export class Level1 extends GameLevel {
 
@@ -106,7 +108,37 @@ export class Level1 extends GameLevel {
   }
 
   protected createTeleports() {
-    // todo
+    const scene = this.scene!;
+    const firstPositionZ = -8;
+    const gap = 2;
+
+    this.teleports = [
+      new TeleportTrigger('teleport-stage-2', scene, {
+        level: this,
+        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ)
+      }, new BABYLON.Vector3(6.07, 6.00, 1.93)),
+      new TeleportTrigger('teleport-stage-3', scene, {
+        level: this,
+        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap)
+      }, new BABYLON.Vector3(11.60, 12.20, -7.65)),
+      new TeleportTrigger('teleport-stage-4', scene, {
+        level: this,
+        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 2)
+      }, new BABYLON.Vector3(4.13, 22.20, -8.09)),
+      new TeleportTrigger('teleport-stage-5', scene, {
+        level: this,
+        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 3)
+      }, new BABYLON.Vector3(-5.80, 32.50, -8.70)),
+      new TeleportTrigger('teleport-top', scene, {
+        level: this,
+        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 4)
+      }, new BABYLON.Vector3(-12.60, 42.50, 5.70)),
+      
+    ];
+
+    this.teleports.forEach(teleport => {
+      GameEntity.createLabelTag(scene, teleport.mesh, teleport.name);
+    });
   }
 
   protected createLights() {

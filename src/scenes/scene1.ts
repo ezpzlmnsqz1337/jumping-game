@@ -1,6 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
 import { createSounds } from '../assets/sounds.ts';
-import { CameraOptions, createCamera, createFollowCamera } from '../camera.ts';
 import { GameControls } from '../controls.ts';
 import { PlayerEntity } from '../entities/player.ts';
 import gameRoot from '../game-root.ts';
@@ -11,15 +10,22 @@ import { createBall } from './level1/football.ts';
 import { Level1 } from './level1/level1.ts';
 import { MultiplayerSession } from '../multiplayer-session.ts';
 import { GameLevel } from '../game-level.ts';
+import { ArcRotateCameraOptions, MyArcRotateCamera } from '../cameras/arc-rotate-camera.ts';
+import { FollowCameraOptions, MyFollowCamera } from '../cameras/follow-camera.ts';
 
 const ENABLE_EDITOR = false || import.meta.env.DEV;
 const ENABLE_MULTIPLAYER = false || !import.meta.env.DEV;
 
-const cameraPosition: CameraOptions = {
+const arcRotateCameraOptions: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
   alpha: 1,
   beta: 1,
   radius: 6
+}
+
+const followCameraOptions: FollowCameraOptions = {
+  position: new BABYLON.Vector3(0, 0, 0),
+  radius: 2
 }
 
 const levels: GameLevel[] = [
@@ -36,8 +42,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   scene.sounds = createSounds(scene)
 
-  const camera = createCamera(scene, cameraPosition); // stage1Camera1);
-  const followCamera = createFollowCamera(scene, cameraPosition);
+  const arcRotateCamera = new MyArcRotateCamera('arcRotateCamera', arcRotateCameraOptions, scene);
+  const followCamera = new MyFollowCamera('followCamera', followCameraOptions, scene);
   
   gameRoot.level = levels[0];
   gameRoot.player = new PlayerEntity(
@@ -54,16 +60,16 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
   
-  camera.lockedTarget = gameRoot.player.mesh;
+  arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
   
-  scene.activeCamera = camera;  
+  scene.activeCamera = arcRotateCamera;  
 
   const optimizations = createOptimizations(scene);
 
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;
-    camera.moveToTarget();
+    arcRotateCamera.moveToTarget();
   });
 
   // football

@@ -1,11 +1,12 @@
 import * as BABYLON from '@babylonjs/core';
-import { CameraOptions, MyCamera, setCameraOptions } from '../../camera';
 import { PlayerEntity } from '../../entities/player';
 import { WallEntity } from '../../entities/walls';
 import { GameLevel } from '../../game-level';
 import { Trigger } from '../../triggers/trigger';
+import { ArcRotateCameraOptions } from '../../cameras/arc-rotate-camera';
+import { AutomaticCamera } from '../../cameras/automatic-camera';
 
-export const stage2Camera1: CameraOptions = {
+export const stage2Camera1: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(1.93, 10.95, 1.52),
   alpha: 2.8882,
   beta: 1.0083,
@@ -45,7 +46,7 @@ export const createStage2 = (scene: BABYLON.Scene, level: GameLevel) => {
 }
 
 const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  const camera = player.mesh!.getScene().activeCamera as MyCamera;
+  const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera
   if (!camera) return
-  setCameraOptions(camera, stage2Camera1);
+  camera.setMoveToTarget(stage2Camera1.alpha, stage2Camera1.beta, stage2Camera1.radius, 50);
 }

@@ -216,13 +216,10 @@ export class GameControls {
 
     if ('KeyR' === key) {
       const spawnPoint = level.getRandomSpawnPoint().mesh as BABYLON.Mesh;
-      console.log(spawnPoint.rotationQuaternion);
       player.physics.body.disablePreStep = true;
       player.mesh.position = spawnPoint.position.clone();
       player.mesh.position.y += 1;
-      console.log('1', player.mesh.rotationQuaternion);
       player.mesh.rotationQuaternion = (spawnPoint.rotationQuaternion || BABYLON.Quaternion.Zero()).clone();
-      console.log('2', player.mesh.rotationQuaternion);
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;

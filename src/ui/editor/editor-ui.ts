@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { MyCamera } from '../../camera';
+import { MyCamera } from '../../cameras/arc-rotate-camera';
 import { PlayerEntity } from '../../entities/player';
 import { AbstractUI } from "../abstract-ui";
 

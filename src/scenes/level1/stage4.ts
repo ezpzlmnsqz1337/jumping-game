@@ -1,12 +1,13 @@
 import * as BABYLON from '@babylonjs/core';
 import { WallEntity } from '../../entities/walls';
 import { PlayerEntity } from '../../entities/player';
-import { CameraOptions, MyCamera, setCameraOptions } from '../../camera';
+import { ArcRotateCameraOptions } from '../../cameras/arc-rotate-camera';
 import { GameLevel } from '../../game-level';
 import { Trigger } from '../../triggers/trigger';
+import { AutomaticCamera } from '../../cameras/automatic-camera';
 
 // front
-export const stage4Camera1: CameraOptions = {
+export const stage4Camera1: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(8.45, 25.39, -12.14),
   alpha: 0,
   beta: 1.0646,
@@ -14,7 +15,7 @@ export const stage4Camera1: CameraOptions = {
 };
 
 // left
-export const stage4Camera2: CameraOptions = {
+export const stage4Camera2: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(-5.17, 30.62, -22.25),
   alpha: 4.2592,
   beta: 0.8755,
@@ -22,7 +23,7 @@ export const stage4Camera2: CameraOptions = {
 };
 
 // right
-export const stage4Camera3: CameraOptions = {
+export const stage4Camera3: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(-1.54, 34.70, -2.79),
   alpha: 1.4415,
   beta: 0.8745,
@@ -30,7 +31,7 @@ export const stage4Camera3: CameraOptions = {
 };
 
 // final
-export const stage4Camera4: CameraOptions = {
+export const stage4Camera4: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(12.37, 20.50, -8.56),
   alpha: 1.6465,
   beta: 1.1284,
@@ -90,19 +91,19 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
 }  
   
 const showFrontCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  const camera = player.mesh!.getScene().activeCamera as MyCamera;
+  const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return
-  setCameraOptions(camera, stage4Camera1);
+  camera.setMoveToTarget(stage4Camera1.alpha, stage4Camera1.beta, stage4Camera1.radius, 50);
 }
 
 const showCameraLeft = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  const camera = player.mesh!.getScene().activeCamera as MyCamera;
+  const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return
-  setCameraOptions(camera, stage4Camera2);
+  camera.setMoveToTarget(stage4Camera2.alpha, stage4Camera2.beta, stage4Camera2.radius, 50);
 }
 
 const showCameraRight = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
-  const camera = player.mesh!.getScene().activeCamera as MyCamera;
+  const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return
-  setCameraOptions(camera, stage4Camera3);
+  camera.setMoveToTarget(stage4Camera3.alpha, stage4Camera3.beta, stage4Camera3.radius, 50);
 }

@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerColor } from '../../assets/colors';
-import { MyCamera } from '../../camera';
+import { MyCamera } from '../../cameras/arc-rotate-camera';
 import { PlayerEntity } from '../../entities/player';
 import { getGameSettings } from '../../storage';
 import { AbstractUI } from './../abstract-ui';

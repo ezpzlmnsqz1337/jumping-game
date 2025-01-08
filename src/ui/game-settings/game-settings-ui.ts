@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { MyCamera, MyFollowCamera } from '../../camera';
+import { AutomaticCamera } from '../../cameras/automatic-camera';
 import { PlayerEntity } from '../../entities/player';
 import gameRoot from '../../game-root';
 import { AbstractUI } from '../abstract-ui';
@@ -19,7 +19,7 @@ export class GameSettingsUI extends AbstractUI {
   }
 
   toggleFollowCamera() {
-    const arcRotateCamera = this.scene.getCameraByName('mainArcRotateCamera');
+    const arcRotateCamera = this.scene.getCameraByName('arcRotateCamera');
     const followCamera = this.scene.getCameraByName('followCamera');
 
     if (this.followCameraEnabled) {
@@ -47,7 +47,7 @@ export class GameSettingsUI extends AbstractUI {
   }
 
   toggleAutomaticCamera() {
-    const camera = this.scene.activeCamera as MyCamera | MyFollowCamera;
+    const camera = this.scene.activeCamera as unknown as AutomaticCamera;
     camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
     renderingCanvas.focus();
@@ -65,7 +65,7 @@ export class GameSettingsUI extends AbstractUI {
     this.collissionsCheckBox = document.querySelector('.collissions-enabled') as HTMLInputElement;
     this.playerInfoCheckBox = document.querySelector('.player-info-enabled') as HTMLInputElement;
 
-    const camera = this.scene.activeCamera as MyCamera | MyFollowCamera;
+    const camera = this.scene.activeCamera as unknown as AutomaticCamera;
 
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
 

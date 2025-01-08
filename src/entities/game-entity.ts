@@ -12,7 +12,29 @@ export class GameEntity {
     this.scene = scene;
     this.name = name;
     this.level = level;
-  } 
+  }
+
+  static createLabelTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) {
+    // name tag
+    const nickNameTextPlane = BABYLON.MeshBuilder.CreatePlane('label', { size: 2 }, scene);
+    nickNameTextPlane.rotation = new BABYLON.Vector3(0, 0, 0);
+    nickNameTextPlane.parent = mesh;
+    nickNameTextPlane.position.y = 2;
+    nickNameTextPlane.isPickable = false;
+    nickNameTextPlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    nickNameTextPlane.scaling = new BABYLON.Vector3(1, 5, 1);
+
+    const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(nickNameTextPlane);
+
+    const nickNameText = new GUI.TextBlock("labelText", nickname);
+    nickNameText.color = "white";
+    nickNameText.fontSize = "70px";
+    nickNameText.shadowBlur = 0;
+    nickNameText.outlineWidth = 10;
+    nickNameText.outlineColor = "black";
+    advancedTexture.addControl(nickNameText);
+
+  }
 
   static createNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) {
     // name tag
