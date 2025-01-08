@@ -147,15 +147,17 @@ export class Level1 extends GameLevel {
 
     const hemiLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
-    const utilLayer = new BABYLON.UtilityLayerRenderer(scene);
 
     const light1 = new BABYLON.PointLight('pointLight', new BABYLON.Vector3(-6, 6, 0), scene);
     light1.intensity = 0.4;
     light1.shadowEnabled = true;
     light1.shadowMinZ = 0.1;
     light1.shadowMaxZ = 100;
-    const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
-    lightGizmo1.light = light1;
+    if (import.meta.env.DEV) {
+      const utilLayer = new BABYLON.UtilityLayerRenderer(scene);
+      const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
+      lightGizmo1.light = light1;
+    }
 
     this.lights = [hemiLight, light1];
     this.shadowGenerators = [
