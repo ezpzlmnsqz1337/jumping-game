@@ -25,7 +25,7 @@ export default config({
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
         app.get("/", (req, res) => {
-            res.sendFile(path.join(__dirname, './dist/index.html'))
+            res.sendFile(path.join(__dirname, '../dist/index.html'))
         });
 
         /**
@@ -42,7 +42,7 @@ export default config({
          * Read more: https://docs.colyseus.io/tools/monitor/#restrict-access-to-the-panel-using-a-password
          */
         app.use("/colyseus", monitor());
-        app.use(express.static("./dist"))
+        app.use(express.static(path.join(__dirname, "../dist")))
     },
 
 

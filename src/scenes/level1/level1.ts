@@ -66,12 +66,12 @@ export class Level1 extends GameLevel {
     const scene = this.scene!;
 
     this.spawnPoints = [
-      new SpawnPointEntity('spawn-point-1', this, scene, new BABYLON.Vector3(-11.80, 0.05, 1)),
-      new SpawnPointEntity('spawn-point-2', this, scene, new BABYLON.Vector3(-11.80, 0.05, 0)),
-      new SpawnPointEntity('spawn-point-3', this, scene, new BABYLON.Vector3(-11.80, 0.05, -1)),
-      new SpawnPointEntity('spawn-point-4', this, scene, new BABYLON.Vector3(-11.80, 0.05, -2)),
-      new SpawnPointEntity('spawn-point-5', this, scene, new BABYLON.Vector3(-11.80, 0.05, -3)),
-      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.80, 0.05, -4)),
+      new SpawnPointEntity('spawn-point-1', this, scene, new BABYLON.Vector3(-11.80, 0.4, 1)),
+      new SpawnPointEntity('spawn-point-2', this, scene, new BABYLON.Vector3(-11.80, 0.4, 0)),
+      new SpawnPointEntity('spawn-point-3', this, scene, new BABYLON.Vector3(-11.80, 0.4, -1)),
+      new SpawnPointEntity('spawn-point-4', this, scene, new BABYLON.Vector3(-11.80, 0.4, -2)),
+      new SpawnPointEntity('spawn-point-5', this, scene, new BABYLON.Vector3(-11.80, 0.4, -3)),
+      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.80, 0.4, -4)),
     ];
   }
 
@@ -97,11 +97,11 @@ export class Level1 extends GameLevel {
         position: new BABYLON.Vector3(-10.00, 42.00, 8.00),
         scaling: new BABYLON.Vector3(5, 0.1, 5)
       }),
-      new EndTrigger(scene, {
-        level: this,
-        position: new BABYLON.Vector3(-14, 0, -8),
-        scaling: new BABYLON.Vector3(5, 0.1, 5)
-      }),
+      // new EndTrigger(scene, {
+      //   level: this,
+      //   position: new BABYLON.Vector3(-14, 0, -8),
+      //   scaling: new BABYLON.Vector3(5, 0.1, 5)
+      // }),
     ];
   }
 
