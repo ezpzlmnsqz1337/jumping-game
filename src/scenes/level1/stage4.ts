@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
-import { WallEntity } from '../../entities/walls';
-import { PlayerEntity } from '../../entities/player';
+import { WallEntity } from '../../entities/wall-entity';
+import { PlayerEntity } from '../../entities/player-entity';
 import { ArcRotateCameraOptions } from '../../cameras/arc-rotate-camera';
 import { GameLevel } from '../../game-level';
 import { Trigger } from '../../triggers/trigger';

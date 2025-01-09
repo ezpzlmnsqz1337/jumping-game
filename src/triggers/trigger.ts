@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from '../entities/player';
+import { PlayerEntity } from '../entities/player-entity';
 import { defaultTriggerColor } from '../assets/colors';
 import { GameLevel } from '../game-level';
 

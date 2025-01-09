@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from '../../entities/player';
+import { PlayerEntity } from '../../entities/player-entity';
 import { AbstractUI } from '../abstract-ui';
 
 export class PlayerInfoUI extends AbstractUI {

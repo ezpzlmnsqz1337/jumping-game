@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
-import { MyCamera } from '../../cameras/arc-rotate-camera';
-import { PlayerEntity } from '../../entities/player';
+import { PlayerEntity } from '../../entities/player-entity';
 import { AbstractUI } from "../abstract-ui";
+import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
@@ -131,7 +131,7 @@ export class EditorUI extends AbstractUI {
     const cameraRadiusSpan = document.querySelector('.editor .camera-radius .value') as HTMLSpanElement
     const lockTargetCheckBox = document.querySelector('.editor .lock-target-enabled') as HTMLInputElement
 
-    const camera = this.scene.activeCamera as MyCamera;
+    const camera = this.scene.activeCamera as MyArcRotateCamera;
 
     if (!camera) return;
 

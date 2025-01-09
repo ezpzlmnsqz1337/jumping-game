@@ -1,6 +1,3 @@
-import * as BABYLON from '@babylonjs/core';
-
-//filtering happens here
 export const FILTER_GROUP_PLAYER = 1;
 export const FILTER_GROUP_GROUND = 2;
 export const FILTER_GROUP_WALL = 4;

@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { machtinSS, warFlag } from '../../assets/textures';
-import { WallEntity } from '../../entities/walls';
+import { WallEntity } from '../../entities/wall-entity';
 import { GameLevel } from '../../game-level';
 
 export const createSlide = (scene: BABYLON.Scene, level: GameLevel) => {

@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { WallEntity } from '../../entities/walls';
+import { WallEntity } from '../../entities/wall-entity';
 import { GameLevel } from '../../game-level';
 
 export const createStage5 = (scene: BABYLON.Scene, level: GameLevel) => {

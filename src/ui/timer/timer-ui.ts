@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from '../../entities/player';
-import { LevelTimer } from '../../timer';
+import { PlayerEntity } from '../../entities/player-entity';
+import { LevelTimer } from '../../level-timer';
 import { AbstractUI } from './../abstract-ui';
 
 export class TimerUI extends AbstractUI {

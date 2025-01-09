@@ -1,14 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
 import * as Colyseus from "colyseus.js";
-
-
 import { getModel } from './assets/models';
 import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
 import { GameEntity } from './entities/game-entity';
-import { PlayerEntity, PlayerStatus } from './entities/player';
+import { PlayerEntity, PlayerStatus } from './entities/player-entity';
 import gameRoot from './game-root';
-import { TimeEntry } from './timer';
-import { renderingCanvas } from './ui/ui-manager';
+import { TimeEntry } from './level-timer';
 
 const UPDATE_SPEED_MS = 1000 / 60;
 

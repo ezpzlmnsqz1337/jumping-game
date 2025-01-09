@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { startTriggerColor } from '../assets/colors';
-import { PlayerEntity } from '../entities/player';
+import { PlayerEntity } from '../entities/player-entity';
 import { CreateTriggerOptions, Trigger } from './trigger';
 
 export class StartTrigger extends Trigger {

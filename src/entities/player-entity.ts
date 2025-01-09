@@ -119,4 +119,17 @@ export class PlayerEntity extends GameEntity {
       }
     }
   }
+
+  jump() {
+    if (!this.mesh) return;
+    this.jumping = true;
+    this.moving = true;
+    console.log('jump');
+
+    this.physics.body.applyImpulse(
+      BABYLON.Vector3.Up().scale(this.jumpingPower),
+      this.mesh.getAbsolutePosition()
+    );
+    this.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+  }
 }

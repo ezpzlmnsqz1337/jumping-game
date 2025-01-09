@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import earcut from 'earcut';
 import { easyColor, hardColor, mediumColor } from '../../assets/colors';
 import { getLightTexture } from '../../assets/textures';
-import { WallEntity } from '../../entities/walls';
+import { WallEntity } from '../../entities/wall-entity';
 import { GameLevel } from '../../game-level';
 
 export const createLongJumps = (scene: BABYLON.Scene, level: GameLevel, numberOfJumps: number = 19) => {

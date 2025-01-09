@@ -1,11 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerColor } from '../../assets/colors';
-import { MyCamera } from '../../cameras/arc-rotate-camera';
-import { PlayerEntity } from '../../entities/player';
-import { getGameSettings } from '../../storage';
+import { PlayerEntity } from '../../entities/player-entity';
 import { AbstractUI } from './../abstract-ui';
 import { renderingCanvas } from './../ui-manager';
 import gameRoot from '../../game-root';
+import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
+import { GameStorage } from '../../game-storage';
 
 export class LobbyUI extends AbstractUI {
   nicknameInput!: HTMLInputElement;
@@ -20,7 +20,7 @@ export class LobbyUI extends AbstractUI {
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'lobby', player);
-    this.lastCameraRadius = (this.scene.activeCamera as MyCamera).radius || 6;
+    this.lastCameraRadius = (this.scene.activeCamera as MyArcRotateCamera).radius || 6;
   }
   
   openLobby() {
@@ -35,7 +35,7 @@ export class LobbyUI extends AbstractUI {
       gameRoot.uiManager?.gameSettingsUI.toggleFollowCamera();
       this.switchCameraOnClose = true;
     };
-    const camera = this.scene.activeCamera as MyCamera;
+    const camera = this.scene.activeCamera as MyArcRotateCamera;
     camera.useAutoRotationBehavior = true;
     this.lastCameraRadius = camera.radius;
     camera.setMoveToTarget(camera.alpha + 0.01, camera.beta + 0.01, 3, 50);
@@ -52,7 +52,7 @@ export class LobbyUI extends AbstractUI {
     this.lobbyButtonDiv.style.display = 'block';
     this.open = false;
 
-    const camera = this.scene.activeCamera as MyCamera;
+    const camera = this.scene.activeCamera as MyArcRotateCamera;
     camera.useAutoRotationBehavior = false;
     
     const radius = this.lastCameraRadius > 0 ? this.lastCameraRadius : 6;
@@ -82,7 +82,7 @@ export class LobbyUI extends AbstractUI {
     localStorage.setItem('color', this.player.color as PlayerColor);
     localStorage.setItem('nickname', nickname);
 
-    (this.scene.activeCamera as MyCamera).useAutoRotationBehavior = false;
+    (this.scene.activeCamera as MyArcRotateCamera).useAutoRotationBehavior = false;
     this.player.changeNickname(nickname);
     this.closeLobby();
   }
@@ -98,7 +98,7 @@ export class LobbyUI extends AbstractUI {
 
     this.lobbyDiv.style.display = this.open ? 'block' : 'none';
   
-    const gameSettings = getGameSettings();
+    const gameSettings = GameStorage.getGameSettings();
   
     this.nicknameInput.value = gameSettings.nickname;
   

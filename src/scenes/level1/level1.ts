@@ -1,11 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
 import { getDarkTexture, getRedTexture } from '../../assets/textures';
 import { FILTER_GROUP_GROUND } from '../../collission-groups';
-import { SpawnPointEntity } from '../../entities/spawn-point';
+import { SpawnPointEntity } from '../../entities/spawn-point-entity';
 import { GameLevel } from '../../game-level';
 import { ShadowGenerator } from '../../shadows';
-import { EndTrigger } from '../../triggers/end';
-import { StartTrigger } from '../../triggers/start';
+import { EndTrigger } from '../../triggers/end-trigger';
+import { StartTrigger } from '../../triggers/start-trigger';
 import { createBorder } from './border';
 import { createLongJumps } from './longjumps';
 import { Skybox } from './skybox';
@@ -16,8 +16,9 @@ import { createStage3 } from './stage3';
 import { createStage4 } from './stage4';
 import { createStage5 } from './stage5';
 import { createStage6 } from './stage6';
-import { TeleportTrigger } from '../../triggers/teleport';
+import { TeleportTrigger } from '../../triggers/teleport-trigger';
 import { GameEntity } from '../../entities/game-entity';
+import { createBunnyHops } from './bunnyhops';
 
 export class Level1 extends GameLevel {
 
@@ -58,10 +59,11 @@ export class Level1 extends GameLevel {
       ...createLongJumps(scene, this),
       ...createBorder(scene, this),
       ...createSlide(scene, this),
+      ...createBunnyHops(scene, this),
     ];
 
     // last wall red
-    (this.walls[this.walls.length - 1].mesh.material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
+    (this.walls[this.walls.length - 2].mesh.material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
   };
 
   protected createSpawnPoints() {
@@ -73,7 +75,7 @@ export class Level1 extends GameLevel {
       new SpawnPointEntity('spawn-point-3', this, scene, new BABYLON.Vector3(-11.80, 0.4, -1)),
       new SpawnPointEntity('spawn-point-4', this, scene, new BABYLON.Vector3(-11.80, 0.4, -2)),
       new SpawnPointEntity('spawn-point-5', this, scene, new BABYLON.Vector3(-11.80, 0.4, -3)),
-      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.80, 0.4, -4)),
+      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.80, 0.4, -4)),      
     ];
   }
 

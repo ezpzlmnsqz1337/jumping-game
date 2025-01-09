@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { createSounds } from '../assets/sounds.ts';
 import { GameControls } from '../controls.ts';
-import { PlayerEntity } from '../entities/player.ts';
+import { PlayerEntity } from '../entities/player-entity.ts';
 import gameRoot from '../game-root.ts';
 import { createOptimizations } from '../optimizations.ts';
 import { createPhysics } from '../physics.ts';

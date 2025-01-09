@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from '../../entities/player';
+import { PlayerEntity } from '../../entities/player-entity';
 import gameRoot from '../../game-root';
 import { ChatMessage } from '../../multiplayer-session';
 import { AbstractUI } from './../abstract-ui';

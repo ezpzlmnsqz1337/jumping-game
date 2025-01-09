@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { Checkpoint, PlayerEntity } from './entities/player';
+import { Checkpoint, PlayerEntity } from './entities/player-entity';
 import gameRoot from './game-root';
 import { GameLevel } from './game-level';
 
@@ -135,16 +135,9 @@ export class GameControls {
   handleJumping(player: PlayerEntity) {
     if (!player.mesh) return;
     const keyStatus = this.keyStatus;
-    const jumpingPower = player.jumpingPower;
 
     if (keyStatus.Space && !player.jumping) {
-      player.jumping = true;
-      player.moving = true;
-      player.physics.body.applyImpulse(
-        BABYLON.Vector3.Up().scale(jumpingPower),
-        player.mesh.getAbsolutePosition()
-      );
-      player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+      player.jump()
     }
   }
 

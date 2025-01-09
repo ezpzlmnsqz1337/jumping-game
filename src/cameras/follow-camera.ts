@@ -14,7 +14,7 @@ export class MyFollowCamera extends BABYLON.FollowCamera implements AutomaticCam
     super(name, opts.position, scene, opts.lockedTarget);
     
     this.radius = opts.radius;
-    this.heightOffset = 2;
+    this.heightOffset = 5;
     this.rotationOffset = 0;
     this.cameraAcceleration = 0.1;
     this.maxCameraSpeed = 5;

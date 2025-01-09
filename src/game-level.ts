@@ -1,13 +1,13 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerEntity } from './entities/player';
-import { SpawnPointEntity } from './entities/spawn-point';
-import { WallEntity } from './entities/walls';
+import { PlayerEntity } from './entities/player-entity';
+import { SpawnPointEntity } from './entities/spawn-point-entity';
+import { WallEntity } from './entities/wall-entity';
 import { Skybox } from './scenes/level1/skybox';
 import { ShadowGenerator } from './shadows';
-import { LevelTimer } from './timer';
-import { EndTrigger } from './triggers/end';
-import { StartTrigger } from './triggers/start';
-import { TeleportTrigger } from './triggers/teleport';
+import { LevelTimer } from './level-timer';
+import { EndTrigger } from './triggers/end-trigger';
+import { StartTrigger } from './triggers/start-trigger';
+import { TeleportTrigger } from './triggers/teleport-trigger';
 
 export class GameLevel {
   name: string;
