@@ -124,7 +124,6 @@ export class PlayerEntity extends GameEntity {
     if (!this.mesh) return;
     this.jumping = true;
     this.moving = true;
-    console.log('jump');
 
     this.physics.body.applyImpulse(
       BABYLON.Vector3.Up().scale(this.jumpingPower),

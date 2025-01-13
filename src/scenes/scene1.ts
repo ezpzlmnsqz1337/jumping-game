@@ -99,5 +99,16 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
     gameRoot.multiplayer = new MultiplayerSession(scene, gameRoot.player, mpObjects);
   }
 
+  // demo
+  if (!localStorage.getItem('demo')) {
+    const demo = await fetch('assets/demo/map-record.json');
+    const demoJson = await demo.json();
+    localStorage.setItem('demo', JSON.stringify(demoJson));
+  }
+  const lastDemo = localStorage.getItem('demo');
+  if (lastDemo) {
+    setTimeout(() => gameRoot.demoService.playDemo(JSON.parse(lastDemo)), 1000);
+  }
+
   return scene;
 }

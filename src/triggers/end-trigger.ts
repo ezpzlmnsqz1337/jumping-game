@@ -22,6 +22,8 @@ export class EndTrigger extends Trigger {
       checkpoints: player.checkpoints.length
     });
     this.mesh.getScene().sounds?.find(x => x.name === 'wicked-sick')?.play();
+    const demo = gameRoot.demoService.stopRecording();
+    gameRoot.demoService.playDemo(demo);
   }
 
   onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {

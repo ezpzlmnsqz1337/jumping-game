@@ -49,11 +49,7 @@ export class Trigger {
     this.mesh.material = material;
   }
 
-  onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
-    console.log(`Player ${player.nickname} entered the trigger ${trigger.name}`);    
-  }
+  onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {}
 
-  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
-    console.log(`Player ${player.nickname} exitted the trigger ${trigger.name}`);    
-  }
+  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {}
 }
