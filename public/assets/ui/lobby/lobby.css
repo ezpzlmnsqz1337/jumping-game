@@ -42,6 +42,15 @@
   border: 0.2rem solid #1d96ff;
 }
 
+.lobby>.nickname>input.invalid {
+  border-color: var(--red);
+}
+
+.lobby>.nickname>.error {
+  color: var(--red);
+  font-size: 1.4rem;
+}
+
 .lobby>.player-color {
   display: flex;
   flex-direction: column;
