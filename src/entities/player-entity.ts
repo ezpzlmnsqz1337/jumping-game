@@ -19,7 +19,7 @@ export class PlayerEntity extends GameEntity {
   jumpingPower = 60;
   jumping = false;
   moving = false;
-  physics: BABYLON.PhysicsAggregate;
+  physics!: BABYLON.PhysicsAggregate;
   checkpoints: Checkpoint[] = [];
   lastCheckpointIndex = 0;
   color = 'blue';
@@ -41,25 +41,7 @@ export class PlayerEntity extends GameEntity {
     this.mesh.visibility = 0;
     this.mesh.position = new BABYLON.Vector3(0, 0.001, 0);
 
-    // physics
-    this.physics = new BABYLON.PhysicsAggregate(
-      this.mesh,
-      BABYLON.PhysicsShapeType.BOX,
-      { mass: 10, restitution: 0, friction: 0.5 },
-      scene
-    );
-
-    this.physics.body.setCollisionCallbackEnabled(true);
-    this.physics.body.setLinearDamping(1);
-
-    const observable = this.physics.body.getCollisionObservable();
-    const observer = observable.add(collisionEvent => this.handleCollissions(collisionEvent));
-
-    this.changeNickname(this.nickname);
-
-    this.physics.shape.filterMembershipMask = FILTER_GROUP_PLAYER;
-    const playerMask = this.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;
-    this.physics.shape.filterCollideMask = playerMask;
+    this.createPhysics(scene);
   }
 
   async changeColor(color: string) {
@@ -130,5 +112,28 @@ export class PlayerEntity extends GameEntity {
       this.mesh.getAbsolutePosition()
     );
     this.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+  }
+
+  createPhysics(scene: BABYLON.Scene): void {
+    if (!this.mesh) return;
+    // physics
+    this.physics = new BABYLON.PhysicsAggregate(
+      this.mesh,
+      BABYLON.PhysicsShapeType.BOX,
+      { mass: 10, restitution: 0, friction: 0.5 },
+      scene
+    );
+
+    this.physics.body.setCollisionCallbackEnabled(true);
+    this.physics.body.setLinearDamping(1);
+
+    const observable = this.physics.body.getCollisionObservable();
+    const observer = observable.add(collisionEvent => this.handleCollissions(collisionEvent));
+
+    this.changeNickname(this.nickname);
+
+    this.physics.shape.filterMembershipMask = FILTER_GROUP_PLAYER;
+    const playerMask = this.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;
+    this.physics.shape.filterCollideMask = playerMask;
   }
 }

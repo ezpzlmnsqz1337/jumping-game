@@ -6,7 +6,7 @@ export class GameEntity {
   name: string;
   scene: BABYLON.Scene;
   level: GameLevel;
-  mesh: BABYLON.Nullable<BABYLON.Mesh> = null;
+  protected _mesh: BABYLON.Nullable<BABYLON.Mesh> = null;
 
   constructor(name: string, level: GameLevel, scene: BABYLON.Scene) {
     this.scene = scene;
@@ -14,7 +14,17 @@ export class GameEntity {
     this.level = level;
   }
 
-  static createLabelTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) {
+  get mesh(): BABYLON.Nullable<BABYLON.Mesh> {
+    return this._mesh;
+  }
+
+  set mesh(mesh: BABYLON.Mesh) {
+    this._mesh = mesh;
+    if (!this._mesh.metadata) this._mesh.metadata = {};
+    this._mesh.metadata.entity = this;
+  }
+
+  static createLabelTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string): void {
     // name tag
     const nickNameTextPlane = BABYLON.MeshBuilder.CreatePlane('label', { size: 2 }, scene);
     nickNameTextPlane.rotation = new BABYLON.Vector3(0, 0, 0);
@@ -36,7 +46,7 @@ export class GameEntity {
 
   }
 
-  static createNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) {
+  static createNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string): void {
     // name tag
     const nickNameTextPlane = BABYLON.MeshBuilder.CreatePlane('nickname', { size: 2 }, scene);
     nickNameTextPlane.rotation = new BABYLON.Vector3(0, 0, 0);
@@ -56,12 +66,26 @@ export class GameEntity {
     advancedTexture.addControl(nickNameText);
   }
 
-  static removeNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh) {
+  static removeNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh): void {
     if (!mesh) return;
     mesh.getChildMeshes().forEach(mesh => {
       if (mesh.name === 'nickname') {
         scene.removeMesh(mesh);
       }
     });
+  }
+
+  createPhysics(scene: BABYLON.Scene): void { }
+
+  updatePhysicsBody(): void {
+    if (!this.mesh) return;
+
+    if (this.mesh.physicsBody) {
+      this.mesh.physicsBody.getCollisionObservable().clear();
+      this.mesh.physicsBody.dispose();
+      this.mesh.physicsBody = null;
+    }
+
+    this.createPhysics(this.mesh.getScene());
   }
 }
