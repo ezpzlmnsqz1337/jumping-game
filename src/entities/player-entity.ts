@@ -18,6 +18,9 @@ export class PlayerEntity extends GameEntity {
   strafeBoostSpeed = 1.4;
   jumpingPower = 60;
   jumping = false;
+  shooting = false;
+  shootingRateMs = 250;
+  shotSpeed = 0.5;
   moving = false;
   physics: BABYLON.PhysicsAggregate;
   checkpoints: Checkpoint[] = [];
@@ -121,7 +124,7 @@ export class PlayerEntity extends GameEntity {
   }
 
   jump() {
-    if (!this.mesh) return;
+    if (!this.mesh || this.jumping) return;
     this.jumping = true;
     this.moving = true;
 
@@ -130,5 +133,35 @@ export class PlayerEntity extends GameEntity {
       this.mesh.getAbsolutePosition()
     );
     this.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+  }
+
+  shoot() {
+    if (!this.mesh || this.shooting) return;
+    this.shooting = true;
+    const playerDirection = this.mesh.getDirection(BABYLON.Axis.Z);
+    
+    const bullet = BABYLON.MeshBuilder.CreateSphere('shot', { diameter: 0.05 }, this.scene);
+    bullet.position = this.mesh.getAbsolutePosition().add(playerDirection.scale(-1));
+    
+    const bulletSpeed = -1 * this.shotSpeed * this.scene.getAnimationRatio();
+    const bulletDirection = playerDirection.scale(bulletSpeed);
+    const updateBullet = () => {
+      bullet.moveWithCollisions(bulletDirection);
+  
+      // Create a ray from the bullet's position in the direction it is moving with a limited range
+      const ray = new BABYLON.Ray(bullet.position, bulletDirection, 1);
+    
+      // Check for intersections with other meshes in the scene within the limited range
+      const hit = this.scene.pickWithRay(ray);
+    
+      if (hit && hit.pickedMesh) {
+        bullet.dispose();
+        this.scene.onBeforeRenderObservable.remove(observer);
+      }
+    };
+  
+    const observer = this.scene.onBeforeRenderObservable.add(updateBullet);
+
+    setTimeout(() => this.shooting = false, this.shootingRateMs);
   }
 }

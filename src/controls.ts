@@ -11,7 +11,7 @@ export interface KeyStatus {
   Comma: boolean,
   Period: boolean,
   Space: boolean,
-  ControlLeft: boolean
+  KeyE: boolean
 }
 
 export class GameControls {
@@ -23,7 +23,7 @@ export class GameControls {
     Comma: false,
     Period: false,
     Space: false,
-    ControlLeft: false
+    KeyE: false
   }
 
   bindControls(scene: BABYLON.Scene, player: PlayerEntity): void {
@@ -59,6 +59,7 @@ export class GameControls {
       this.handleWSADMovement(player, deltaTime);
       this.handleTurning(player, deltaTime);
       this.handleJumping(player);
+      this.handleShooting(player);
     });
 
     window.addEventListener('keypress', e => {
@@ -134,10 +135,17 @@ export class GameControls {
 
   handleJumping(player: PlayerEntity) {
     if (!player.mesh) return;
-    const keyStatus = this.keyStatus;
 
-    if (keyStatus.Space && !player.jumping) {
+    if (this.keyStatus.Space) {
       player.jump()
+    }
+  }
+
+  handleShooting(player: PlayerEntity) {
+    if (!player.mesh) return;
+
+    if (this.keyStatus.KeyE) {
+      player.shoot();
     }
   }
 
