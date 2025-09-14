@@ -7,11 +7,14 @@ import { GameLevel } from '../game-level.ts';
 export type WallType = 'box' | 'sphere' | 'cylinder';
 
 export class WallEntity extends GameEntity {
-  friction = 0.4;
-  wallType = 'box';
+  wallType: WallType = 'box';
+  opts: any = {};
 
   constructor(scene: BABYLON.Scene, level: GameLevel, wallType: WallType, opts: any, position: BABYLON.Vector3, rotation?: BABYLON.Quaternion) {
     super('wall', level, scene);
+    this.wallType = wallType;
+    this.opts = opts;
+
     switch (wallType) {
       case 'box':
         this.mesh = BABYLON.MeshBuilder.CreateBox('wall', opts, scene);
@@ -25,17 +28,15 @@ export class WallEntity extends GameEntity {
       default:
         this.mesh = BABYLON.MeshBuilder.CreateBox('wall', opts, scene);
     }
+    this.mesh.metadata = {...this.mesh.metadata, opts};
+
     const wallMaterial = new BABYLON.StandardMaterial('wallMaterial');
     wallMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
     wallMaterial.diffuseTexture = getDarkTexture({ uScale: opts.uScale, vScale: opts.vScale }, scene);
     wallMaterial.roughness = 0.3;
     this.mesh.material = wallMaterial;
-    this.mesh.metadata = {...this.mesh.metadata, opts};
     this.mesh.position = position;
     if (rotation) this.mesh.rotationQuaternion = rotation;
-
-    this.wallType = opts.wallType;
-    this.friction = opts.friction;
 
     this.createPhysics(scene);
   }
@@ -61,9 +62,21 @@ export class WallEntity extends GameEntity {
     const wallAggregate = new BABYLON.PhysicsAggregate(
       this.mesh,
       physicsShapeType,
-      { mass: 0, friction: this.friction },
+      { mass: 0, friction: this.opts.friction },
       scene
     );
     wallAggregate.shape.filterMembershipMask = FILTER_GROUP_WALL;
+  }
+
+  serialize(): any {
+    return {
+      ...super.serialize(),
+      opts: this.opts,
+      wallType: this.wallType
+    }
+  }
+
+  static deserialize(scene: BABYLON.Scene, level: GameLevel, data: any) {
+    return new WallEntity(scene, level, data.wallType, data.opts, data.position, data.rotation);
   }
 }

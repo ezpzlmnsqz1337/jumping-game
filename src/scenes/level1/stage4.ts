@@ -58,8 +58,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
   )
 
     // front camera trigger
-    const trigger1 = new Trigger(scene, {
-      level,
+    const trigger1 = new Trigger(scene, level, {
       position: new BABYLON.Vector3(3.50, 27.10, -10.46),
       width: 3,
       depth: 5,
@@ -68,8 +67,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
     trigger1.onEnter = showFrontCamera;
 
     // left camera trigger
-    const trigger2 = new Trigger(scene, {
-      level,
+    const trigger2 = new Trigger(scene, level, {
       position: new BABYLON.Vector3( -1.50, 25.50, -15.66),
       width: 6,
       depth: 3,
@@ -78,8 +76,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
     trigger2.onEnter = showCameraLeft;
 
     // right camera trigger
-    const trigger3 = new Trigger(scene, {
-      level,
+    const trigger3 = new Trigger(scene, level, {
       position: new BABYLON.Vector3(-1.77, 27.10, -10.45),      
       width: 3,
       depth: 3,

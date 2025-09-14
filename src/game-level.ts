@@ -94,4 +94,15 @@ export class GameLevel {
     const index = Math.round(Math.random() * (this.spawnPoints.length - 1));
     return this.spawnPoints[index];
   }
+
+  serialize(): string {
+    return JSON.stringify({
+      name: this.name,
+      player: this.player?.serialize(),
+      walls: this.walls.map(wall => wall.serialize()),
+      spawnPoints: this.spawnPoints.map(spawnPoint => spawnPoint.serialize()),
+      startTriggers: this.startTriggers.map(trigger => trigger.serialize()),
+      endTriggers: this.endTriggers.map(trigger => trigger.serialize()),
+    });
+  }
 }

@@ -2,11 +2,14 @@ import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { GameLevel } from '../game-level';
 
+export type GameEntityType = 'wall' | 'player' | 'trigger';
+
 export class GameEntity {
   name: string;
   scene: BABYLON.Scene;
   level: GameLevel;
   protected _mesh: BABYLON.Nullable<BABYLON.Mesh> = null;
+  type: GameEntityType = 'wall';
 
   constructor(name: string, level: GameLevel, scene: BABYLON.Scene) {
     this.scene = scene;
@@ -87,5 +90,16 @@ export class GameEntity {
     }
 
     this.createPhysics(this.mesh.getScene());
+  }
+
+  serialize(): any {
+    return {
+      type: this.type,
+      name: this.name,
+      position: this.mesh?.position,
+      rotation: this.mesh?.rotationQuaternion,
+      scaling: this.mesh?.scaling,
+      material: this.mesh?.material?.serialize()
+    };
   }
 }

@@ -63,7 +63,7 @@ export class Level1 extends GameLevel {
     ];
 
     // last wall red
-    (this.walls[this.walls.length - 2].mesh.material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
+    // (this.walls[this.walls.length - 2].mesh.material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
   };
 
   protected createSpawnPoints() {
@@ -84,8 +84,8 @@ export class Level1 extends GameLevel {
 
     this.startTriggers = [
       new StartTrigger(scene,
+        this,
         {
-          level: this,
           position: new BABYLON.Vector3(-8, 0, -2),
           scaling: new BABYLON.Vector3(5, 0.1, 7)
         }),
@@ -96,8 +96,8 @@ export class Level1 extends GameLevel {
     const scene = this.scene!;
 
     this.endTriggers = [
-      new EndTrigger(scene, {
-        level: this,
+      new EndTrigger(scene, this, {
+        
         position: new BABYLON.Vector3(-10.00, 42.00, 8.00),
         scaling: new BABYLON.Vector3(5, 0.1, 5)
       }),
@@ -115,24 +115,19 @@ export class Level1 extends GameLevel {
     const gap = 2;
 
     this.teleports = [
-      new TeleportTrigger('teleport-stage-2', scene, {
-        level: this,
+      new TeleportTrigger('teleport-stage-2', scene, this, {
         position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ)
       }, new BABYLON.Vector3(6.07, 6.00, 1.93)),
-      new TeleportTrigger('teleport-stage-3', scene, {
-        level: this,
+      new TeleportTrigger('teleport-stage-3', scene, this,  {
         position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap)
       }, new BABYLON.Vector3(11.60, 12.20, -7.65)),
-      new TeleportTrigger('teleport-stage-4', scene, {
-        level: this,
+      new TeleportTrigger('teleport-stage-4', scene, this,  {
         position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 2)
       }, new BABYLON.Vector3(4.13, 22.20, -8.09)),
-      new TeleportTrigger('teleport-stage-5', scene, {
-        level: this,
+      new TeleportTrigger('teleport-stage-5', scene, this,  {
         position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 3)
       }, new BABYLON.Vector3(-5.80, 32.50, -8.70)),
-      new TeleportTrigger('teleport-top', scene, {
-        level: this,
+      new TeleportTrigger('teleport-top', scene, this,  {
         position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 4)
       }, new BABYLON.Vector3(-12.60, 42.50, 5.70)),
       
@@ -163,7 +158,7 @@ export class Level1 extends GameLevel {
 
     this.lights = [hemiLight, light1];
     this.shadowGenerators = [
-      new ShadowGenerator(light1, [...this.walls.map(x => x.mesh)], [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]),
+      new ShadowGenerator(light1, [...this.walls.map(x => x.mesh!)], [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh!)]),
     ];
   }
 }

@@ -44,17 +44,16 @@ export const createBunnyHops = (scene: BABYLON.Scene, level: GameLevel) => {
     new WallEntity(scene, level, 'box', { width: 5, depth: 1, height: height-3 }, new BABYLON.Vector3(initialX, initialY-1.5, initialZ+12.5)),
   ]  
 
-  walls.forEach(wall => (wall.mesh.material as BABYLON.StandardMaterial).diffuseTexture = getDarkTexture({ uScale: 1, vScale: 1 }, scene));
+  walls.forEach(wall => (wall.mesh!.material as BABYLON.StandardMaterial).diffuseTexture = getDarkTexture({ uScale: 1, vScale: 1 }, scene));
   return walls;
 }
 
 const createJump = (scene:BABYLON.Scene, level: GameLevel, position: BABYLON.Vector3, height: number) => {
   const wall = new WallEntity(scene, level, 'box', { width: 2, depth: 2, height }, position);
-  const jumpTrigger = new Trigger(scene, {
+  const jumpTrigger = new Trigger(scene, level, {
     isVisible: false,
     position: position.add(new BABYLON.Vector3(0, 2, 0)),
     scaling: new BABYLON.Vector3(2, 0.2, 2),
-    level
   });
 
   jumpTrigger.onEnter = (trigger: BABYLON.Mesh, player: PlayerEntity) => {

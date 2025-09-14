@@ -4,7 +4,6 @@ import { defaultTriggerColor } from '../assets/colors';
 import { GameLevel } from '../game-level';
 
 export interface CreateTriggerOptions {
-  level: GameLevel
   position?: BABYLON.Vector3
   scaling?: BABYLON.Vector3
   isVisible?: boolean
@@ -15,8 +14,8 @@ export class Trigger {
   level: GameLevel;
   mesh: BABYLON.Mesh;
 
-  constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    this.level = opts.level;
+  constructor(scene: BABYLON.Scene, level: GameLevel, opts: CreateTriggerOptions) {
+    this.level = level;
 
     const material = new BABYLON.StandardMaterial('triggerMaterial');
     material.diffuseColor = defaultTriggerColor;
@@ -52,4 +51,17 @@ export class Trigger {
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {}
 
   onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {}
+
+  serialize(): any {
+    return {
+      tape: 'default',
+      position: this.mesh.position,
+      scaling: this.mesh.scaling,
+      isVisible: this.mesh.isVisible
+    }
+  }
+
+  static deserialize(scene: BABYLON.Scene, level: GameLevel, data: any): Trigger {
+    return new Trigger(scene, level, data);
+  }
 }

@@ -3,10 +3,11 @@ import { PlayerEntity } from '../entities/player-entity';
 import {  CreateTriggerOptions, Trigger } from './trigger';
 import { endTriggerColor } from '../assets/colors';
 import gameRoot from '../game-root';
+import { GameLevel } from '../game-level';
 
 export class EndTrigger extends Trigger {
-  constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    super(scene, { ...opts, isVisible: true });
+  constructor(scene: BABYLON.Scene, level: GameLevel, opts: CreateTriggerOptions) {
+    super(scene, level, { ...opts, isVisible: true });
     (this.mesh.material as BABYLON.StandardMaterial).diffuseColor = endTriggerColor;
   }
 
@@ -28,5 +29,12 @@ export class EndTrigger extends Trigger {
 
   onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
+  }
+
+  serialize(): any {
+    return {
+      ...super.serialize(),
+      type: 'end'
+    }
   }
 }

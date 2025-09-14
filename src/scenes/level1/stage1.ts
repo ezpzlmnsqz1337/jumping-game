@@ -29,8 +29,7 @@ export const createStage1 = (scene: BABYLON.Scene, level: GameLevel) => {
     new WallEntity(scene, level, 'box', { width: 2, depth: 2, height: 5.8 }, new BABYLON.Vector3(3, 2.9, -5))
   )
 
-  const trigger = new Trigger(scene, {
-    level,
+  const trigger = new Trigger(scene, level, {
     position: new BABYLON.Vector3(-3, 1.5, 1),
     width: 2,
     depth: 2,

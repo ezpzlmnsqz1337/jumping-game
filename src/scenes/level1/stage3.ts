@@ -94,8 +94,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
 
 
   // back wall camera trigger main (in the center)
-  const trigger1 = new Trigger(scene, {
-    level,
+  const trigger1 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(10.20, 13.00, -11.80),
     width: 5,
     depth: 5,
@@ -104,8 +103,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger1.onEnter = showBackWallCamera;
 
   // left wall camera trigger
-  const trigger2 = new Trigger(scene, {
-    level,
+  const trigger2 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(13.78, 13.00, -11.79),
     width: 2,
     depth: 9.6,
@@ -114,8 +112,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger2.onEnter = showLeftWallCamera;
 
   // back wall camera trigger
-  const trigger3 = new Trigger(scene, {
-    level,
+  const trigger3 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(9.94, 15.20, -15.39),
     width: 9.6,
     depth: 2,
@@ -125,8 +122,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger3.onEnter = showBackWallCamera;
 
   // right wall camera trigger
-  const trigger4 = new Trigger(scene, {
-    level,
+  const trigger4 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(6.24, 17.60, -11.99),
     width: 2,
     depth: 9.6,
@@ -135,8 +131,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger4.onEnter = showRightWallCamera;
 
   // front wall camera trigger
-  const trigger5 = new Trigger(scene, {
-    level,
+  const trigger5 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(9.94, 19.70, -8.19),
     width: 9.6,
     depth: 2,
@@ -145,8 +140,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger5.onEnter = showFrontWallCamera;
 
   // left wall camera trigger up
-  const trigger6 = new Trigger(scene, {
-    level,
+  const trigger6 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(13.84, 21.40, -8.79),
     width: 2,
     depth: 3,
@@ -155,8 +149,7 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   trigger6.onEnter = showLeftWallCameraUp;
 
   // final part trigger
-  const trigger7 = new Trigger(scene, {
-    level,
+  const trigger7 = new Trigger(scene, level, {
     position: new BABYLON.Vector3(10.04, 22.30, -13.09),
     width: 9,
     depth: 2,

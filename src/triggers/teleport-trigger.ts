@@ -2,13 +2,14 @@ import * as BABYLON from '@babylonjs/core';
 import { teleportTriggerColor } from '../assets/colors';
 import { PlayerEntity } from '../entities/player-entity';
 import { CreateTriggerOptions, Trigger } from './trigger';
+import { GameLevel } from '../game-level';
 
 export class TeleportTrigger extends Trigger {
   destination: BABYLON.Vector3;
   name: string;
 
-  constructor(name: string, scene: BABYLON.Scene, opts: CreateTriggerOptions, destination: BABYLON.Vector3) {
-    super(scene, {
+  constructor(name: string, scene: BABYLON.Scene, level: GameLevel, opts: CreateTriggerOptions, destination: BABYLON.Vector3) {
+    super(scene, level, {
       ...opts,
       scaling: new BABYLON.Vector3(1, 0.2, 1),
       isVisible: true
@@ -36,5 +37,13 @@ export class TeleportTrigger extends Trigger {
 
   onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
+  }
+
+  serialize(): any {
+    return {
+      ...super.serialize(),
+      destination: this.destination,
+      type: 'teleport'
+    }
   }
 }

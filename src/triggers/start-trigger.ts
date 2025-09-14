@@ -3,10 +3,11 @@ import { startTriggerColor } from '../assets/colors';
 import { PlayerEntity } from '../entities/player-entity';
 import { CreateTriggerOptions, Trigger } from './trigger';
 import gameRoot from '../game-root';
+import { GameLevel } from '../game-level';
 
 export class StartTrigger extends Trigger {
-  constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    super(scene, { ...opts, isVisible: true });
+  constructor(scene: BABYLON.Scene, level: GameLevel, opts: CreateTriggerOptions) {
+    super(scene, level, { ...opts, isVisible: true });
     (this.mesh.material as BABYLON.StandardMaterial).diffuseColor = startTriggerColor;
   }
 
@@ -21,5 +22,12 @@ export class StartTrigger extends Trigger {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
     this.level.timer?.start();
     gameRoot.demoService.startRecording(player);
+  }
+
+  serialize(): any {
+    return {
+      ...super.serialize(),
+      type: 'start'
+    }
   }
 }

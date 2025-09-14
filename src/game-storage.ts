@@ -1,4 +1,5 @@
 import { PlayerColor } from "./assets/colors";
+import { GameLevel } from "./game-level";
 
 export interface GameSettings {
   nickname: string;
@@ -22,5 +23,9 @@ export class GameStorage {
   static saveGameSettings(settings: GameSettings): void {
     localStorage.setItem('nickname', settings.nickname);
     localStorage.setItem('color', settings.color);
+  }
+
+  static saveLevel(level: GameLevel): void {
+    localStorage.setItem('level', JSON.stringify(level.serialize()));
   }
 }
