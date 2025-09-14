@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:server": "bash -c ./build-server.sh",
     "build:watch": "vite build --watch",
-    "build:all": "npm run build && pushd multiplayer-server && npm run build",
+    "build:all": "bash -c ./build-all.sh",
     "start:server": "node multiplayer-server/build/index.js",
+    "deploy:homelab": "bash -c ./deploy.sh",
     "preview": "vite preview"
   },
   "devDependencies": {
