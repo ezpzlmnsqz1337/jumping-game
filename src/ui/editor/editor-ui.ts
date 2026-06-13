@@ -20,6 +20,8 @@ export class EditorUI extends AbstractUI {
   controlsToggle!: NodeListOf<HTMLDivElement>;
 
   meshNameSpan!: HTMLDivElement;
+  meshDetailFields!: Record<string, HTMLSpanElement>;
+  triggerHeading!: HTMLDivElement;
   transformCheckBox!: HTMLInputElement;
   scalingCheckBox!: HTMLInputElement;
   rotationCheckBox!: HTMLInputElement;
@@ -50,6 +52,141 @@ export class EditorUI extends AbstractUI {
   constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
     super(scene, 'editor', player);
     this.gizmoManager = gizmoManager;
+  }
+
+  private formatVector3(v: BABYLON.Vector3) {
+    return `[${v.x.toFixed(2)}, ${v.y.toFixed(2)}, ${v.z.toFixed(2)}]`;
+  }
+
+  private formatQuaternion(q: BABYLON.Quaternion) {
+    return `[${q.x.toFixed(3)}, ${q.y.toFixed(3)}, ${q.z.toFixed(3)}, ${q.w.toFixed(3)}]`;
+  }
+
+  private updateSelectedMeshInfo(mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) {
+    const set = (key: string, value: string) => {
+      const field = this.meshDetailFields[key];
+      if (!field) return;
+      field.innerText = value;
+    };
+
+    if (!mesh) {
+      set('mesh-type', '-');
+      set('mesh-name', '-');
+      set('mesh-id', '-');
+      set('position', '-');
+      set('rotation', '-');
+      set('scaling', '-');
+      set('bounds', '-');
+      set('visible', '-');
+      set('collisions', '-');
+      set('material-alpha', '-');
+      set('material-roughness', '-');
+      set('material-texture', '-');
+      set('physics-mode', '-');
+      set('physics-shape', '-');
+      set('physics-mass', '-');
+      set('physics-friction', '-');
+      set('physics-restitution', '-');
+      set('trigger-type', '-');
+      set('trigger-debug', '-');
+      set('trigger-camera', '-');
+      this.triggerHeading.classList.remove('show');
+      return;
+    }
+
+    const metadata = (mesh.metadata || {}) as Record<string, unknown>;
+    const concreteMesh = mesh as BABYLON.Mesh;
+
+    const rotationQuaternion =
+      mesh.rotationQuaternion ||
+      BABYLON.Quaternion.RotationYawPitchRoll(mesh.rotation.y, mesh.rotation.x, mesh.rotation.z);
+
+    set('mesh-type', metadata.triggerType ? 'trigger' : mesh.name);
+    set('mesh-name', mesh.name);
+    set('mesh-id', mesh.id);
+    set('position', this.formatVector3(mesh.position));
+    set('rotation', this.formatQuaternion(rotationQuaternion));
+    set('scaling', this.formatVector3(mesh.scaling));
+    set('visible', String(mesh.isVisible));
+    set('collisions', String(concreteMesh.checkCollisions));
+
+    const boundsSize = concreteMesh.getBoundingInfo().boundingBox.extendSize.scale(2);
+    set('bounds', this.formatVector3(boundsSize));
+
+    const material = mesh.material as BABYLON.StandardMaterial | null;
+    if (material) {
+      set('material-alpha', material.alpha?.toFixed(2) ?? 'n/a');
+      set('material-roughness', material.roughness?.toFixed(2) ?? 'n/a');
+      if (material.diffuseTexture) {
+        set('material-texture', material.diffuseTexture.name || 'assigned');
+      } else {
+        set('material-texture', '-');
+      }
+    } else {
+      set('material-alpha', '-');
+      set('material-roughness', '-');
+      set('material-texture', '-');
+    }
+
+    const physicsSettings = metadata.physicsSettings as
+      | { mass?: number; friction?: number; restitution?: number; shape?: string }
+      | undefined;
+
+    if (physicsSettings) {
+      set('physics-mode', 'metadata');
+      set('physics-shape', String(physicsSettings.shape ?? 'n/a'));
+      set('physics-mass', String(physicsSettings.mass ?? 'n/a'));
+      set('physics-friction', String(physicsSettings.friction ?? 'n/a'));
+      set('physics-restitution', String(physicsSettings.restitution ?? 'n/a'));
+    } else {
+      set('physics-mode', concreteMesh.physicsBody ? 'physics body attached' : 'none');
+      set('physics-shape', '-');
+      set('physics-mass', '-');
+      set('physics-friction', '-');
+      set('physics-restitution', '-');
+    }
+
+    if (metadata.triggerType || metadata.debugType) {
+      const triggerType = String(metadata.triggerType || 'generic');
+      const debugType = String(metadata.debugType || 'trigger');
+      const cameraTarget = metadata.cameraTarget as
+        | { alpha?: number; beta?: number; radius?: number; speed?: number }
+        | undefined;
+
+      this.triggerHeading.classList.add('show');
+      set('trigger-type', triggerType);
+      set('trigger-debug', debugType);
+      if (cameraTarget) {
+        set(
+          'trigger-camera',
+          `a=${cameraTarget.alpha?.toFixed(3)}, b=${cameraTarget.beta?.toFixed(3)}, r=${cameraTarget.radius?.toFixed(2)}, s=${cameraTarget.speed ?? 'n/a'}`
+        );
+      } else {
+        set('trigger-camera', '-');
+      }
+    } else if (metadata.wallType) {
+      const opts = (metadata.opts || {}) as Record<string, unknown>;
+
+      this.triggerHeading.classList.remove('show');
+      set('trigger-type', '-');
+      set('trigger-debug', '-');
+      set('trigger-camera', '-');
+
+      const wallSuffix = `${String(metadata.wallType)} | tex=${String(metadata.textureVariant || 'dark')}`;
+      set('mesh-type', `wall (${wallSuffix})`);
+
+      const width = typeof opts.width === 'number' ? opts.width : undefined;
+      const height = typeof opts.height === 'number' ? opts.height : undefined;
+      const depth = typeof opts.depth === 'number' ? opts.depth : undefined;
+      if (width !== undefined || height !== undefined || depth !== undefined) {
+        set('bounds', `w=${width ?? '-'} h=${height ?? '-'} d=${depth ?? '-'}`);
+      }
+    } else {
+      this.triggerHeading.classList.remove('show');
+      set('trigger-type', '-');
+      set('trigger-debug', '-');
+      set('trigger-camera', '-');
+    }
   }
 
   updateMeshDetails(gizmoType: GizmoType, htmlElement: HTMLDivElement) {
@@ -83,6 +220,7 @@ export class EditorUI extends AbstractUI {
       this.updateMeshDetails('position', this.positionValueDiv);
       this.updateMeshDetails('rotation', this.rotationValueDiv);
       this.updateMeshDetails('scaling', this.scalingValueDiv);
+      this.updateSelectedMeshInfo(newMesh);
 
       if (!newMesh) return;
 
@@ -91,23 +229,29 @@ export class EditorUI extends AbstractUI {
 
     this.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(() => {
       this.updateMeshDetails('position', this.positionValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
     this.gizmoManager.gizmos.positionGizmo?.onDragObservable.add(() => {
       this.updateMeshDetails('position', this.positionValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
 
     this.gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(() => {
       this.updateMeshDetails('rotation', this.rotationValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
     this.gizmoManager.gizmos.rotationGizmo?.onDragObservable.add(() => {
       this.updateMeshDetails('rotation', this.rotationValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
 
     this.gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(() => {
       this.updateMeshDetails('scaling', this.scalingValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
     this.gizmoManager.gizmos.scaleGizmo?.onDragObservable.add(() => {
       this.updateMeshDetails('scaling', this.scalingValueDiv);
+      this.updateSelectedMeshInfo(this.gizmoManager?.attachedMesh || null);
     });
 
     // leave only transform enabled
@@ -206,6 +350,29 @@ export class EditorUI extends AbstractUI {
     ) as NodeListOf<HTMLDivElement>;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
+    this.triggerHeading = document.querySelector('.trigger-heading') as HTMLDivElement;
+    this.meshDetailFields = {
+      'mesh-type': document.querySelector('.detail-mesh-type') as HTMLSpanElement,
+      'mesh-name': document.querySelector('.detail-mesh-name') as HTMLSpanElement,
+      'mesh-id': document.querySelector('.detail-mesh-id') as HTMLSpanElement,
+      position: document.querySelector('.detail-position') as HTMLSpanElement,
+      rotation: document.querySelector('.detail-rotation') as HTMLSpanElement,
+      scaling: document.querySelector('.detail-scaling') as HTMLSpanElement,
+      bounds: document.querySelector('.detail-bounds') as HTMLSpanElement,
+      visible: document.querySelector('.detail-visible') as HTMLSpanElement,
+      collisions: document.querySelector('.detail-collisions') as HTMLSpanElement,
+      'material-alpha': document.querySelector('.detail-material-alpha') as HTMLSpanElement,
+      'material-roughness': document.querySelector('.detail-material-roughness') as HTMLSpanElement,
+      'material-texture': document.querySelector('.detail-material-texture') as HTMLSpanElement,
+      'physics-mode': document.querySelector('.detail-physics-mode') as HTMLSpanElement,
+      'physics-shape': document.querySelector('.detail-physics-shape') as HTMLSpanElement,
+      'physics-mass': document.querySelector('.detail-physics-mass') as HTMLSpanElement,
+      'physics-friction': document.querySelector('.detail-physics-friction') as HTMLSpanElement,
+      'physics-restitution': document.querySelector('.detail-physics-restitution') as HTMLSpanElement,
+      'trigger-type': document.querySelector('.detail-trigger-type') as HTMLSpanElement,
+      'trigger-debug': document.querySelector('.detail-trigger-debug') as HTMLSpanElement,
+      'trigger-camera': document.querySelector('.detail-trigger-camera') as HTMLSpanElement,
+    };
     this.transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
     this.scalingCheckBox = document.querySelector('.scaling-enabled') as HTMLInputElement;
     this.rotationCheckBox = document.querySelector('.rotation-enabled') as HTMLInputElement;
@@ -226,6 +393,7 @@ export class EditorUI extends AbstractUI {
         x => (x.style.display = x.style.display === 'none' ? 'flex' : 'none')
       );
       this.updateEditorSelection(null);
+      this.updateSelectedMeshInfo(null);
     });
 
     this.exportLevelButton.addEventListener('click', () => {

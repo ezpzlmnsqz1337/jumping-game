@@ -69,7 +69,16 @@ export class WallEntity extends GameEntity {
     }
     wallMaterial.roughness = 0.3;
     this.mesh.material = wallMaterial;
-    this.mesh.metadata = { wallType: type, opts, textureVariant: this.textureVariant };
+    this.mesh.metadata = {
+      wallType: type,
+      opts,
+      textureVariant: this.textureVariant,
+      physicsSettings: {
+        mass: 0,
+        friction,
+        shape: BABYLON.PhysicsShapeType[physicsShapeType],
+      },
+    };
     this.mesh.position = position;
     this.mesh.checkCollisions = true;
     if (rotation) this.mesh.rotationQuaternion = rotation;

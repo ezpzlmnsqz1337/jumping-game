@@ -80,3 +80,23 @@
   text-align: right;
   word-break: break-word;
 }
+
+.editor .mesh-details-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor .heading-small {
+  color: #9ad0ff;
+  font-size: 0.9rem;
+  padding-top: 0.3rem;
+  margin-bottom: 0.1rem;
+}
+
+.editor .heading-small.trigger-heading {
+  display: none;
+}
+
+.editor .heading-small.trigger-heading.show {
+  display: block;
+}

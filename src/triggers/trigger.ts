@@ -48,6 +48,10 @@ export class Trigger {
       debugType: this.debugType,
       triggerType: this.triggerType,
       cameraTarget: this.cameraTarget,
+      triggerSettings: {
+        isVisible: this.mesh.isVisible,
+        checkCollisions: this.mesh.checkCollisions,
+      },
     };
 
     this.level.triggers.push(this);
