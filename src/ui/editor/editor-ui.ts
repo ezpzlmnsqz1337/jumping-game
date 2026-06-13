@@ -21,8 +21,10 @@ export class EditorUI extends AbstractUI {
 
   meshNameSpan!: HTMLDivElement;
   meshDetailFields!: Record<string, HTMLSpanElement>;
-  tabButtons!: NodeListOf<HTMLButtonElement>;
-  tabContents!: NodeListOf<HTMLDivElement>;
+  sectionTabButtons!: NodeListOf<HTMLButtonElement>;
+  sectionTabContents!: NodeListOf<HTMLDivElement>;
+  detailTabButtons!: NodeListOf<HTMLButtonElement>;
+  detailTabContents!: NodeListOf<HTMLDivElement>;
   triggerTabButton!: HTMLButtonElement;
   transformCheckBox!: HTMLInputElement;
   scalingCheckBox!: HTMLInputElement;
@@ -192,13 +194,31 @@ export class EditorUI extends AbstractUI {
   }
 
   private setupTabNavigation() {
-    this.tabButtons.forEach(button => {
+    this.sectionTabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const sectionName = button.getAttribute('data-tab-section');
+        if (!sectionName) return;
+
+        this.sectionTabButtons.forEach(btn => btn.classList.remove('active'));
+        this.sectionTabContents.forEach(content => content.classList.remove('active'));
+
+        button.classList.add('active');
+        const content = document.querySelector(
+          `.editor .editor-tab-content[data-tab-section="${sectionName}"]`
+        ) as HTMLDivElement;
+        if (content) {
+          content.classList.add('active');
+        }
+      });
+    });
+
+    this.detailTabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const tabName = button.getAttribute('data-tab');
         if (!tabName) return;
 
-        this.tabButtons.forEach(btn => btn.classList.remove('active'));
-        this.tabContents.forEach(content => content.classList.remove('active'));
+        this.detailTabButtons.forEach(btn => btn.classList.remove('active'));
+        this.detailTabContents.forEach(content => content.classList.remove('active'));
 
         button.classList.add('active');
         const content = document.querySelector(
@@ -371,8 +391,14 @@ export class EditorUI extends AbstractUI {
     ) as NodeListOf<HTMLDivElement>;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
-    this.tabButtons = document.querySelectorAll('.editor .tab-button') as NodeListOf<HTMLButtonElement>;
-    this.tabContents = document.querySelectorAll('.editor .tab-content') as NodeListOf<HTMLDivElement>;
+    this.sectionTabButtons = document.querySelectorAll(
+      '.editor .editor-tab-button'
+    ) as NodeListOf<HTMLButtonElement>;
+    this.sectionTabContents = document.querySelectorAll(
+      '.editor .editor-tab-content'
+    ) as NodeListOf<HTMLDivElement>;
+    this.detailTabButtons = document.querySelectorAll('.editor .tab-button') as NodeListOf<HTMLButtonElement>;
+    this.detailTabContents = document.querySelectorAll('.editor .tab-content') as NodeListOf<HTMLDivElement>;
     this.triggerTabButton = document.querySelector(
       '.editor .tab-button.trigger-tab'
     ) as HTMLButtonElement;
