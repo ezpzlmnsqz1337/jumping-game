@@ -14,17 +14,16 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
   targetAlpha: number = 0;
   targetBeta: number = 0;
   targetRadius: number = 0;
-  goLeft: boolean = false;
 
   automaticCameraEnabled: boolean = true;
 
   constructor(name: string, opts: ArcRotateCameraOptions, scene: BABYLON.Scene) {
     super(name, opts.alpha, opts.beta, opts.radius, opts.position, scene);
     this.useAutoRotationBehavior = true;
-    this.wheelDeltaPercentage = 0.01;
+    this.wheelDeltaPercentage = 0.004;
     this.speed = 0.1;
-    this.angularSensibilityX = 1000; // Adjust this value to change horizontal turning speed
-    this.angularSensibilityY = 1000; // Adjust this value to change vertical turning speed
+    this.angularSensibilityX = 2200;
+    this.angularSensibilityY = 2200;
     this.allowUpsideDown = false;
     this.lowerRadiusLimit = 2;
     this.upperRadiusLimit = 100;
@@ -35,6 +34,14 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
     this.upperBetaLimit = Math.PI / 2;
 
     this.attachControl(true);
+
+    const keyboardInput = this.inputs.attached['keyboard'] as
+      | { angularSpeed?: number; zoomingSensibility?: number }
+      | undefined;
+    if (keyboardInput) {
+      keyboardInput.angularSpeed = 0.0035;
+      keyboardInput.zoomingSensibility = 60;
+    }
   }
 
   setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, _speed: number) {
@@ -42,9 +49,15 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
     this.targetAlpha = targetAlpha % (Math.PI * 2);
     this.targetBeta = targetBeta;
     this.targetRadius = targetRadius;
-    const diff = this.targetAlpha - this.alpha;
-    this.goLeft = diff > 0 ? diff > Math.PI : diff > -Math.PI;
     this.movingToTarget = true;
+  }
+
+  getShortestAngularDelta(from: number, to: number) {
+    const twoPi = Math.PI * 2;
+    let delta = (to - from) % twoPi;
+    if (delta > Math.PI) delta -= twoPi;
+    if (delta < -Math.PI) delta += twoPi;
+    return delta;
   }
 
   moveToTarget() {
@@ -56,41 +69,28 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
     if (this.alpha < 0) this.alpha = Math.PI * 2 + this.alpha;
     if (this.alpha > Math.PI * 2) this.alpha = this.alpha % (Math.PI * 2);
 
-    const factor = 0.01 * this._scene.getAnimationRatio();
+    const ratio = this._scene.getAnimationRatio();
+    const lerpFactor = Math.min(0.35, Math.max(0.08, 0.12 * ratio));
 
-    if (this.targetAlpha !== this.alpha) {
-      if (this.goLeft) {
-        this.alpha -= factor;
-      } else {
-        this.alpha += factor;
-      }
+    const alphaDelta = this.getShortestAngularDelta(this.alpha, this.targetAlpha);
+    const betaDelta = this.targetBeta - this.beta;
+    const radiusDelta = this.targetRadius - this.radius;
 
-      if (Math.abs(this.targetAlpha - this.alpha) < factor) {
-        this.alpha = this.targetAlpha;
-      }
+    this.alpha += alphaDelta * lerpFactor;
+    this.beta += betaDelta * lerpFactor;
+    this.radius += radiusDelta * lerpFactor;
+
+    if (Math.abs(alphaDelta) < 0.001) {
+      this.alpha = this.targetAlpha;
     }
-
-    if (this.targetBeta > this.beta + factor) {
-      this.beta += factor;
-    } else if (this.targetBeta < this.beta - factor) {
-      this.beta -= factor;
-    } else {
+    if (Math.abs(betaDelta) < 0.001) {
       this.beta = this.targetBeta;
     }
-
-    if (this.targetRadius > this.radius + factor * 10) {
-      this.radius += factor * 10;
-    } else if (this.targetRadius < this.radius - factor * 10) {
-      this.radius -= factor * 10;
-    } else {
+    if (Math.abs(radiusDelta) < 0.01) {
       this.radius = this.targetRadius;
     }
 
-    if (
-      this.targetAlpha === this.alpha &&
-      this.targetBeta === this.beta &&
-      this.targetRadius === this.radius
-    ) {
+    if (Math.abs(alphaDelta) < 0.001 && Math.abs(betaDelta) < 0.001 && Math.abs(radiusDelta) < 0.01) {
       this.movingToTarget = false;
     }
   }

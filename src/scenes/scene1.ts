@@ -25,7 +25,7 @@ const arcRotateCameraOptions: ArcRotateCameraOptions = {
 
 const followCameraOptions: FollowCameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
-  radius: 2,
+  radius: 4.5,
 };
 
 const levels: GameLevel[] = [new Level1('level1')];

@@ -37,21 +37,22 @@ export class WallEntity extends GameEntity {
         physicsShapeType = BABYLON.PhysicsShapeType.BOX;
     }
     const wallMaterial = new BABYLON.StandardMaterial('wallMaterial');
+    const uScale = typeof opts.uScale === 'number' ? opts.uScale : 1;
+    const vScale = typeof opts.vScale === 'number' ? opts.vScale : 1;
+    const friction = typeof opts.friction === 'number' ? opts.friction : 0.4;
     wallMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
-    wallMaterial.diffuseTexture = getDarkTexture(
-      { uScale: opts.uScale, vScale: opts.vScale },
-      scene
-    );
+    wallMaterial.diffuseTexture = getDarkTexture({ uScale, vScale }, scene);
     wallMaterial.roughness = 0.3;
     this.mesh.material = wallMaterial;
     this.mesh.metadata = opts;
     this.mesh.position = position;
+    this.mesh.checkCollisions = true;
     if (rotation) this.mesh.rotationQuaternion = rotation;
 
     const wallAggregate = new BABYLON.PhysicsAggregate(
       this.mesh,
       physicsShapeType,
-      { mass: 0, friction: opts.friction || 0.4 },
+      { mass: 0, friction },
       scene
     );
     wallAggregate.shape.filterMembershipMask = FILTER_GROUP_WALL;
