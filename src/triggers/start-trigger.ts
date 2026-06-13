@@ -12,14 +12,21 @@ export class StartTrigger extends Trigger {
 
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
+    const timer = this.level.timer;
+    if (!timer) return;
+
+    timer.resetRun();
+    timer.armRun();
+
     player.checkpoints = [];
     player.lastCheckpointIndex = 0;
-    this.level.timer?.reset();
   }
 
   onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
-    this.level.timer?.start();
+    const timer = this.level.timer;
+    if (!timer?.startRun()) return;
+
     gameRoot.demoService.startRecording(player);
   }
 }

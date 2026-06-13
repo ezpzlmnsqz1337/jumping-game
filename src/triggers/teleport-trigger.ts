@@ -30,7 +30,7 @@ export class TeleportTrigger extends Trigger {
 
     player.checkpoints = [];
     player.lastCheckpointIndex = 0;
-    this.level.timer?.reset();
+    this.level.timer?.resetRun();
 
     player.physics.body.disablePreStep = true;
     player.mesh.position = this.destination.clone();

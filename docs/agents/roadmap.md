@@ -2,9 +2,9 @@
 
 ## Near-Term Implementation Plan
 
-1. Reduce client network chatter by throttling player-state sends and skipping unchanged snapshots.
-2. Add basic safety guards around multiplayer sends so UI/gameplay events do not crash before the room is ready.
-3. Revisit frame-by-frame UI observers and consolidate any remaining expensive updates after the network layer is stable.
+1. Centralize trigger and timer run-state transitions so start, end, and teleport behavior is deterministic.
+2. Add deterministic trigger tests for start/end/reset sequencing.
+3. Reduce client network chatter by throttling player-state sends and skipping unchanged snapshots.
 
 Prioritize in this order unless user requests otherwise.
 
@@ -14,16 +14,22 @@ Prioritize in this order unless user requests otherwise.
 - Add interpolation/extrapolation to reduce jitter.
 - Keep local prediction minimal and reversible.
 
-## 2) Trigger and timer reliability
+## 1) Trigger and timer reliability
 
 - Centralize run-state transitions: idle -> running -> finished.
 - Enforce anti-cheat sanity checks for impossible times/paths.
 - Add deterministic trigger tests.
 
-## 3) Camera robustness
+## 2) Camera robustness
 
 - Add camera obstruction handling (raycast/shape-cast push-in).
 - Improve follow/manual mode handoff and defaults.
+
+## 3) Multiplayer authority and smoothing
+
+- Move to clearer server-authoritative state for player transforms.
+- Add interpolation/extrapolation to reduce jitter.
+- Keep local prediction minimal and reversible.
 
 ## 4) Physics stability
 

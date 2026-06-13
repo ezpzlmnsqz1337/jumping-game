@@ -13,8 +13,8 @@ export class EndTrigger extends Trigger {
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
     const timer = this.level.timer;
-    if (!timer?.active) return;
-    timer.stop();
+    if (!timer?.finishRun()) return;
+
     gameRoot.multiplayer?.sendTimeToServer({
       nickname: player.nickname,
       timeStr: timer.getTimeAsString(),
