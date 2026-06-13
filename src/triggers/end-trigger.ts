@@ -6,7 +6,7 @@ import gameRoot from '../game-root';
 
 export class EndTrigger extends Trigger {
   constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    super(scene, { ...opts, isVisible: true });
+    super(scene, { ...opts, isVisible: true, triggerType: 'end' });
     (this.mesh.material as BABYLON.StandardMaterial).diffuseColor = endTriggerColor;
   }
 

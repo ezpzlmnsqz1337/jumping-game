@@ -15,8 +15,9 @@ export class TeleportTrigger extends Trigger {
   ) {
     super(scene, {
       ...opts,
-      scaling: new BABYLON.Vector3(1, 0.2, 1),
-      isVisible: true,
+      scaling: opts.scaling || new BABYLON.Vector3(1, 0.2, 1),
+      isVisible: opts.isVisible ?? true,
+      triggerType: 'teleport',
     });
     this.name = name;
     this.destination = destination;
@@ -41,5 +42,16 @@ export class TeleportTrigger extends Trigger {
 
   onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
+  }
+
+  serialize() {
+    return {
+      ...super.serialize(),
+      destination: {
+        x: this.destination.x,
+        y: this.destination.y,
+        z: this.destination.z,
+      },
+    };
   }
 }

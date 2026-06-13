@@ -4,8 +4,29 @@
       <div>Editor</div>
     </div>
     <div>
+      <span>Level source</span>
+      <span class="level-source">hardcoded</span>
+    </div>
+    <div>
+      <span>Level summary</span>
+      <span class="level-summary">default</span>
+    </div>
+    <div>
       <label for="edit-mode-enabled">Edit mode</label>
       <input type="checkbox" class="edit-mode-enabled" />
+    </div>
+    <div>
+      <span>Export level</span>
+      <button type="button" class="export-level">Download JSON</button>
+    </div>
+    <div>
+      <span>Import level</span>
+      <button type="button" class="import-level">Load JSON</button>
+      <input type="file" class="import-level-input" accept="application/json,.json" />
+    </div>
+    <div>
+      <span>Reset import</span>
+      <button type="button" class="clear-level-import">Use hardcoded level</button>
     </div>
   </div>
   <div class="editor-controls">

@@ -240,6 +240,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger1 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera1.alpha,
+      beta: stage3Camera1.beta,
+      radius: stage3Camera1.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(10.2, 13.0, -11.8),
     width: 5,
     depth: 5,
@@ -251,6 +258,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger2 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera2.alpha,
+      beta: stage3Camera2.beta,
+      radius: stage3Camera2.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(13.78, 13.0, -11.79),
     width: 2,
     depth: 9.6,
@@ -262,6 +276,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger3 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera1.alpha,
+      beta: stage3Camera1.beta,
+      radius: stage3Camera1.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(9.94, 15.2, -15.39),
     width: 9.6,
     depth: 2,
@@ -274,6 +295,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger4 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera3.alpha,
+      beta: stage3Camera3.beta,
+      radius: stage3Camera3.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(6.24, 17.6, -11.99),
     width: 2,
     depth: 9.6,
@@ -285,6 +313,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger5 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera4.alpha,
+      beta: stage3Camera4.beta,
+      radius: stage3Camera4.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(9.94, 19.7, -8.19),
     width: 9.6,
     depth: 2,
@@ -296,6 +331,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger6 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera5.alpha,
+      beta: stage3Camera5.beta,
+      radius: stage3Camera5.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(13.84, 21.4, -8.79),
     width: 2,
     depth: 3,
@@ -307,6 +349,13 @@ export const createStage3 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger7 = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage3Camera6.alpha,
+      beta: stage3Camera6.beta,
+      radius: stage3Camera6.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(10.04, 22.3, -13.09),
     width: 9,
     depth: 2,

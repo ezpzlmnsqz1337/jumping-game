@@ -13,11 +13,11 @@ const SAMPLE_RATE_MS = 1000 / 60;
 
 export class DemoService {
   recording: DemoEntry[] = [];
-  recordingInterval: NodeJS.Timeout | null = null;
+  recordingInterval: ReturnType<typeof setTimeout> | null = null;
 
   playing: DemoEntry[] = [];
   playingFrameIndex = 0;
-  playingInterval: NodeJS.Timeout | null = null;
+  playingInterval: ReturnType<typeof setTimeout> | null = null;
   playingEntity: BABYLON.Mesh | null = null;
 
   startRecording(player: PlayerEntity): void {

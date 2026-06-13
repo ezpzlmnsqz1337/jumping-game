@@ -2,12 +2,21 @@ import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../../entities/player-entity';
 import { AbstractUI } from '../abstract-ui';
 import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
+import { GameStorage } from '../../game-storage';
+import gameRoot from '../../game-root';
+import { isLevelDocument } from '../../level-document';
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
 export class EditorUI extends AbstractUI {
   editorDiv!: HTMLDivElement;
   editModeCheckBox!: HTMLInputElement;
+  levelSourceSpan!: HTMLSpanElement;
+  levelSummarySpan!: HTMLSpanElement;
+  exportLevelButton!: HTMLButtonElement;
+  importLevelButton!: HTMLButtonElement;
+  importLevelInput!: HTMLInputElement;
+  clearLevelImportButton!: HTMLButtonElement;
   controlsToggle!: NodeListOf<HTMLDivElement>;
 
   meshNameSpan!: HTMLDivElement;
@@ -22,6 +31,21 @@ export class EditorUI extends AbstractUI {
   gizmoManager?: BABYLON.GizmoManager;
 
   oldMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
+
+  private updateLevelInfo() {
+    const level = GameStorage.getLevel();
+
+    if (!level) {
+      this.levelSourceSpan.innerText = 'hardcoded';
+      this.levelSummarySpan.innerText = 'default Level1 script';
+      return;
+    }
+
+    this.levelSourceSpan.innerText = 'imported JSON';
+    this.levelSummarySpan.innerText = `${level.name} | walls: ${level.walls.length} | triggers: ${
+      level.startTriggers.length + level.endTriggers.length + level.teleports.length + level.triggers.length
+    }`;
+  }
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
     super(scene, 'editor', player);
@@ -171,6 +195,12 @@ export class EditorUI extends AbstractUI {
     await super.bindUI();
     this.editorDiv = document.querySelector('.editor') as HTMLDivElement;
     this.editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
+    this.levelSourceSpan = document.querySelector('.level-source') as HTMLSpanElement;
+    this.levelSummarySpan = document.querySelector('.level-summary') as HTMLSpanElement;
+    this.exportLevelButton = document.querySelector('.export-level') as HTMLButtonElement;
+    this.importLevelButton = document.querySelector('.import-level') as HTMLButtonElement;
+    this.importLevelInput = document.querySelector('.import-level-input') as HTMLInputElement;
+    this.clearLevelImportButton = document.querySelector('.clear-level-import') as HTMLButtonElement;
     this.controlsToggle = document.querySelectorAll(
       '.editor > .editor-controls'
     ) as NodeListOf<HTMLDivElement>;
@@ -186,6 +216,7 @@ export class EditorUI extends AbstractUI {
 
     this.editorDiv.style.display = 'block';
     this.editModeCheckBox.checked = true;
+    this.updateLevelInfo();
 
     this.editModeCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
@@ -195,6 +226,36 @@ export class EditorUI extends AbstractUI {
         x => (x.style.display = x.style.display === 'none' ? 'flex' : 'none')
       );
       this.updateEditorSelection(null);
+    });
+
+    this.exportLevelButton.addEventListener('click', () => {
+      if (!gameRoot.level) return;
+      GameStorage.downloadLevel(gameRoot.level);
+    });
+
+    this.importLevelButton.addEventListener('click', () => {
+      this.importLevelInput.click();
+    });
+
+    this.importLevelInput.addEventListener('change', async () => {
+      const file = this.importLevelInput.files?.[0];
+      if (!file) return;
+
+      try {
+        const fileContent = await file.text();
+        const parsed = JSON.parse(fileContent) as unknown;
+        if (!isLevelDocument(parsed)) return;
+
+        GameStorage.saveLevelDocument(parsed);
+        window.location.reload();
+      } catch {
+        return;
+      }
+    });
+
+    this.clearLevelImportButton.addEventListener('click', () => {
+      GameStorage.clearLevel();
+      window.location.reload();
     });
 
     this.bindMeshInfoUI();

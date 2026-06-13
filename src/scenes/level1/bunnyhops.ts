@@ -186,6 +186,7 @@ const createJump = (
     position: position.add(new BABYLON.Vector3(0, 2, 0)),
     scaling: new BABYLON.Vector3(2, 0.2, 2),
     level,
+    triggerType: 'jump',
   });
 
   jumpTrigger.onEnter = (_trigger: BABYLON.Mesh, player: PlayerEntity) => {

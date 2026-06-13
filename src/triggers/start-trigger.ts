@@ -6,7 +6,7 @@ import gameRoot from '../game-root';
 
 export class StartTrigger extends Trigger {
   constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
-    super(scene, { ...opts, isVisible: true });
+    super(scene, { ...opts, isVisible: true, triggerType: 'start' });
     (this.mesh.material as BABYLON.StandardMaterial).diffuseColor = startTriggerColor;
   }
 

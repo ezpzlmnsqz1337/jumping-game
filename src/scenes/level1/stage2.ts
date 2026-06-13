@@ -102,6 +102,13 @@ export const createStage2 = (scene: BABYLON.Scene, level: GameLevel) => {
   const trigger = new Trigger(scene, {
     level,
     debugType: 'camera-trigger',
+    triggerType: 'camera',
+    cameraTarget: {
+      alpha: stage2Camera1.alpha,
+      beta: stage2Camera1.beta,
+      radius: stage2Camera1.radius,
+      speed: 50,
+    },
     position: new BABYLON.Vector3(8.0, 6.8, 0.2),
     width: 2,
     depth: 2,

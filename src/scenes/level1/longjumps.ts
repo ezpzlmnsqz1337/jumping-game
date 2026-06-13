@@ -1,7 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import earcut from 'earcut';
 import { easyColor, hardColor, mediumColor } from '../../assets/colors';
-import { getLightTexture } from '../../assets/textures';
 import { WallEntity } from '../../entities/wall-entity';
 import { GameLevel } from '../../game-level';
 
@@ -44,20 +43,26 @@ export const createLongJumps = (
     material.diffuseColor =
       jumpLength <= 100 ? easyColor : jumpLength <= 110 ? mediumColor : hardColor;
     jumpLengthText.material = material;
+    jumpLengthText.metadata = {
+      levelTextDecoration: {
+        text: `${jumpLength}`,
+        color: material.diffuseColor,
+      },
+    };
 
     walls.push(
       new WallEntity(
         scene,
         level,
         'box',
-        { width: 8, depth, height },
+        { width: 8, depth, height, textureVariant: 'light' },
         new BABYLON.Vector3(initialJumpX, 0.3, initialJumpZ + spacing * i)
       ),
       new WallEntity(
         scene,
         level,
         'box',
-        { width: 8, depth, height },
+        { width: 8, depth, height, textureVariant: 'light' },
         new BABYLON.Vector3(
           initialJumpX - nextJumpLengthDelta - 17.5,
           0.3,
@@ -67,12 +72,5 @@ export const createLongJumps = (
     );
   }
 
-  walls.forEach(
-    wall =>
-      ((wall.mesh.material as BABYLON.StandardMaterial).diffuseTexture = getLightTexture(
-        { uScale: 1, vScale: 1 },
-        scene
-      ))
-  );
   return walls;
 };

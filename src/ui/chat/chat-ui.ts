@@ -12,7 +12,7 @@ export class ChatUI extends AbstractUI {
   chatMessagesDiv!: HTMLDivElement;
   chatInput!: HTMLInputElement;
 
-  hideChatTimeout!: NodeJS.Timeout;
+  hideChatTimeout!: ReturnType<typeof setTimeout>;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'chat', player);

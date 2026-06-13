@@ -5,9 +5,11 @@ import { WallEntity } from './entities/wall-entity';
 import { Skybox } from './scenes/level1/skybox';
 import { ShadowGenerator } from './shadows';
 import { LevelTimer } from './level-timer';
+import { Trigger } from './triggers/trigger';
 import { EndTrigger } from './triggers/end-trigger';
 import { StartTrigger } from './triggers/start-trigger';
 import { TeleportTrigger } from './triggers/teleport-trigger';
+import { serializeColor3, serializeQuaternion, serializeVector3, type LevelDocument } from './level-document';
 
 export class GameLevel {
   name: string;
@@ -15,6 +17,7 @@ export class GameLevel {
   ground: BABYLON.Nullable<BABYLON.Mesh> = null;
   walls: WallEntity[] = [];
   spawnPoints: SpawnPointEntity[] = [];
+  triggers: Trigger[] = [];
   startTriggers: StartTrigger[] = [];
   endTriggers: EndTrigger[] = [];
   teleports: TeleportTrigger[] = [];
@@ -33,6 +36,10 @@ export class GameLevel {
     this.player = player;
 
     this.timer = new LevelTimer();
+    this.triggers = [];
+    this.startTriggers = [];
+    this.endTriggers = [];
+    this.teleports = [];
     this.createSkybox();
     this.createGround();
     this.createWalls();
@@ -93,5 +100,82 @@ export class GameLevel {
   getRandomSpawnPoint() {
     const index = Math.round(Math.random() * (this.spawnPoints.length - 1));
     return this.spawnPoints[index];
+  }
+
+  private serializeTextDecorations() {
+    if (!this.scene) return [];
+
+    return this.scene.meshes
+      .filter(mesh => {
+        const metadata = mesh.metadata as { levelTextDecoration?: { text?: string } } | undefined;
+        return Boolean(metadata?.levelTextDecoration?.text);
+      })
+      .map(mesh => {
+        const metadata = mesh.metadata as {
+          levelTextDecoration?: { text: string; color?: BABYLON.Color3 };
+        };
+        const textData = metadata.levelTextDecoration!;
+
+        return {
+          text: textData.text,
+          position: serializeVector3(mesh.position),
+          rotation: mesh.rotationQuaternion ? serializeQuaternion(mesh.rotationQuaternion) : undefined,
+          color: textData.color ? serializeColor3(textData.color) : undefined,
+        };
+      });
+  }
+
+  private serializeEnvironment() {
+    const skyboxMesh = this.scene?.getMeshByName('skyBox');
+    const groundMaterial = this.ground?.material as BABYLON.StandardMaterial | null;
+    const groundTexture = groundMaterial?.diffuseTexture as BABYLON.Texture | null;
+    const groundTextureName = groundTexture?.name || '';
+
+    let textureVariant: 'dark' | 'light' | 'red' | undefined;
+    if (groundTextureName.includes('/light/')) textureVariant = 'light';
+    if (groundTextureName.includes('/red/')) textureVariant = 'red';
+    if (groundTextureName.includes('/dark/')) textureVariant = 'dark';
+
+    return {
+      skyboxEnabled: Boolean(skyboxMesh),
+      ground: this.ground
+        ? {
+            width: this.ground.getBoundingInfo().boundingBox.extendSize.x * 2,
+            height: this.ground.getBoundingInfo().boundingBox.extendSize.z * 2,
+            scaling: serializeVector3(this.ground.scaling),
+            textureVariant,
+            uScale: groundTexture?.uScale,
+            vScale: groundTexture?.vScale,
+            roughness: groundMaterial?.roughness,
+            color: groundMaterial?.diffuseColor ? serializeColor3(groundMaterial.diffuseColor) : undefined,
+          }
+        : undefined,
+    };
+  }
+
+  serialize(): LevelDocument {
+    const startTriggerSet = new Set(this.startTriggers);
+    const endTriggerSet = new Set(this.endTriggers);
+    const teleportSet = new Set(this.teleports);
+
+    return {
+      version: 1,
+      name: this.name,
+      walls: this.walls.map(wall => wall.serialize()),
+      spawnPoints: this.spawnPoints.map(spawnPoint => spawnPoint.serialize()),
+      startTriggers: this.startTriggers.map(trigger => trigger.serialize()),
+      endTriggers: this.endTriggers.map(trigger => trigger.serialize()),
+      teleports: this.teleports.map(teleport => teleport.serialize()),
+      triggers: this.triggers
+        .filter(
+          trigger =>
+            !startTriggerSet.has(trigger as StartTrigger) &&
+            !endTriggerSet.has(trigger as EndTrigger) &&
+            !teleportSet.has(trigger as TeleportTrigger)
+        )
+        .map(trigger => trigger.serialize()),
+      texts: this.serializeTextDecorations(),
+      environment: this.serializeEnvironment(),
+    };
   }
 }

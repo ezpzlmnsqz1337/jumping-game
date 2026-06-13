@@ -59,3 +59,24 @@
 .editor .camera>div>input[type="checkbox"] {
   margin-right: 0;
 }
+
+.editor button {
+  border: 0;
+  border-radius: 0.2rem;
+  padding: 0.35rem 0.6rem;
+  background: #1d96ff;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.editor .import-level-input {
+  display: none;
+}
+
+.editor .level-source,
+.editor .level-summary {
+  color: #9ad0ff;
+  max-width: 15rem;
+  text-align: right;
+  word-break: break-word;
+}
