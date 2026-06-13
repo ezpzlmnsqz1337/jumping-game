@@ -17,6 +17,14 @@
 - Document assumptions in PR/summary when touching gameplay math or netcode.
 - If a fix needs a tradeoff (fairness vs smoothness, realism vs responsiveness), prefer responsive gameplay unless user asks for strict simulation.
 
+## CSS Design Token Convention
+
+- All UI colors must use `--color-*` variables from `src/style.css`. Do not hardcode hex/rgb values in `.css` files.
+- All UI font sizes must use `--font-size-ui-*` variables. Do not hardcode `rem`/`px` font sizes.
+- All UI padding values must use `--space-*` variables. Do not hardcode `rem`/`px` spacing.
+- When adding a genuinely new value that has no matching token, add the token to `src/style.css` first with a semantic name, then use it.
+- Existing palette color names (`--blue`, `--red`, etc.) are for gameplay/player-color use only; use `--color-*` tokens for UI chrome.
+
 ## Definition Of Done For Typical Changes
 
 - TypeScript builds cleanly for touched package(s).

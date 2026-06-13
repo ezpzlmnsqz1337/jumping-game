@@ -19,6 +19,17 @@
 - Runtime: Node.js (use nvm in this environment).
 - Host environment: WSL2.
 
+## Testing Snapshot
+
+- Client/UI tests: Vitest + jsdom in root `src/ui/**/*.test.ts`.
+- Server tests: Mocha in `multiplayer-server/test`.
+- Key commands:
+  - `npm run test:ui`
+  - `npm run test:ui:coverage`
+  - `cd multiplayer-server && npm test`
+- Coverage output: `coverage/ui` (gitignored).
+- CI runs UI tests and server tests as enforced checks in `.github/workflows/ci.yml`.
+
 ## Repository Map
 
 - Root client app:
@@ -29,7 +40,15 @@
   - `src/ui/` all in-game UI modules.
   - `src/multiplayer-session.ts` client-side multiplayer state sync.
   - `src/services/demo-service.ts` ghost/demo behavior.
+  - `src/level-document.ts` serialization schema for level JSON (walls, triggers, texts, environment).
+  - `src/game-storage.ts` localStorage persistence for imported level documents.
+  - `src/game-level.ts` base level class; `serialize()` exports a `LevelDocument`.
+  - `public/assets/ui/editor/` in-game level editor UI (tabbed: Editor / Mesh Info / Camera).
   - `public/` assets, UI html/css fragments, textures, models, sounds.
+- CSS design tokens (defined once in `src/style.css` on `body`):
+  - `--color-*` semantic color variables.
+  - `--font-size-ui-*` scale from `xs` (0.8rem) to `6xl` (3rem).
+  - `--space-*` spacing scale from `xxs` to `4xl` plus `--space-button-y`.
 - Multiplayer server:
   - `multiplayer-server/src/index.ts` server bootstrap.
   - `multiplayer-server/src/rooms/MyRoom.ts` room logic.
