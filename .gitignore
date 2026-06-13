@@ -25,3 +25,6 @@ multiplayer-server/build
 *.njsproj
 *.sln
 *.sw?
+
+# test coverage
+coverage/

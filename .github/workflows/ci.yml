@@ -101,6 +101,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Run UI tests
+        run: npm run test:ui
+
       - name: Install server dependencies
         run: |
           cd multiplayer-server
@@ -110,4 +116,3 @@ jobs:
         run: |
           cd multiplayer-server
           npm test
-        continue-on-error: true

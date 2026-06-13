@@ -1,9 +1,21 @@
 import assert from "assert";
 import { ColyseusTestServer, boot } from "@colyseus/testing";
+import { after, before, beforeEach, describe, it } from "mocha";
 
 // import your "app.config.ts" file here.
 import appConfig from "../src/app.config";
 import { MyRoomState } from "../src/rooms/schema/MyRoomState";
+import { MyRoom } from "../src/rooms/MyRoom";
+import { Player, TimeEntry } from "../src/rooms/schema/MyRoomState";
+
+function createTimeEntry(nickname: string, checkpoints: number, time: number, timeStr: string): TimeEntry {
+  const entry = new TimeEntry();
+  entry.nickname = nickname;
+  entry.checkpoints = checkpoints;
+  entry.time = time;
+  entry.timeStr = timeStr;
+  return entry;
+}
 
 describe("testing your Colyseus app", () => {
   let colyseus: ColyseusTestServer;
@@ -26,6 +38,128 @@ describe("testing your Colyseus app", () => {
     // wait for state sync
     await room.waitForNextPatch();
 
-    assert.deepStrictEqual({ mySynchronizedProperty: "Hello world" }, client1.state.toJSON());
+    const syncedState = (client1.state as unknown as { toJSON: () => Record<string, unknown> }).toJSON() as {
+      players: Record<string, { nickname: string }>;
+      times: unknown[];
+      chatMessages: unknown[];
+    };
+    assert.ok(syncedState.players[client1.sessionId]);
+    assert.strictEqual(syncedState.players[client1.sessionId].nickname, "player");
+    assert.strictEqual(Array.isArray(syncedState.times), true);
+    assert.strictEqual(Array.isArray(syncedState.chatMessages), true);
+  });
+});
+
+describe("MyRoom unit behavior", () => {
+  it("sorts times by checkpoints and then by time", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    room.addTime(createTimeEntry("A", 10, 2000, "00:02.000"));
+    room.addTime(createTimeEntry("B", 8, 3000, "00:03.000"));
+    room.addTime(createTimeEntry("C", 10, 1500, "00:01.500"));
+
+    assert.strictEqual(room.state.times[0].nickname, "B");
+    assert.strictEqual(room.state.times[1].nickname, "C");
+    assert.strictEqual(room.state.times[2].nickname, "A");
+  });
+
+  it("updates player transform and profile", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const existing = new Player();
+    room.state.players.set("p1", existing);
+
+    const incoming = new Player();
+    incoming.position.x = 1;
+    incoming.position.y = 2;
+    incoming.position.z = 3;
+    incoming.rotation.x = 4;
+    incoming.rotation.y = 5;
+    incoming.rotation.z = 6;
+    incoming.rotation.w = 7;
+    incoming.nickname = "runner";
+    incoming.collissionEnabled = false;
+    incoming.color = "red";
+    incoming.status = "in_game";
+
+    room.updatePlayerInfo("p1", incoming);
+
+    const updated = room.state.players.get("p1");
+    assert.strictEqual(updated.position.x, 1);
+    assert.strictEqual(updated.position.y, 2);
+    assert.strictEqual(updated.position.z, 3);
+    assert.strictEqual(updated.rotation.x, 4);
+    assert.strictEqual(updated.rotation.y, 5);
+    assert.strictEqual(updated.rotation.z, 6);
+    assert.strictEqual(updated.rotation.w, 7);
+    assert.strictEqual(updated.nickname, "runner");
+    assert.strictEqual(updated.collissionEnabled, false);
+    assert.strictEqual(updated.color, "red");
+    assert.strictEqual(updated.status, "in_game");
+  });
+
+  it("adds chat message and broadcasts player message", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const player = new Player();
+    player.nickname = "chat-user";
+    player.color = "green";
+    room.state.players.set("p1", player);
+
+    const broadcasts: Array<{ type: string; payload: unknown }> = [];
+    (room as unknown as { broadcast: (type: string, payload: unknown) => void }).broadcast = (
+      type,
+      payload
+    ) => broadcasts.push({ type, payload });
+
+    room.handleChatMessage("p1", "hello world");
+
+    assert.strictEqual(room.state.chatMessages.length, 1);
+    assert.strictEqual(room.state.chatMessages[0].nickname, "chat-user");
+    assert.strictEqual(room.state.chatMessages[0].text, "hello world");
+    assert.strictEqual(broadcasts.length, 1);
+    assert.strictEqual(broadcasts[0].type, "chat:update");
+    assert.deepStrictEqual(broadcasts[0].payload, {
+      playerId: "p1",
+      nickname: "chat-user",
+      color: "green",
+      text: "hello world",
+    });
+  });
+
+  it("removes player and emits disconnect plus server chat message on leave", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const player = new Player();
+    player.nickname = "leaver";
+    room.state.players.set("p1", player);
+
+    const broadcasts: Array<{ type: string; payload: unknown }> = [];
+    (room as unknown as { broadcast: (type: string, payload: unknown) => void }).broadcast = (
+      type,
+      payload
+    ) => broadcasts.push({ type, payload });
+
+    room.onLeave({ sessionId: "p1" } as never, true);
+
+    assert.strictEqual(room.state.players.has("p1"), false);
+    assert.strictEqual(broadcasts.length, 2);
+    assert.deepStrictEqual(broadcasts[0], {
+      type: "player:disconnected",
+      payload: "p1",
+    });
+    assert.deepStrictEqual(broadcasts[1], {
+      type: "chat:update",
+      payload: {
+        playerId: "server",
+        nickname: "Server",
+        color: "gray",
+        text: "Player leaver disconnected.",
+      },
+    });
   });
 });

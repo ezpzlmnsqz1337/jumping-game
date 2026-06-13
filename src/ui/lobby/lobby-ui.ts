@@ -9,7 +9,7 @@ import { GameStorage } from '../../game-storage';
 
 export class LobbyUI extends AbstractUI {
   nicknameInput!: HTMLInputElement;
-  nickanmeErrorText!: HTMLSpanElement;
+  nicknameErrorText!: HTMLSpanElement;
   playerColorsDivs!: NodeListOf<HTMLDivElement>;
   enterButton!: HTMLButtonElement;
   lobbyDiv!: HTMLDivElement;
@@ -81,11 +81,11 @@ export class LobbyUI extends AbstractUI {
     if (!nickname || this.nicknameInput.value.length === 0) {
       this.nicknameInput.classList.add('invalid');
       this.nicknameInput.focus();
-      this.nickanmeErrorText.style.display = 'block';
+      this.nicknameErrorText.style.display = 'block';
       return;
     }
 
-    this.nickanmeErrorText.style.display = 'none';
+    this.nicknameErrorText.style.display = 'none';
     this.nicknameInput.classList.remove('invalid');
 
     localStorage.setItem('color', this.player.color as PlayerColor);
@@ -100,7 +100,7 @@ export class LobbyUI extends AbstractUI {
     await super.bindUI();
 
     this.nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
-    this.nickanmeErrorText = document.querySelector('.lobby .nickname .error') as HTMLSpanElement;
+    this.nicknameErrorText = document.querySelector('.lobby .nickname .error') as HTMLSpanElement;
     this.playerColorsDivs = document.querySelectorAll(
       '.lobby .player-color > .colors > div'
     ) as NodeListOf<HTMLDivElement>;
