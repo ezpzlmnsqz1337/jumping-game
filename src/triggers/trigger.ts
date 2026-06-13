@@ -4,11 +4,11 @@ import { defaultTriggerColor } from '../assets/colors';
 import { GameLevel } from '../game-level';
 
 export interface CreateTriggerOptions {
-  level: GameLevel
-  position?: BABYLON.Vector3
-  scaling?: BABYLON.Vector3
-  isVisible?: boolean
-  [key: string]: unknown
+  level: GameLevel;
+  position?: BABYLON.Vector3;
+  scaling?: BABYLON.Vector3;
+  isVisible?: boolean;
+  [key: string]: unknown;
 }
 
 export class Trigger {
@@ -31,17 +31,18 @@ export class Trigger {
     this.mesh.actionManager = new BABYLON.ActionManager(scene);
     this.mesh.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
-        { 
+        {
           trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
-          parameter: this.level.player
+          parameter: this.level.player,
         },
         () => this.onEnter(this.mesh, this.level.player as PlayerEntity)
-      ));
+      )
+    );
     this.mesh.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
-        { 
+        {
           trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
-          parameter: this.level.player
+          parameter: this.level.player,
         },
         () => this.onExit(this.mesh, this.level.player as PlayerEntity)
       )

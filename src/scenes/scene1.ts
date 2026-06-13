@@ -20,17 +20,15 @@ const arcRotateCameraOptions: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
   alpha: 1,
   beta: 1,
-  radius: 6
-}
+  radius: 6,
+};
 
 const followCameraOptions: FollowCameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
-  radius: 2
-}
+  radius: 2,
+};
 
-const levels: GameLevel[] = [
-  new Level1('level1'),
-];
+const levels: GameLevel[] = [new Level1('level1')];
 
 export const createScene1 = async (engine: BABYLON.Engine) => {
   const scene = new BABYLON.Scene(engine);
@@ -38,32 +36,32 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   await createPhysics(scene);
 
   const fontMontserratRegular = await (await fetch('fonts/Montserrat_Regular.json')).json();
-  scene.metadata = { fonts: { fontMontserratRegular }};
+  scene.metadata = { fonts: { fontMontserratRegular } };
 
-  scene.sounds = createSounds(scene)
+  scene.sounds = createSounds(scene);
 
   const arcRotateCamera = new MyArcRotateCamera('arcRotateCamera', arcRotateCameraOptions, scene);
   const followCamera = new MyFollowCamera('followCamera', followCameraOptions, scene);
-  
+
   gameRoot.level = levels[0];
   gameRoot.player = new PlayerEntity(
     gameRoot.gameSettings.nickname,
     gameRoot.level,
     scene,
     gameRoot.gameSettings.color
-  ); 
+  );
 
   // Controls
   gameRoot.controls = new GameControls();
-  gameRoot.controls.bindControls(scene, gameRoot.player); 
+  gameRoot.controls.bindControls(scene, gameRoot.player);
 
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
-  
+
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
-  
-  scene.activeCamera = arcRotateCamera;  
+
+  scene.activeCamera = arcRotateCamera;
 
   createOptimizations(scene);
 
@@ -74,8 +72,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   // football
   const mpObjects = [
-    createBall(scene, new BABYLON.Vector3(-12.60, 43.50, 9.7)),
-    createBall(scene, new BABYLON.Vector3(-12.60, 43.50, 5.7))
+    createBall(scene, new BABYLON.Vector3(-12.6, 43.5, 9.7)),
+    createBall(scene, new BABYLON.Vector3(-12.6, 43.5, 5.7)),
   ];
 
   // fog
@@ -95,7 +93,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   await gameRoot.uiManager.bindUI();
 
   // multiplayer
-  if (ENABLE_MULTIPLAYER) { // if not running in dev mode
+  if (ENABLE_MULTIPLAYER) {
+    // if not running in dev mode
     gameRoot.multiplayer = new MultiplayerSession(scene, gameRoot.player, mpObjects);
   }
 
@@ -111,4 +110,4 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   }
 
   return scene;
-}
+};

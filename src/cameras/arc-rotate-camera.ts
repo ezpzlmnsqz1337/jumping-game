@@ -2,11 +2,11 @@ import * as BABYLON from '@babylonjs/core';
 import { AutomaticCamera } from './automatic-camera';
 
 export interface ArcRotateCameraOptions {
-  alpha: number
-  beta: number
-  radius: number
-  position: BABYLON.Vector3
-  lockedTarget?: BABYLON.AbstractMesh
+  alpha: number;
+  beta: number;
+  radius: number;
+  position: BABYLON.Vector3;
+  lockedTarget?: BABYLON.AbstractMesh;
 }
 
 export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements AutomaticCamera {
@@ -24,16 +24,16 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
     this.wheelDeltaPercentage = 0.01;
     this.speed = 0.1;
     this.angularSensibilityX = 1000; // Adjust this value to change horizontal turning speed
-    this.angularSensibilityY = 1000; // Adjust this value to change vertical turning speed  
+    this.angularSensibilityY = 1000; // Adjust this value to change vertical turning speed
     this.allowUpsideDown = false;
     this.lowerRadiusLimit = 2;
     this.upperRadiusLimit = 100;
-    
+
     this.collisionRadius = new BABYLON.Vector3(0.5, 0.5, 0.5);
     this.checkCollisions = true;
-  
+
     this.upperBetaLimit = Math.PI / 2;
-  
+
     this.attachControl(true);
   }
 

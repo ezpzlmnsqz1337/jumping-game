@@ -7,13 +7,13 @@ import { renderingCanvas } from '../ui-manager';
 
 export class GameSettingsUI extends AbstractUI {
   gameSettingsDiv!: HTMLDivElement;
-  playerInfoCheckBox! : HTMLInputElement;
-  automaticCameraCheckBox! : HTMLInputElement;
-  followCameraCheckBox! : HTMLInputElement;
-  collissionsCheckBox! : HTMLInputElement;
+  playerInfoCheckBox!: HTMLInputElement;
+  automaticCameraCheckBox!: HTMLInputElement;
+  followCameraCheckBox!: HTMLInputElement;
+  collissionsCheckBox!: HTMLInputElement;
 
   followCameraEnabled = false;
-    
+
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'game-settings', player);
   }
@@ -35,8 +35,10 @@ export class GameSettingsUI extends AbstractUI {
     this.followCameraEnabled = !this.followCameraEnabled;
     this.followCameraCheckBox.checked = this.followCameraEnabled;
 
-    this.automaticCameraCheckBox.checked = (this.scene.activeCamera as {automaticCameraEnabled?: boolean}).automaticCameraEnabled ?? false;
-    
+    this.automaticCameraCheckBox.checked =
+      (this.scene.activeCamera as { automaticCameraEnabled?: boolean }).automaticCameraEnabled ??
+      false;
+
     renderingCanvas.focus();
   }
 
@@ -60,8 +62,12 @@ export class GameSettingsUI extends AbstractUI {
   async bindUI() {
     await super.bindUI();
     this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLInputElement;
-    this.automaticCameraCheckBox = document.querySelector('.automatic-camera-enabled') as HTMLInputElement;
-    this.followCameraCheckBox = document.querySelector('.follow-camera-enabled') as HTMLInputElement;
+    this.automaticCameraCheckBox = document.querySelector(
+      '.automatic-camera-enabled'
+    ) as HTMLInputElement;
+    this.followCameraCheckBox = document.querySelector(
+      '.follow-camera-enabled'
+    ) as HTMLInputElement;
     this.collissionsCheckBox = document.querySelector('.collissions-enabled') as HTMLInputElement;
     this.playerInfoCheckBox = document.querySelector('.player-info-enabled') as HTMLInputElement;
 
@@ -87,7 +93,7 @@ export class GameSettingsUI extends AbstractUI {
     this.playerInfoCheckBox.addEventListener('click', () => {
       this.togglePlayerInfo();
     });
-    
+
     this.rootElement = this.gameSettingsDiv;
   }
 }

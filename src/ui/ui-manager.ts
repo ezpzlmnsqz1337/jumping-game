@@ -38,7 +38,7 @@ export class UIManager {
 
   async bindUI() {
     if (this.initialized) return;
-    
+
     await this.playerInfoUI.bindUI();
     await this.timerUI.bindUI();
     await this.timeTableUI.bindUI();

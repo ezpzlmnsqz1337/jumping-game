@@ -11,7 +11,7 @@ export class ShadowGenerator {
     this.shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
 
     meshesCastingShadow.forEach(x => this.shadowGenerator.addShadowCaster(x));
-    meshesReceivingShadows.forEach(x => x.receiveShadows = true);
+    meshesReceivingShadows.forEach(x => (x.receiveShadows = true));
 
     this.shadowGenerator.useBlurCloseExponentialShadowMap = true;
     this.shadowGenerator.useKernelBlur = true;

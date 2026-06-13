@@ -7,18 +7,14 @@ on:
     branches: [main, develop]
 
 jobs:
-  lint-format-build-test:
+  lint:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [20.x]
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -32,23 +28,58 @@ jobs:
 
       - name: Lint root (TypeScript)
         run: npm run lint
-        continue-on-error: false
 
       - name: Lint server (TypeScript)
         run: |
           cd multiplayer-server
           npm run lint
-        continue-on-error: false
+
+  format:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Install server dependencies
+        run: |
+          cd multiplayer-server
+          npm install
 
       - name: Check formatting (root)
         run: npm run format:check
-        continue-on-error: false
 
       - name: Check formatting (server)
         run: |
           cd multiplayer-server
           npm run format:check
-        continue-on-error: false
+
+  build:
+    needs: [lint, format]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Install server dependencies
+        run: |
+          cd multiplayer-server
+          npm install
 
       - name: Build client
         run: npm run build
@@ -58,7 +89,24 @@ jobs:
           cd multiplayer-server
           npm run build
 
-      - name: Test server
+  test:
+    needs: [lint, format]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install server dependencies
+        run: |
+          cd multiplayer-server
+          npm install
+
+      - name: Run server tests
         run: |
           cd multiplayer-server
           npm test

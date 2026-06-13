@@ -14,7 +14,7 @@ export class StartTrigger extends Trigger {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
     player.checkpoints = [];
     player.lastCheckpointIndex = 0;
-    this.level.timer?.reset();    
+    this.level.timer?.reset();
   }
 
   onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {

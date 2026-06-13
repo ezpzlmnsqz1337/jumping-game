@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../../entities/player-entity';
-import { AbstractUI } from "../abstract-ui";
+import { AbstractUI } from '../abstract-ui';
 import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
@@ -29,11 +29,13 @@ export class EditorUI extends AbstractUI {
   }
 
   updateMeshDetails(gizmoType: GizmoType, htmlElement: HTMLDivElement) {
-    if (!this.gizmoManager?.attachedMesh) return gizmoType === 'rotation' ? '[0, 0, 0, 0]' : '[0, 0, 0]';
-    const gizmo = this.gizmoManager.attachedMesh![gizmoType === 'rotation' ? 'rotationQuaternion' : gizmoType];
+    if (!this.gizmoManager?.attachedMesh)
+      return gizmoType === 'rotation' ? '[0, 0, 0, 0]' : '[0, 0, 0]';
+    const gizmo =
+      this.gizmoManager.attachedMesh![gizmoType === 'rotation' ? 'rotationQuaternion' : gizmoType];
 
-    if (!gizmo) return
-    const value = [gizmo.x, gizmo.y, gizmo.z]
+    if (!gizmo) return;
+    const value = [gizmo.x, gizmo.y, gizmo.z];
     if (gizmoType === 'rotation') value.push((gizmo as BABYLON.Quaternion).w);
 
     this.setInnerText(htmlElement, this.arrayToString(value));
@@ -109,7 +111,6 @@ export class EditorUI extends AbstractUI {
     this.gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = false;
   }
 
-
   updateEditorSelection(newMesh: BABYLON.Nullable<BABYLON.AbstractMesh>) {
     // restore old mesh alpha
     const oldMaterial = this.oldMesh?.material;
@@ -125,11 +126,19 @@ export class EditorUI extends AbstractUI {
   }
 
   bindCameraInfoUI() {
-    const cameraPositionSpan = document.querySelector('.editor .camera-position .value') as HTMLSpanElement
-    const cameraAlphaSpan = document.querySelector('.editor .camera-alpha .value') as HTMLSpanElement
-    const cameraBetaSpan = document.querySelector('.editor .camera-beta .value') as HTMLSpanElement
-    const cameraRadiusSpan = document.querySelector('.editor .camera-radius .value') as HTMLSpanElement
-    const lockTargetCheckBox = document.querySelector('.editor .lock-target-enabled') as HTMLInputElement
+    const cameraPositionSpan = document.querySelector(
+      '.editor .camera-position .value'
+    ) as HTMLSpanElement;
+    const cameraAlphaSpan = document.querySelector(
+      '.editor .camera-alpha .value'
+    ) as HTMLSpanElement;
+    const cameraBetaSpan = document.querySelector('.editor .camera-beta .value') as HTMLSpanElement;
+    const cameraRadiusSpan = document.querySelector(
+      '.editor .camera-radius .value'
+    ) as HTMLSpanElement;
+    const lockTargetCheckBox = document.querySelector(
+      '.editor .lock-target-enabled'
+    ) as HTMLInputElement;
 
     const camera = this.scene.activeCamera as MyArcRotateCamera;
 
@@ -138,7 +147,7 @@ export class EditorUI extends AbstractUI {
     lockTargetCheckBox.setAttribute('checked', camera.lockedTarget ? 'true' : 'false');
 
     camera.onAfterCheckInputsObservable.add(() => {
-      const position = [camera.position.x, camera.position.y, camera.position.z]
+      const position = [camera.position.x, camera.position.y, camera.position.z];
       this.setInnerText(cameraPositionSpan, this.arrayToString(position));
       this.setInnerText(cameraAlphaSpan, camera.alpha.toFixed(4));
       this.setInnerText(cameraBetaSpan, camera.beta.toFixed(4));
@@ -162,7 +171,9 @@ export class EditorUI extends AbstractUI {
     await super.bindUI();
     this.editorDiv = document.querySelector('.editor') as HTMLDivElement;
     this.editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
-    this.controlsToggle = document.querySelectorAll('.editor > .editor-controls') as NodeListOf<HTMLDivElement>;
+    this.controlsToggle = document.querySelectorAll(
+      '.editor > .editor-controls'
+    ) as NodeListOf<HTMLDivElement>;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
     this.transformCheckBox = document.querySelector('.transform-enabled') as HTMLInputElement;
@@ -174,13 +185,15 @@ export class EditorUI extends AbstractUI {
     this.scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
 
     this.editorDiv.style.display = 'block';
-    this.editModeCheckBox.checked =  true;
+    this.editModeCheckBox.checked = true;
 
     this.editModeCheckBox.addEventListener('click', () => {
       if (!this.gizmoManager) return;
       this.gizmoManager.attachableMeshes = this.gizmoManager.attachableMeshes === null ? [] : null;
       this.gizmoManager.attachToMesh(null);
-      this.controlsToggle.forEach(x => x.style.display = x.style.display === 'none' ? 'flex' : 'none');
+      this.controlsToggle.forEach(
+        x => (x.style.display = x.style.display === 'none' ? 'flex' : 'none')
+      );
       this.updateEditorSelection(null);
     });
 

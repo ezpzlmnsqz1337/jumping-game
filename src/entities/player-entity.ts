@@ -1,14 +1,18 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerColor } from '../assets/colors';
 import { getModel } from '../assets/models';
-import { FILTER_GROUP_PLAYER, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from '../collission-groups';
+import {
+  FILTER_GROUP_PLAYER,
+  FILTER_MASK_PLAYER_NO_COLLISSIONS,
+  FILTER_MASK_PLAYER_WITH_COLLISSIONS,
+} from '../collission-groups';
 import { GameEntity } from './game-entity';
 import { GameLevel } from '../game-level';
 
 export type PlayerStatus = 'in_lobby' | 'playing' | 'afk' | 'in_chat';
 export interface Checkpoint {
-  position: BABYLON.Vector3
-  rotationQuaternion: BABYLON.Quaternion
+  position: BABYLON.Vector3;
+  rotationQuaternion: BABYLON.Quaternion;
 }
 
 export class PlayerEntity extends GameEntity {
@@ -26,15 +30,24 @@ export class PlayerEntity extends GameEntity {
   status = 'in_lobby';
   collissionEnabled = true;
 
-  constructor(nickname: string = 'player', level: GameLevel, scene: BABYLON.Scene, color: PlayerColor) {
+  constructor(
+    nickname: string = 'player',
+    level: GameLevel,
+    scene: BABYLON.Scene,
+    color: PlayerColor
+  ) {
     super('player', level, scene);
     this.nickname = nickname;
 
-    this.mesh = BABYLON.MeshBuilder.CreateBox('player', {
-      width: 0.4,
-      height: 0.4,
-      depth: 0.4,
-    }, scene);
+    this.mesh = BABYLON.MeshBuilder.CreateBox(
+      'player',
+      {
+        width: 0.4,
+        height: 0.4,
+        depth: 0.4,
+      },
+      scene
+    );
 
     this.changeColor(color);
 
@@ -58,15 +71,19 @@ export class PlayerEntity extends GameEntity {
     this.changeNickname(this.nickname);
 
     this.physics.shape.filterMembershipMask = FILTER_GROUP_PLAYER;
-    const playerMask = this.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;
+    const playerMask = this.collissionEnabled
+      ? FILTER_MASK_PLAYER_WITH_COLLISSIONS
+      : FILTER_MASK_PLAYER_NO_COLLISSIONS;
     this.physics.shape.filterCollideMask = playerMask;
   }
 
   async changeColor(color: string) {
     // remove old meshes
-    this.mesh!.getChildMeshes().filter(mesh => mesh.name.includes('player')).forEach(mesh => {
-      this.scene.removeMesh(mesh, true);
-    });
+    this.mesh!.getChildMeshes()
+      .filter(mesh => mesh.name.includes('player'))
+      .forEach(mesh => {
+        this.scene.removeMesh(mesh, true);
+      });
 
     // load new model
     const playerModel = await getModel(this.scene, `player-${color}.glb`);
@@ -102,8 +119,8 @@ export class PlayerEntity extends GameEntity {
     if (!this.mesh) return;
 
     const collidedAgainstNode = collisionEvent.collidedAgainst.transformNode;
-    if (!['ground', 'wall', 'player-mp'].includes(collidedAgainstNode.name))return;
-    
+    if (!['ground', 'wall', 'player-mp'].includes(collidedAgainstNode.name)) return;
+
     if (collisionEvent.type === BABYLON.PhysicsEventType.COLLISION_STARTED) {
       const upCollission = collisionEvent.normal?.dot(BABYLON.Vector3.Up()) ?? -1;
       // console.log('upCollission', upCollission);

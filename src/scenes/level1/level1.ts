@@ -21,7 +21,6 @@ import { GameEntity } from '../../entities/game-entity';
 import { createBunnyHops } from './bunnyhops';
 
 export class Level1 extends GameLevel {
-
   protected createSkybox(): void {
     this.skybox = new Skybox(this.scene!);
   }
@@ -33,13 +32,18 @@ export class Level1 extends GameLevel {
 
     groundMaterial.diffuseTexture = getDarkTexture({ uScale: 20, vScale: 20 }, this.scene!);
 
-    this.ground = BABYLON.MeshBuilder.CreateGround('ground', {
-      height: 100,
-      width: 100
-    }, this.scene!);
+    this.ground = BABYLON.MeshBuilder.CreateGround(
+      'ground',
+      {
+        height: 100,
+        width: 100,
+      },
+      this.scene!
+    );
     this.ground.material = groundMaterial;
 
-    const groundAggregate = new BABYLON.PhysicsAggregate(this.ground,
+    const groundAggregate = new BABYLON.PhysicsAggregate(
+      this.ground,
       BABYLON.PhysicsShapeType.BOX,
       { mass: 0, friction: 0.4 },
       this.scene!
@@ -63,19 +67,20 @@ export class Level1 extends GameLevel {
     ];
 
     // last wall red
-    (this.walls[this.walls.length - 2].mesh.material as BABYLON.StandardMaterial).diffuseTexture = getRedTexture({ uScale: 1, vScale: 1 }, scene);
-  };
+    (this.walls[this.walls.length - 2].mesh.material as BABYLON.StandardMaterial).diffuseTexture =
+      getRedTexture({ uScale: 1, vScale: 1 }, scene);
+  }
 
   protected createSpawnPoints() {
     const scene = this.scene!;
 
     this.spawnPoints = [
-      new SpawnPointEntity('spawn-point-1', this, scene, new BABYLON.Vector3(-11.80, 0.4, 1)),
-      new SpawnPointEntity('spawn-point-2', this, scene, new BABYLON.Vector3(-11.80, 0.4, 0)),
-      new SpawnPointEntity('spawn-point-3', this, scene, new BABYLON.Vector3(-11.80, 0.4, -1)),
-      new SpawnPointEntity('spawn-point-4', this, scene, new BABYLON.Vector3(-11.80, 0.4, -2)),
-      new SpawnPointEntity('spawn-point-5', this, scene, new BABYLON.Vector3(-11.80, 0.4, -3)),
-      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.80, 0.4, -4)),      
+      new SpawnPointEntity('spawn-point-1', this, scene, new BABYLON.Vector3(-11.8, 0.4, 1)),
+      new SpawnPointEntity('spawn-point-2', this, scene, new BABYLON.Vector3(-11.8, 0.4, 0)),
+      new SpawnPointEntity('spawn-point-3', this, scene, new BABYLON.Vector3(-11.8, 0.4, -1)),
+      new SpawnPointEntity('spawn-point-4', this, scene, new BABYLON.Vector3(-11.8, 0.4, -2)),
+      new SpawnPointEntity('spawn-point-5', this, scene, new BABYLON.Vector3(-11.8, 0.4, -3)),
+      new SpawnPointEntity('spawn-point-6', this, scene, new BABYLON.Vector3(-11.8, 0.4, -4)),
     ];
   }
 
@@ -83,12 +88,11 @@ export class Level1 extends GameLevel {
     const scene = this.scene!;
 
     this.startTriggers = [
-      new StartTrigger(scene,
-        {
-          level: this,
-          position: new BABYLON.Vector3(-8, 0, -2),
-          scaling: new BABYLON.Vector3(5, 0.1, 7)
-        }),
+      new StartTrigger(scene, {
+        level: this,
+        position: new BABYLON.Vector3(-8, 0, -2),
+        scaling: new BABYLON.Vector3(5, 0.1, 7),
+      }),
     ];
   }
 
@@ -98,8 +102,8 @@ export class Level1 extends GameLevel {
     this.endTriggers = [
       new EndTrigger(scene, {
         level: this,
-        position: new BABYLON.Vector3(-10.00, 42.00, 8.00),
-        scaling: new BABYLON.Vector3(5, 0.1, 5)
+        position: new BABYLON.Vector3(-10.0, 42.0, 8.0),
+        scaling: new BABYLON.Vector3(5, 0.1, 5),
       }),
       // new EndTrigger(scene, {
       //   level: this,
@@ -115,27 +119,51 @@ export class Level1 extends GameLevel {
     const gap = 2;
 
     this.teleports = [
-      new TeleportTrigger('teleport-stage-2', scene, {
-        level: this,
-        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ)
-      }, new BABYLON.Vector3(6.07, 6.00, 1.93)),
-      new TeleportTrigger('teleport-stage-3', scene, {
-        level: this,
-        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap)
-      }, new BABYLON.Vector3(11.60, 12.20, -7.65)),
-      new TeleportTrigger('teleport-stage-4', scene, {
-        level: this,
-        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 2)
-      }, new BABYLON.Vector3(4.13, 22.20, -8.09)),
-      new TeleportTrigger('teleport-stage-5', scene, {
-        level: this,
-        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 3)
-      }, new BABYLON.Vector3(-5.80, 32.50, -8.70)),
-      new TeleportTrigger('teleport-top', scene, {
-        level: this,
-        position: new BABYLON.Vector3(-15.90, 0.00, firstPositionZ - gap * 4)
-      }, new BABYLON.Vector3(-12.60, 42.50, 5.70)),
-      
+      new TeleportTrigger(
+        'teleport-stage-2',
+        scene,
+        {
+          level: this,
+          position: new BABYLON.Vector3(-15.9, 0.0, firstPositionZ),
+        },
+        new BABYLON.Vector3(6.07, 6.0, 1.93)
+      ),
+      new TeleportTrigger(
+        'teleport-stage-3',
+        scene,
+        {
+          level: this,
+          position: new BABYLON.Vector3(-15.9, 0.0, firstPositionZ - gap),
+        },
+        new BABYLON.Vector3(11.6, 12.2, -7.65)
+      ),
+      new TeleportTrigger(
+        'teleport-stage-4',
+        scene,
+        {
+          level: this,
+          position: new BABYLON.Vector3(-15.9, 0.0, firstPositionZ - gap * 2),
+        },
+        new BABYLON.Vector3(4.13, 22.2, -8.09)
+      ),
+      new TeleportTrigger(
+        'teleport-stage-5',
+        scene,
+        {
+          level: this,
+          position: new BABYLON.Vector3(-15.9, 0.0, firstPositionZ - gap * 3),
+        },
+        new BABYLON.Vector3(-5.8, 32.5, -8.7)
+      ),
+      new TeleportTrigger(
+        'teleport-top',
+        scene,
+        {
+          level: this,
+          position: new BABYLON.Vector3(-15.9, 0.0, firstPositionZ - gap * 4),
+        },
+        new BABYLON.Vector3(-12.6, 42.5, 5.7)
+      ),
     ];
 
     this.teleports.forEach(teleport => {
@@ -147,8 +175,7 @@ export class Level1 extends GameLevel {
     const scene = this.scene!;
     const player = this.player!;
 
-    const hemiLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-
+    const hemiLight = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
 
     const light1 = new BABYLON.PointLight('pointLight', new BABYLON.Vector3(-6, 6, 0), scene);
     light1.intensity = 0.4;
@@ -163,7 +190,11 @@ export class Level1 extends GameLevel {
 
     this.lights = [hemiLight, light1];
     this.shadowGenerators = [
-      new ShadowGenerator(light1, [...this.walls.map(x => x.mesh)], [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]),
+      new ShadowGenerator(
+        light1,
+        [...this.walls.map(x => x.mesh)],
+        [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
+      ),
     ];
   }
 }

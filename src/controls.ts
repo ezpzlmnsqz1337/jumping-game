@@ -4,14 +4,14 @@ import gameRoot from './game-root';
 import { GameLevel } from './game-level';
 
 export interface KeyStatus {
-  KeyW: boolean,
-  KeyS: boolean,
-  KeyA: boolean,
-  KeyD: boolean,
-  Comma: boolean,
-  Period: boolean,
-  Space: boolean,
-  ControlLeft: boolean
+  KeyW: boolean;
+  KeyS: boolean;
+  KeyA: boolean;
+  KeyD: boolean;
+  Comma: boolean;
+  Period: boolean;
+  Space: boolean;
+  ControlLeft: boolean;
 }
 
 export class GameControls {
@@ -23,35 +23,29 @@ export class GameControls {
     Comma: false,
     Period: false,
     Space: false,
-    ControlLeft: false
-  }
+    ControlLeft: false,
+  };
 
   bindControls(scene: BABYLON.Scene, player: PlayerEntity): void {
     scene.actionManager = new BABYLON.ActionManager(scene);
 
     scene.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(
-        BABYLON.ActionManager.OnKeyDownTrigger,
-        e => {
-          const key = e.sourceEvent.code as string;
-          if (key in this.keyStatus) {
-            this.keyStatus[key as keyof typeof this.keyStatus] = true;
-          }
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, e => {
+        const key = e.sourceEvent.code as string;
+        if (key in this.keyStatus) {
+          this.keyStatus[key as keyof typeof this.keyStatus] = true;
         }
-      )
-    )
+      })
+    );
 
     scene.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(
-        BABYLON.ActionManager.OnKeyUpTrigger,
-        e => {
-          const key = e.sourceEvent.code as string;
-          if (key in this.keyStatus) {
-            this.keyStatus[key as keyof typeof this.keyStatus] = false;
-          }
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, e => {
+        const key = e.sourceEvent.code as string;
+        if (key in this.keyStatus) {
+          this.keyStatus[key as keyof typeof this.keyStatus] = false;
         }
-      )
-    )
+      })
+    );
 
     scene.onBeforeRenderObservable.add(() => {
       if (!player || ['in_lobby', 'in_chat'].includes(player.status)) return;
@@ -82,20 +76,14 @@ export class GameControls {
   handleWSADMovement(player: PlayerEntity, deltaTime: number) {
     if (!player.mesh) return;
     const keyStatus = this.keyStatus;
-    if (
-      keyStatus.KeyW ||
-      keyStatus.KeyS ||
-      keyStatus.KeyA ||
-      keyStatus.KeyD
-    ) {
+    if (keyStatus.KeyW || keyStatus.KeyS || keyStatus.KeyA || keyStatus.KeyD) {
       player.moving = true;
       const forward = player.mesh.getDirection(BABYLON.Axis.Z);
       const right = player.mesh.getDirection(BABYLON.Axis.X);
-      const speed = (keyStatus.KeyS || keyStatus.KeyW) &&
-        (keyStatus.KeyA || keyStatus.KeyD) ||
-        player.jumping ?
-        player.speed * 0.5 * deltaTime :
-        player.speed * deltaTime;
+      const speed =
+        ((keyStatus.KeyS || keyStatus.KeyW) && (keyStatus.KeyA || keyStatus.KeyD)) || player.jumping
+          ? player.speed * 0.5 * deltaTime
+          : player.speed * deltaTime;
 
       const { x, z } = player.physics.body.getLinearVelocity();
       const hSpeed = new BABYLON.Vector3(x, 0, z).length();
@@ -107,22 +95,13 @@ export class GameControls {
           );
         }
         if (keyStatus.KeyS && !keyStatus.KeyW) {
-          player.physics.body.applyImpulse(
-            forward.scale(speed),
-            player.mesh.getAbsolutePosition()
-          );
+          player.physics.body.applyImpulse(forward.scale(speed), player.mesh.getAbsolutePosition());
         }
         if (keyStatus.KeyA && !keyStatus.KeyD) {
-          player.physics.body.applyImpulse(
-            right.scale(speed),
-            player.mesh.getAbsolutePosition()
-          );
+          player.physics.body.applyImpulse(right.scale(speed), player.mesh.getAbsolutePosition());
         }
         if (keyStatus.KeyD && !keyStatus.KeyA) {
-          player.physics.body.applyImpulse(
-            right.scale(-speed),
-            player.mesh.getAbsolutePosition()
-          );
+          player.physics.body.applyImpulse(right.scale(-speed), player.mesh.getAbsolutePosition());
         }
       }
     }
@@ -137,7 +116,7 @@ export class GameControls {
     const keyStatus = this.keyStatus;
 
     if (keyStatus.Space && !player.jumping) {
-      player.jump()
+      player.jump();
     }
   }
 
@@ -147,7 +126,8 @@ export class GameControls {
     const keyStatus = this.keyStatus;
     const rotationSpeed = player.rotationSpeed;
     const forward = player.mesh.getDirection(BABYLON.Axis.Z);
-    const strafeBoostSpeed = player.strafeBoostSpeed * (deltaTime < 1 ? deltaTime * 1.2 : deltaTime);
+    const strafeBoostSpeed =
+      player.strafeBoostSpeed * (deltaTime < 1 ? deltaTime * 1.2 : deltaTime);
 
     if (keyStatus.Comma && !keyStatus.Period) {
       player.physics.body.setAngularVelocity(new BABYLON.Vector3(0, -rotationSpeed, 0));
@@ -177,7 +157,7 @@ export class GameControls {
       if (!player.jumping) {
         player.checkpoints.push({
           position: player.mesh.getAbsolutePosition().clone(),
-          rotationQuaternion: player.mesh.rotationQuaternion!.clone()
+          rotationQuaternion: player.mesh.rotationQuaternion!.clone(),
         });
         player.lastCheckpointIndex = player.checkpoints.length - 1;
       }
@@ -212,7 +192,9 @@ export class GameControls {
       player.physics.body.disablePreStep = true;
       player.mesh.position = spawnPoint.position.clone();
       player.mesh.position.y += 1;
-      player.mesh.rotationQuaternion = (spawnPoint.rotationQuaternion || BABYLON.Quaternion.Zero()).clone();
+      player.mesh.rotationQuaternion = (
+        spawnPoint.rotationQuaternion || BABYLON.Quaternion.Zero()
+      ).clone();
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;

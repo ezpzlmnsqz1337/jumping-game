@@ -1,7 +1,13 @@
 import * as BABYLON from '@babylonjs/core';
-import * as Colyseus from "colyseus.js";
+import * as Colyseus from 'colyseus.js';
 import { getModel } from './assets/models';
-import { FILTER_GROUP_PLAYER_MP, FILTER_MASK_PLAYER_MP_NO_COLLISSIONS, FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS, FILTER_MASK_PLAYER_NO_COLLISSIONS, FILTER_MASK_PLAYER_WITH_COLLISSIONS } from './collission-groups';
+import {
+  FILTER_GROUP_PLAYER_MP,
+  FILTER_MASK_PLAYER_MP_NO_COLLISSIONS,
+  FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS,
+  FILTER_MASK_PLAYER_NO_COLLISSIONS,
+  FILTER_MASK_PLAYER_WITH_COLLISSIONS,
+} from './collission-groups';
 import { GameEntity } from './entities/game-entity';
 import { PlayerEntity, PlayerStatus } from './entities/player-entity';
 import gameRoot from './game-root';
@@ -68,45 +74,48 @@ export class MultiplayerSession {
     this.scene = scene;
     this.player = player;
     this.ws = new Colyseus.Client(`ws://${window.location.host}`);
-    this.ws.joinOrCreate<MultiplayerGameInfo>("my_room").then(room => {
-      this.room = room;
-      console.warn(room.sessionId, "joined", room.name);
-      this.localPlayerId = room.sessionId;
+    this.ws
+      .joinOrCreate<MultiplayerGameInfo>('my_room')
+      .then(room => {
+        this.room = room;
+        console.warn(room.sessionId, 'joined', room.name);
+        this.localPlayerId = room.sessionId;
 
-      room.onStateChange(async state =>  {
-        if (performance.now() - this.lastTimeSent < UPDATE_SPEED_MS) return;
-        this.lastTimeSent = performance.now();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await this.updatePlayers((state.players as any).$items);
+        room.onStateChange(async state => {
+          if (performance.now() - this.lastTimeSent < UPDATE_SPEED_MS) return;
+          this.lastTimeSent = performance.now();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await this.updatePlayers((state.players as any).$items);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        gameRoot.uiManager?.timeTableUI.updateUI((state.times as any).$items);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          gameRoot.uiManager?.timeTableUI.updateUI((state.times as any).$items);
+        });
+
+        room.onMessage('player:disconnected', message => {
+          this.removePlayer(message);
+        });
+
+        room.onMessage('chat:update', message => {
+          if (message.playerId === this.localPlayerId) return;
+          gameRoot.uiManager?.chatUI.addChatMessage(message);
+        });
+
+        room.onError((_code, message) => {
+          console.warn(room.sessionId, "couldn't join", room.name, message);
+        });
+
+        room.onLeave(_code => {
+          console.warn(room.sessionId, 'player left', room.name);
+        });
+
+        scene.onBeforeRenderObservable.add(() => {
+          this.sendPlayerInfo();
+          // this.sendObjectInfo(objects);
+        });
+      })
+      .catch(e => {
+        console.warn('JOIN ERROR', e);
       });
-
-      room.onMessage("player:disconnected", (message) => {
-        this.removePlayer(message);
-      });
-
-      room.onMessage("chat:update", (message) => {
-        if (message.playerId === this.localPlayerId) return;
-        gameRoot.uiManager?.chatUI.addChatMessage(message);
-      });
-
-      room.onError((_code, message) => {
-        console.warn(room.sessionId, "couldn't join", room.name, message);
-      });
-
-      room.onLeave((_code) => {
-        console.warn(room.sessionId, "player left", room.name);
-      });
-
-      scene.onBeforeRenderObservable.add(() => {
-        this.sendPlayerInfo();
-        // this.sendObjectInfo(objects);
-      });
-    }).catch(e => {
-      console.warn("JOIN ERROR", e);
-    });
   }
 
   async updatePlayers(playerInfo: Map<string, PlayerInfo>) {
@@ -124,7 +133,7 @@ export class MultiplayerSession {
         this.players.set(id, player);
       }
       // if player changes color, or nickname remove him and skip to next iteration
-      const colorChange = player.mesh && player.color && player.color !== color
+      const colorChange = player.mesh && player.color && player.color !== color;
       const nicknameChange = player.mesh && player.nickname && player.nickname !== nickname;
       if (colorChange || nicknameChange) {
         this.removePlayer(id);
@@ -144,8 +153,17 @@ export class MultiplayerSession {
       }
       if (info.position && info.rotation) {
         player.mesh.physicsBody!.disablePreStep = true;
-        const targetPosition = new BABYLON.Vector3(info.position.x, info.position.y, info.position.z);
-        const targetRotation = new BABYLON.Quaternion(info.rotation.x, info.rotation.y, info.rotation.z, info.rotation.w);
+        const targetPosition = new BABYLON.Vector3(
+          info.position.x,
+          info.position.y,
+          info.position.z
+        );
+        const targetRotation = new BABYLON.Quaternion(
+          info.rotation.x,
+          info.rotation.y,
+          info.rotation.z,
+          info.rotation.w
+        );
         player.mesh.position = targetPosition;
         player.mesh.rotationQuaternion = targetRotation;
         player.mesh.physicsBody!.disablePreStep = false;
@@ -158,25 +176,35 @@ export class MultiplayerSession {
         const material = x.material as BABYLON.PBRMaterial;
         material.alpha = shouldHaveCollission ? 1 : 0.5;
         material.transparencyMode = shouldHaveCollission ? 0 : 2;
-      })
+      });
       const mpBody = player.mesh.physicsBody;
       if (!mpBody || !mpBody.shape) return;
-      const playerMpMask = shouldHaveCollission ? FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS : FILTER_MASK_PLAYER_MP_NO_COLLISSIONS;
-      mpBody.shape.filterCollideMask = playerMpMask;      
+      const playerMpMask = shouldHaveCollission
+        ? FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS
+        : FILTER_MASK_PLAYER_MP_NO_COLLISSIONS;
+      mpBody.shape.filterCollideMask = playerMpMask;
     }
 
     this.updating = false;
   }
 
   sendObjectInfo(meshes: BABYLON.Mesh[]) {
-    this.room.send('objects:info', meshes.reduce((acc: Record<string, unknown>, cur) => {
-      acc[cur.name] = {
-        position: { x: cur.position.x, y: cur.position.y, z: cur.position.z },
-        rotation: { x: cur.rotationQuaternion?.x, y: cur.rotationQuaternion?.y, z: cur.rotationQuaternion?.z, w: cur.rotationQuaternion?.w }
-      }
-      return acc;
-    }, {}));
-  };
+    this.room.send(
+      'objects:info',
+      meshes.reduce((acc: Record<string, unknown>, cur) => {
+        acc[cur.name] = {
+          position: { x: cur.position.x, y: cur.position.y, z: cur.position.z },
+          rotation: {
+            x: cur.rotationQuaternion?.x,
+            y: cur.rotationQuaternion?.y,
+            z: cur.rotationQuaternion?.z,
+            w: cur.rotationQuaternion?.w,
+          },
+        };
+        return acc;
+      }, {})
+    );
+  }
 
   updateObjects(objectInfo: Map<string, ObjectInfo>) {
     if (this.updatingObjects) return;
@@ -198,7 +226,12 @@ export class MultiplayerSession {
       if (info.position && info.rotation) {
         o.mesh.physicsBody!.disablePreStep = true;
         o.mesh.position = new BABYLON.Vector3(info.position.x, info.position.y, info.position.z);
-        o.mesh.rotationQuaternion = new BABYLON.Quaternion(info.rotation.x, info.rotation.y, info.rotation.z, info.rotation.w);
+        o.mesh.rotationQuaternion = new BABYLON.Quaternion(
+          info.rotation.x,
+          info.rotation.y,
+          info.rotation.z,
+          info.rotation.w
+        );
         o.mesh.physicsBody!.disablePreStep = false;
       }
     }
@@ -218,21 +251,30 @@ export class MultiplayerSession {
     const mesh = this.player.mesh as BABYLON.Mesh;
     this.room.send('player:info', {
       position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
-      rotation: { x: mesh.rotationQuaternion?.x, y: mesh.rotationQuaternion?.y, z: mesh.rotationQuaternion?.z, w: mesh.rotationQuaternion?.w },
+      rotation: {
+        x: mesh.rotationQuaternion?.x,
+        y: mesh.rotationQuaternion?.y,
+        z: mesh.rotationQuaternion?.z,
+        w: mesh.rotationQuaternion?.w,
+      },
       nickname: this.player.nickname,
       color: this.player.color,
       status: this.player.status,
-      collissionEnabled: this.player.collissionEnabled
+      collissionEnabled: this.player.collissionEnabled,
     });
-  };
+  }
 
   async createMpPlayer(scene: BABYLON.Scene, nickname: string, color?: string) {
     console.warn('Creating player', nickname);
-    const box = BABYLON.MeshBuilder.CreateBox('player-mp', {
-      width: 0.4,
-      height: 0.4,
-      depth: 0.4
-    }, scene);
+    const box = BABYLON.MeshBuilder.CreateBox(
+      'player-mp',
+      {
+        width: 0.4,
+        height: 0.4,
+        depth: 0.4,
+      },
+      scene
+    );
     box.visibility = 0;
 
     const playerModel = await getModel(scene, `player-${color || 'red'}.glb`);
@@ -253,7 +295,6 @@ export class MultiplayerSession {
     boxAggregate.body.setLinearDamping(1);
     boxAggregate.shape.filterMembershipMask = FILTER_GROUP_PLAYER_MP;
     boxAggregate.shape.filterCollideMask = FILTER_MASK_PLAYER_MP_WITH_COLLISSIONS;
-
 
     GameEntity.createNameTag(scene, box, nickname);
 
@@ -276,7 +317,9 @@ export class MultiplayerSession {
     // player mask
     const body = this.player.mesh.physicsBody;
 
-    const playerMask = this.player.collissionEnabled ? FILTER_MASK_PLAYER_WITH_COLLISSIONS : FILTER_MASK_PLAYER_NO_COLLISSIONS;    
+    const playerMask = this.player.collissionEnabled
+      ? FILTER_MASK_PLAYER_WITH_COLLISSIONS
+      : FILTER_MASK_PLAYER_NO_COLLISSIONS;
 
     if (!body || !body.shape) return;
     body.shape.filterCollideMask = playerMask;

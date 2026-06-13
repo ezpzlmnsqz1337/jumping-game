@@ -27,7 +27,7 @@ export class ChatUI extends AbstractUI {
       id: '',
       nickname: this.player.nickname,
       text,
-      color: this.player.color
+      color: this.player.color,
     });
     this.chatInput.value = '';
     if (mp) mp.sendChatMessage(text);
@@ -62,7 +62,7 @@ export class ChatUI extends AbstractUI {
     this.chatInput.style.display = 'block';
     this.chatInput.focus();
     this.player.status = 'in_chat';
-    setTimeout(() => this.chatInput.value = '');
+    setTimeout(() => (this.chatInput.value = ''));
   }
 
   stopChat() {

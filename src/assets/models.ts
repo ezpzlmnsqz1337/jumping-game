@@ -7,9 +7,12 @@ export const ModelId = {
   playerOrange: 'player-orange.glb',
   playerYellow: 'player-yellow.glb',
   playerPink: 'player-pink.glb',
-  playerPurple: 'player-purple.glb'
-}
+  playerPurple: 'player-purple.glb',
+};
 
-export const getModel = (scene: BABYLON.Scene, model: string): Promise<BABYLON.ISceneLoaderAsyncResult> => {
+export const getModel = (
+  scene: BABYLON.Scene,
+  model: string
+): Promise<BABYLON.ISceneLoaderAsyncResult> => {
   return BABYLON.SceneLoader.ImportMeshAsync('', './assets/models/', model, scene);
-}
+};

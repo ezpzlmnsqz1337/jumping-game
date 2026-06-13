@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import HavokPhysics from "@babylonjs/havok";
+import HavokPhysics from '@babylonjs/havok';
 
 export const createPhysics = async (scene: BABYLON.Scene) => {
   // pass the engine to the plugin
@@ -8,4 +8,4 @@ export const createPhysics = async (scene: BABYLON.Scene) => {
   const gravityVector = new BABYLON.Vector3(0, -9.8, 0);
   // enable physics in the scene with a gravity
   scene.enablePhysics(gravityVector, physicsPlugin);
-}
+};

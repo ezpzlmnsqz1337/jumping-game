@@ -2,7 +2,6 @@ import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../../entities/player-entity';
 import { AbstractUI } from './../abstract-ui';
 
-
 export class PerformanceUI extends AbstractUI {
   performanceDiv!: HTMLDivElement;
   fpsCounerDiv!: HTMLDivElement;

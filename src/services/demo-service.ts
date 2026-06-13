@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { getModel } from '../assets/models';
 import { GameEntity } from '../entities/game-entity';
-import { PlayerEntity } from "../entities/player-entity";
+import { PlayerEntity } from '../entities/player-entity';
 import gameRoot from '../game-root';
 
 interface DemoEntry {
@@ -30,7 +30,7 @@ export class DemoService {
   storeFrame(player: PlayerEntity): void {
     const frame = {
       position: player.mesh!.position.clone(),
-      rotation: player.mesh!.rotationQuaternion!.clone()
+      rotation: player.mesh!.rotationQuaternion!.clone(),
     };
     this.recording.push(frame);
     this.recordingInterval = setTimeout(() => this.storeFrame(player), SAMPLE_RATE_MS);
@@ -85,11 +85,15 @@ export class DemoService {
     const scene = gameRoot.activeScene!;
     const nickname = 'Map record';
 
-    const box = BABYLON.MeshBuilder.CreateBox('player-demo', {
-      width: 0.4,
-      height: 0.4,
-      depth: 0.4
-    }, scene);
+    const box = BABYLON.MeshBuilder.CreateBox(
+      'player-demo',
+      {
+        width: 0.4,
+        height: 0.4,
+        depth: 0.4,
+      },
+      scene
+    );
     box.visibility = 0;
 
     const playerModel = await getModel(scene, 'player-red.glb');

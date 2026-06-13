@@ -1,8 +1,8 @@
 export interface TimeEntry {
-  nickname: string
-  timeStr: string
-  time: number
-  checkpoints: number
+  nickname: string;
+  timeStr: string;
+  time: number;
+  checkpoints: number;
 }
 
 export class LevelTimer {
@@ -29,7 +29,8 @@ export class LevelTimer {
 
   getTimeAsString() {
     if (!this.active && !this.finishedAt) return '00:00.000';
-    if (this.finishedAt > 0) return LevelTimer.formatTime(new Date(this.finishedAt - this.startedAt));
+    if (this.finishedAt > 0)
+      return LevelTimer.formatTime(new Date(this.finishedAt - this.startedAt));
     return LevelTimer.formatTime(new Date(Date.now() - this.startedAt));
   }
 

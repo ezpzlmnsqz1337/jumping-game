@@ -26,14 +26,13 @@ export class GameEntity {
 
     const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(nickNameTextPlane);
 
-    const nickNameText = new GUI.TextBlock("labelText", nickname);
-    nickNameText.color = "white";
-    nickNameText.fontSize = "70px";
+    const nickNameText = new GUI.TextBlock('labelText', nickname);
+    nickNameText.color = 'white';
+    nickNameText.fontSize = '70px';
     nickNameText.shadowBlur = 0;
     nickNameText.outlineWidth = 10;
-    nickNameText.outlineColor = "black";
+    nickNameText.outlineColor = 'black';
     advancedTexture.addControl(nickNameText);
-
   }
 
   static createNameTag(scene: BABYLON.Scene, mesh: BABYLON.Mesh, nickname: string) {
@@ -47,12 +46,12 @@ export class GameEntity {
 
     const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(nickNameTextPlane);
 
-    const nickNameText = new GUI.TextBlock("nickNameText", nickname);
-    nickNameText.color = "white";
-    nickNameText.fontSize = "70px";
+    const nickNameText = new GUI.TextBlock('nickNameText', nickname);
+    nickNameText.color = 'white';
+    nickNameText.fontSize = '70px';
     nickNameText.shadowBlur = 0;
     nickNameText.outlineWidth = 10;
-    nickNameText.outlineColor = "black";
+    nickNameText.outlineColor = 'black';
     advancedTexture.addControl(nickNameText);
   }
 

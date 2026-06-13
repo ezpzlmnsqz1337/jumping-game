@@ -7,11 +7,16 @@ export class TeleportTrigger extends Trigger {
   destination: BABYLON.Vector3;
   name: string;
 
-  constructor(name: string, scene: BABYLON.Scene, opts: CreateTriggerOptions, destination: BABYLON.Vector3) {
+  constructor(
+    name: string,
+    scene: BABYLON.Scene,
+    opts: CreateTriggerOptions,
+    destination: BABYLON.Vector3
+  ) {
     super(scene, {
       ...opts,
       scaling: new BABYLON.Vector3(1, 0.2, 1),
-      isVisible: true
+      isVisible: true,
     });
     this.name = name;
     this.destination = destination;
@@ -20,7 +25,7 @@ export class TeleportTrigger extends Trigger {
 
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
-    
+
     if (!player.mesh) return;
 
     player.checkpoints = [];

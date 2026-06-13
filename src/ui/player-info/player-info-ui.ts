@@ -45,11 +45,15 @@ export class PlayerInfoUI extends AbstractUI {
 
   async bindUI() {
     await super.bindUI();
-    this.playerInfoDiv = document.querySelector('.player-info') as HTMLDivElement
-    this.hSpeedDiv = document.querySelector('.player-info > .horizontal-speed > .value') as HTMLDivElement
-    this.vSpeedDiv = document.querySelector('.player-info > .vertical-speed > .value') as HTMLDivElement
-    this.movingDiv = document.querySelector('.player-info > .moving > .value') as HTMLDivElement
-    this.jumpingDiv = document.querySelector('.player-info > .jumping > .value') as HTMLDivElement
+    this.playerInfoDiv = document.querySelector('.player-info') as HTMLDivElement;
+    this.hSpeedDiv = document.querySelector(
+      '.player-info > .horizontal-speed > .value'
+    ) as HTMLDivElement;
+    this.vSpeedDiv = document.querySelector(
+      '.player-info > .vertical-speed > .value'
+    ) as HTMLDivElement;
+    this.movingDiv = document.querySelector('.player-info > .moving > .value') as HTMLDivElement;
+    this.jumpingDiv = document.querySelector('.player-info > .jumping > .value') as HTMLDivElement;
 
     this.scene.onBeforeRenderObservable.add(() => this.updateUI());
     this.rootElement = this.playerInfoDiv;

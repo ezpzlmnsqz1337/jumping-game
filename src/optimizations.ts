@@ -7,4 +7,4 @@ export const createOptimizations = (scene: BABYLON.Scene) => {
   optimizer.start();
 
   return optimizer;
-}
+};

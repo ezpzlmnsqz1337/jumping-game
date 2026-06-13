@@ -7,7 +7,7 @@ export class TimeTableUI extends AbstractUI {
   timesListDiv!: HTMLDivElement;
 
   noOfTimes: number = 0;
-  
+
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'time-table', player);
   }
@@ -21,13 +21,13 @@ export class TimeTableUI extends AbstractUI {
   updateUI(times: Map<string, TimeEntry>): void {
     if (times.size === 0 || this.noOfTimes === times.size) return;
     this.noOfTimes = times.size;
-    
+
     if (!this.timesListDiv) return;
-    this.timesListDiv.innerHTML = ''
+    this.timesListDiv.innerHTML = '';
     const timesListOl = document.createElement('ol');
     times.forEach(time => {
       const timesListLi = document.createElement('li');
-  
+
       timesListLi.innerText = `${time.timeStr} - ${time.nickname} (CP: ${time.checkpoints}) `;
       timesListOl.appendChild(timesListLi);
       this.timesListDiv.appendChild(timesListOl);

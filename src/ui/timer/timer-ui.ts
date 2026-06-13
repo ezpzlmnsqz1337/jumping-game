@@ -13,7 +13,7 @@ export class TimerUI extends AbstractUI {
 
   updateTime() {
     const timer = this.player.level.timer as LevelTimer;
-    if (this.uiTimerDiv.innerText === timer.getTimeAsString()) return
+    if (this.uiTimerDiv.innerText === timer.getTimeAsString()) return;
     this.uiTimerDiv.innerText = timer.getTimeAsString();
   }
 

@@ -12,7 +12,7 @@ export const createBall = (scene: BABYLON.Scene, position: BABYLON.Vector3) => {
   material.diffuseTexture = getOrangeTexture({ uScale: 1, vScale: 1 }, scene);
   material.roughness = 0;
   ball.material = material;
-  
+
   // physics
   const _ballAggregate = new BABYLON.PhysicsAggregate(
     ball,
@@ -23,4 +23,4 @@ export const createBall = (scene: BABYLON.Scene, position: BABYLON.Vector3) => {
 
   noOfBalls++;
   return ball;
-}
+};

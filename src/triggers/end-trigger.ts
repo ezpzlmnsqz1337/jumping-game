@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player-entity';
-import {  CreateTriggerOptions, Trigger } from './trigger';
+import { CreateTriggerOptions, Trigger } from './trigger';
 import { endTriggerColor } from '../assets/colors';
 import gameRoot from '../game-root';
 
@@ -19,9 +19,12 @@ export class EndTrigger extends Trigger {
       nickname: player.nickname,
       timeStr: timer.getTimeAsString(),
       time: timer.getTime(),
-      checkpoints: player.checkpoints.length
+      checkpoints: player.checkpoints.length,
     });
-    this.mesh.getScene().sounds?.find(x => x.name === 'wicked-sick')?.play();
+    this.mesh
+      .getScene()
+      .sounds?.find(x => x.name === 'wicked-sick')
+      ?.play();
     const demo = gameRoot.demoService.stopRecording();
     gameRoot.demoService.playDemo(demo);
   }

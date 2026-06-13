@@ -22,7 +22,7 @@ export class AbstractUI {
 
   async loadHtml() {
     const response = await fetch(`assets/ui/${this.name}/${this.name}.html`, {
-      method: 'GET'
+      method: 'GET',
     });
     document.body.insertAdjacentHTML('beforeend', await response.text());
   }
@@ -30,7 +30,7 @@ export class AbstractUI {
   arrayToString(arr: number[]) {
     return `[ ${arr.map(x => x.toFixed(2)).join(', ')} ]`;
   }
-  
+
   setInnerText(element: HTMLElement, text: string) {
     if (element.innerText === text) return;
     element.innerText = text;

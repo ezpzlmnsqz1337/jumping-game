@@ -9,7 +9,14 @@ export type WallType = 'box' | 'sphere' | 'cylinder';
 export class WallEntity extends GameEntity {
   mesh: BABYLON.Mesh;
 
-  constructor(scene: BABYLON.Scene, level: GameLevel, type: WallType, opts: Record<string, unknown>, position: BABYLON.Vector3, rotation?: BABYLON.Quaternion) {
+  constructor(
+    scene: BABYLON.Scene,
+    level: GameLevel,
+    type: WallType,
+    opts: Record<string, unknown>,
+    position: BABYLON.Vector3,
+    rotation?: BABYLON.Quaternion
+  ) {
     super('wall', level, scene);
     let physicsShapeType: BABYLON.PhysicsShapeType;
     switch (type) {
@@ -31,7 +38,10 @@ export class WallEntity extends GameEntity {
     }
     const wallMaterial = new BABYLON.StandardMaterial('wallMaterial');
     wallMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
-    wallMaterial.diffuseTexture = getDarkTexture({ uScale: opts.uScale, vScale: opts.vScale }, scene);
+    wallMaterial.diffuseTexture = getDarkTexture(
+      { uScale: opts.uScale, vScale: opts.vScale },
+      scene
+    );
     wallMaterial.roughness = 0.3;
     this.mesh.material = wallMaterial;
     this.mesh.metadata = opts;

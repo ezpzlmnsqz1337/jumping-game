@@ -1,5 +1,5 @@
-import { Room, Client } from "@colyseus/core";
-import { ChatMessage, MyRoomState, Player, TimeEntry } from "./schema/MyRoomState";
+import { Room, Client } from '@colyseus/core';
+import { ChatMessage, MyRoomState, Player, TimeEntry } from './schema/MyRoomState';
 
 // events
 const EventType = Object.freeze({
@@ -13,38 +13,66 @@ const EventType = Object.freeze({
   CHAT_MESSAGE: 'chat:message',
   CHAT_UPDATE: 'chat:update',
   OBJECTS_INFO: 'objects:info',
-})
+});
 
 export class MyRoom extends Room<MyRoomState> {
-  maxClients = 4;  
+  maxClients = 4;
 
   onCreate(_options: Record<string, unknown>) {
-    this.setState(new MyRoomState());    
+    this.setState(new MyRoomState());
 
     // stored best times
     this.state.times.push(
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 184055, timeStr: '03:04.055', checkpoints: 15 }),
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 179384, timeStr: '02:59.384', checkpoints: 17 }),
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 186865, timeStr: '03:06.865', checkpoints: 17 }),
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 203082, timeStr: '03:23.082', checkpoints: 17 }),
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 202316, timeStr: '03:22.316', checkpoints: 24 }),
-      new TimeEntry({ nickname: 'ezpzlmnsqz1337', time: 274392, timeStr: '04:34.392', checkpoints: 25 })
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 184055,
+        timeStr: '03:04.055',
+        checkpoints: 15,
+      }),
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 179384,
+        timeStr: '02:59.384',
+        checkpoints: 17,
+      }),
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 186865,
+        timeStr: '03:06.865',
+        checkpoints: 17,
+      }),
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 203082,
+        timeStr: '03:23.082',
+        checkpoints: 17,
+      }),
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 202316,
+        timeStr: '03:22.316',
+        checkpoints: 24,
+      }),
+      new TimeEntry({
+        nickname: 'ezpzlmnsqz1337',
+        time: 274392,
+        timeStr: '04:34.392',
+        checkpoints: 25,
+      })
     );
 
     this.onMessage(EventType.PLAYER_INFO, (client, playerInfo) => {
-      this.updatePlayerInfo(client.sessionId, playerInfo);      
+      this.updatePlayerInfo(client.sessionId, playerInfo);
     });
 
-    this.onMessage(EventType.OBJECTS_INFO, (_client, _message) => {
-      
-    });
+    this.onMessage(EventType.OBJECTS_INFO, (_client, _message) => {});
 
     this.onMessage(EventType.ADD_TIME, (client, time) => {
       this.addTime(new TimeEntry(time));
     });
 
     this.onMessage(EventType.CHAT_MESSAGE, (client, message) => {
-     this.handleChatMessage(client.sessionId, message);
+      this.handleChatMessage(client.sessionId, message);
     });
   }
 
@@ -66,15 +94,15 @@ export class MyRoom extends Room<MyRoomState> {
     // emit a message to all players to remove this player
     this.broadcast(EventType.PLAYER_DISCONNECTED, client.sessionId);
     // emit essage to chat
-    this.broadCastServerMessage(`Player ${playerName} disconnected.`)
+    this.broadCastServerMessage(`Player ${playerName} disconnected.`);
   }
 
   onDispose() {
-    console.warn("room", this.roomId, "disposing...");
+    console.warn('room', this.roomId, 'disposing...');
   }
 
   updatePlayerInfo(playerId: string, playerInfo: Player) {
-    const player = this.state.players.get(playerId)
+    const player = this.state.players.get(playerId);
     player.position.x = playerInfo.position.x;
     player.position.y = playerInfo.position.y;
     player.position.z = playerInfo.position.z;
@@ -109,24 +137,24 @@ export class MyRoom extends Room<MyRoomState> {
     this.broadCastPlayerMessage(playerId, text);
   }
 
-  broadCastPlayerMessage(playerId: string, text: string) {    
+  broadCastPlayerMessage(playerId: string, text: string) {
     const player = this.state.players.get(playerId);
     if (player) {
       this.broadcast(EventType.CHAT_UPDATE, {
         playerId: playerId,
         nickname: player.nickname,
         color: player.color,
-        text: text
+        text: text,
       });
     }
   }
 
-  broadCastServerMessage(text: string) {    
+  broadCastServerMessage(text: string) {
     this.broadcast(EventType.CHAT_UPDATE, {
       playerId: 'server',
       nickname: 'Server',
       color: 'gray',
-      text
+      text,
     });
   }
 }
