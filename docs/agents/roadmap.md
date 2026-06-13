@@ -1,5 +1,11 @@
 # High-Value Improvement Roadmap
 
+## Near-Term Implementation Plan
+
+1. Reduce client network chatter by throttling player-state sends and skipping unchanged snapshots.
+2. Add basic safety guards around multiplayer sends so UI/gameplay events do not crash before the room is ready.
+3. Revisit frame-by-frame UI observers and consolidate any remaining expensive updates after the network layer is stable.
+
 Prioritize in this order unless user requests otherwise.
 
 ## 1) Multiplayer authority and smoothing

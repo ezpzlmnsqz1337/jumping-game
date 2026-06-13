@@ -27,7 +27,7 @@ export class PlayerEntity extends GameEntity {
   checkpoints: Checkpoint[] = [];
   lastCheckpointIndex = 0;
   color = 'blue';
-  status = 'in_lobby';
+  status: PlayerStatus = 'in_lobby';
   collissionEnabled = true;
 
   constructor(
