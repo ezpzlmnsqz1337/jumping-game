@@ -26,18 +26,7 @@ export class TeleportTrigger extends Trigger {
 
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
-
-    if (!player.mesh) return;
-
-    player.checkpoints = [];
-    player.lastCheckpointIndex = 0;
-    this.level.timer?.resetRun();
-
-    player.physics.body.disablePreStep = true;
-    player.mesh.position = this.destination.clone();
-    player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
-    player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
-    player.physics.body.disablePreStep = false;
+    this.level.resetRunForTeleport(player, this.destination);
   }
 
   onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {

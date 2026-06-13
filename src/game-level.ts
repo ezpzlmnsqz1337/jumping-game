@@ -9,6 +9,7 @@ import { Trigger } from './triggers/trigger';
 import { EndTrigger } from './triggers/end-trigger';
 import { StartTrigger } from './triggers/start-trigger';
 import { TeleportTrigger } from './triggers/teleport-trigger';
+import gameRoot from './game-root';
 import {
   serializeColor3,
   serializeQuaternion,
@@ -100,6 +101,70 @@ export class GameLevel {
 
   protected createLights() {
     this.lights = [];
+  }
+
+  resetPlayerProgress(player: PlayerEntity) {
+    player.checkpoints = [];
+    player.lastCheckpointIndex = 0;
+  }
+
+  armRunFromStart(player: PlayerEntity) {
+    if (!this.timer) return false;
+
+    this.timer.resetRun();
+    this.timer.armRun();
+    this.resetPlayerProgress(player);
+    gameRoot.demoService.reset();
+    return true;
+  }
+
+  startRunFromStart(player: PlayerEntity) {
+    if (!this.timer?.startRun()) return false;
+
+    gameRoot.demoService.startRecording(player);
+    return true;
+  }
+
+  finishRun(player: PlayerEntity) {
+    if (!this.timer?.finishRun()) return false;
+
+    // Anti-cheat: validate run is legitimate
+    const validation = this.timer.isValidRun(player.checkpoints.length);
+    if (!validation.valid) {
+      console.warn('Run rejected:', validation.reason);
+      this.timer.resetRun();
+      return false;
+    }
+
+    gameRoot.multiplayer?.sendTimeToServer({
+      nickname: player.nickname,
+      timeStr: this.timer.getTimeAsString(),
+      time: this.timer.getTime(),
+      checkpoints: player.checkpoints.length,
+    });
+
+    this.scene
+      ?.sounds?.find(sound => sound.name === 'wicked-sick')
+      ?.play();
+
+    const demo = gameRoot.demoService.stopRecording();
+    gameRoot.demoService.playDemo(demo);
+    return true;
+  }
+
+  resetRunForTeleport(player: PlayerEntity, destination: BABYLON.Vector3) {
+    if (!player.mesh) return false;
+
+    this.resetPlayerProgress(player);
+    this.timer?.resetRun();
+    gameRoot.demoService.reset();
+
+    player.physics.body.disablePreStep = true;
+    player.mesh.position = destination.clone();
+    player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
+    player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+    player.physics.body.disablePreStep = false;
+    return true;
   }
 
   getRandomSpawnPoint() {

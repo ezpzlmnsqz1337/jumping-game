@@ -58,6 +58,10 @@ interface PlayerInfo {
   status: PlayerStatus;
   color?: string;
   collissionEnabled?: boolean;
+  targetPosition?: BABYLON.Vector3;
+  targetRotation?: BABYLON.Quaternion;
+  interpolationStartTime?: number;
+  interpolationDuration: number;
 }
 
 export interface ChatMessage {
@@ -122,6 +126,7 @@ export class MultiplayerSession {
 
         scene.onBeforeRenderObservable.add(() => {
           this.maybeSendPlayerInfo();
+          this.applyInterpolation();
           // this.sendObjectInfo(objects);
         });
       })
@@ -142,7 +147,7 @@ export class MultiplayerSession {
 
         let player = this.players.get(id);
         if (!player) {
-          player = { status: 'in_lobby' };
+          player = { status: 'in_lobby', interpolationDuration: PLAYER_INFO_SEND_INTERVAL_MS };
           this.players.set(id, player);
         }
         // if player changes color, or nickname remove him and skip to next iteration
@@ -152,9 +157,7 @@ export class MultiplayerSession {
           this.removePlayer(id);
           continue;
         }
-        // update local player positions based on server response
-        player.position = info.position;
-        player.rotation = info.rotation;
+        // update status and metadata
         player.status = info.status;
         player.nickname = nickname;
         player.color = color;
@@ -165,21 +168,22 @@ export class MultiplayerSession {
           player.mesh = await this.createMpPlayer(this.scene, nickname, color);
         }
         if (info.position && info.rotation) {
-          player.mesh.physicsBody!.disablePreStep = true;
-          const targetPosition = new BABYLON.Vector3(
+          // set interpolation targets for next frame lerp
+          player.targetPosition = new BABYLON.Vector3(
             info.position.x,
             info.position.y,
             info.position.z
           );
-          const targetRotation = new BABYLON.Quaternion(
+          player.targetRotation = new BABYLON.Quaternion(
             info.rotation.x,
             info.rotation.y,
             info.rotation.z,
             info.rotation.w
           );
-          player.mesh.position = targetPosition;
-          player.mesh.rotationQuaternion = targetRotation;
-          player.mesh.physicsBody!.disablePreStep = false;
+          player.interpolationStartTime = performance.now();
+          // Store current position for interpolation
+          player.position = player.position || info.position;
+          player.rotation = player.rotation || info.rotation;
         }
 
         // collissions toggle
@@ -199,6 +203,40 @@ export class MultiplayerSession {
       }
     } finally {
       this.updating = false;
+    }
+  }
+
+  applyInterpolation() {
+    const now = performance.now();
+    for (const [, player] of this.players) {
+      if (!player.mesh || !player.targetPosition || !player.targetRotation || !player.interpolationStartTime) {
+        continue;
+      }
+
+      const elapsed = now - player.interpolationStartTime;
+      const t = Math.min(1, elapsed / player.interpolationDuration);
+
+      if (t < 1) {
+        // Interpolate towards target
+        const currentPos = player.mesh.position.clone();
+        const newPos = BABYLON.Vector3.Lerp(currentPos, player.targetPosition, t);
+        const newRot = BABYLON.Quaternion.Slerp(player.mesh.rotationQuaternion || BABYLON.Quaternion.Identity(), player.targetRotation, t);
+
+        player.mesh.physicsBody!.disablePreStep = true;
+        player.mesh.position = newPos;
+        player.mesh.rotationQuaternion = newRot;
+        player.mesh.physicsBody!.disablePreStep = false;
+      } else {
+        // Interpolation complete, snap to target and clear
+        player.mesh.physicsBody!.disablePreStep = true;
+        player.mesh.position = player.targetPosition.clone();
+        player.mesh.rotationQuaternion = player.targetRotation.clone();
+        player.mesh.physicsBody!.disablePreStep = false;
+
+        player.interpolationStartTime = undefined;
+        player.targetPosition = undefined;
+        player.targetRotation = undefined;
+      }
     }
   }
 

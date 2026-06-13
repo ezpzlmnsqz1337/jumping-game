@@ -2,7 +2,6 @@ import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../entities/player-entity';
 import { CreateTriggerOptions, Trigger } from './trigger';
 import { endTriggerColor } from '../assets/colors';
-import gameRoot from '../game-root';
 
 export class EndTrigger extends Trigger {
   constructor(scene: BABYLON.Scene, opts: CreateTriggerOptions) {
@@ -12,21 +11,7 @@ export class EndTrigger extends Trigger {
 
   onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Gray();
-    const timer = this.level.timer;
-    if (!timer?.finishRun()) return;
-
-    gameRoot.multiplayer?.sendTimeToServer({
-      nickname: player.nickname,
-      timeStr: timer.getTimeAsString(),
-      time: timer.getTime(),
-      checkpoints: player.checkpoints.length,
-    });
-    this.mesh
-      .getScene()
-      .sounds?.find(x => x.name === 'wicked-sick')
-      ?.play();
-    const demo = gameRoot.demoService.stopRecording();
-    gameRoot.demoService.playDemo(demo);
+    this.level.finishRun(player);
   }
 
   onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {

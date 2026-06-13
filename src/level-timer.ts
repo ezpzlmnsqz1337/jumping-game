@@ -84,6 +84,30 @@ export class LevelTimer {
     return Date.now() - this.startedAt;
   }
 
+  isValidRun(checkpointCount: number = 0): { valid: boolean; reason?: string } {
+    const time = this.getTime();
+    const MIN_TIME_MS = 100;
+    const MAX_TIME_MS = 3600000; // 1 hour
+
+    if (this.state !== 'finished') {
+      return { valid: false, reason: 'Run not finished' };
+    }
+
+    if (time < MIN_TIME_MS) {
+      return { valid: false, reason: 'Run too short (likely invalid)' };
+    }
+
+    if (time > MAX_TIME_MS) {
+      return { valid: false, reason: 'Run too long (likely AFK)' };
+    }
+
+    if (checkpointCount < 0) {
+      return { valid: false, reason: 'Negative checkpoint count' };
+    }
+
+    return { valid: true };
+  }
+
   static formatTime(date: Date) {
     const minutes = date.getUTCMinutes().toString().padStart(2, '0');
     const seconds = date.getUTCSeconds().toString().padStart(2, '0');
