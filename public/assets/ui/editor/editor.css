@@ -4,8 +4,8 @@
   right: 1rem;
   top: 10rem;
   flex-direction: column;
-  color: #ffffff;
-  background-color: #0000006d;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-overlay);
   padding: 1rem 1rem 0.5rem;
   border-radius: 0.2rem;
 }
@@ -13,7 +13,7 @@
 .editor-controls {
   display: flex;
   flex-direction: column;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .edit-mode>div,
@@ -47,8 +47,8 @@
 }
 
 .editor .heading {
-  color: #1d96ff;
-  font-size: 1.2rem;
+  color: var(--color-brand-primary);
+  font-size: var(--font-size-ui-xl);
   padding-top: 0.5rem;
 }
 
@@ -65,8 +65,8 @@
   border: 0;
   border-radius: 0.2rem;
   padding: 0.35rem 0.6rem;
-  background: #1d96ff;
-  color: #ffffff;
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
@@ -76,7 +76,7 @@
 
 .editor .level-source,
 .editor .level-summary {
-  color: #9ad0ff;
+  color: var(--color-brand-primary-muted);
   max-width: 15rem;
   text-align: right;
   word-break: break-word;
@@ -87,7 +87,7 @@
   flex-wrap: wrap;
   gap: 0.2rem;
   margin-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(29, 150, 255, 0.3);
+  border-bottom: 2px solid var(--color-brand-divider);
   padding-bottom: 0.3rem;
 }
 
@@ -96,20 +96,20 @@
   border-radius: 0.2rem;
   padding: 0.35rem 0.6rem;
   background: transparent;
-  color: #9ad0ff;
+  color: var(--color-brand-primary-muted);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--font-size-ui-sm);
   transition: all 0.2s ease;
 }
 
 .editor .editor-tab-button:hover {
-  background: rgba(29, 150, 255, 0.2);
-  color: #ffffff;
+  background: var(--color-brand-hover-overlay);
+  color: var(--color-text-primary);
 }
 
 .editor .editor-tab-button.active {
-  background: #1d96ff;
-  color: #ffffff;
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
 }
 
 .editor .editor-tab-content {
@@ -139,20 +139,20 @@
   border-radius: 0.2rem;
   padding: 0.35rem 0.6rem;
   background: transparent;
-  color: #9ad0ff;
+  color: var(--color-brand-primary-muted);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: var(--font-size-ui-xs);
   transition: all 0.2s ease;
 }
 
 .editor .tab-button:hover {
-  background: rgba(29, 150, 255, 0.2);
-  color: #ffffff;
+  background: var(--color-brand-hover-overlay);
+  color: var(--color-text-primary);
 }
 
 .editor .tab-button.active {
-  background: #1d96ff;
-  color: #ffffff;
+  background: var(--color-brand-primary);
+  color: var(--color-text-primary);
 }
 
 .editor .tab-button.trigger-tab {

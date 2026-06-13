@@ -2,10 +2,10 @@
   position: fixed;
   bottom: 7rem;
   left: 1rem;
-  color: #ffffff;
-  background-color: #0000006d;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-overlay);
   padding: 0.5rem 1rem;
-  font-size: 1rem;
+  font-size: var(--font-size-ui-md);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -62,7 +62,7 @@
   background-color: transparent;
   padding: 0.5rem 1rem;
   border: 0.1rem solid var(--blue);
-  color: #ffffff;
+  color: var(--color-text-primary);
   width: 100%;
 }
 
@@ -71,6 +71,6 @@
     bottom: 11rem;
     left: 0;
     padding: 0.5rem;
-    font-size: 0.8rem;
+    font-size: var(--font-size-ui-xs);
   }
 }

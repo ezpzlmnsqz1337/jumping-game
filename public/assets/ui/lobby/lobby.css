@@ -11,9 +11,9 @@
   display: flex;
   flex-direction: column;
   margin: 3rem;
-  color: #ffffff;
+  color: var(--color-text-primary);
   height: calc(100vh - 6rem);
-  background-color: #000000c3;
+  background-color: var(--color-surface-overlay-strong);
   padding: 2rem;
   z-index: 9999;
   gap: 1rem;
@@ -22,8 +22,8 @@
 }
 
 .lobby .heading {
-  font-size: 2rem;
-  color: #1d96ff;
+  font-size: var(--font-size-ui-5xl);
+  color: var(--color-brand-primary);
 }
 
 .lobby>.nickname {
@@ -36,10 +36,10 @@
 
 .lobby>.nickname>input {
   padding: 0.7rem 1rem;
-  font-size: 3rem;
+  font-size: var(--font-size-ui-6xl);
   width: 60%;
   text-align: center;
-  border: 0.2rem solid #1d96ff;
+  border: 0.2rem solid var(--color-brand-primary);
 }
 
 .lobby>.nickname>input.invalid {
@@ -48,7 +48,7 @@
 
 .lobby>.nickname>.error {
   color: var(--red);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ui-2xl);
 }
 
 .lobby>.player-color {
@@ -111,11 +111,11 @@
 }
 
 .lobby>.enter {
-  font-size: 2rem;
-  color: #ffffff;
+  font-size: var(--font-size-ui-5xl);
+  color: var(--color-text-primary);
   padding: 1rem 2rem;
   width: 20rem;
-  background-color: #1d96ff;
+  background-color: var(--color-brand-primary);
   text-transform: uppercase;
   font-weight: bold;
   border-radius: 0.1rem;
@@ -126,7 +126,7 @@
 
 .lobby>.enter:hover {
   cursor: pointer;
-  background-color: #005cac;
+  background-color: var(--color-brand-primary-hover);
 }
 
 .controls {
@@ -150,7 +150,7 @@
 }
 
 .keyboard-controls>.legend {
-  font-size: 1.1rem;
+  font-size: var(--font-size-ui-lg);
 }
 
 .keyboard-controls>.legend div {
@@ -205,8 +205,8 @@
   position: fixed;
   right: 0;
   bottom: 6.5rem;
-  font-size: 3rem;
-  color: #ffffff;
+  font-size: var(--font-size-ui-6xl);
+  color: var(--color-text-primary);
   z-index: 9999;
 }
 
@@ -215,7 +215,7 @@
 }
 
 .ui-buttons>.settings:hover {
-  color: #1d96ff;
+  color: var(--color-brand-primary);
   cursor: pointer;
 }
 
@@ -225,13 +225,13 @@
   }
   
   .lobby .heading {
-    font-size: 1.5rem;
-    color: #1d96ff;
+    font-size: var(--font-size-ui-3xl);
+    color: var(--color-brand-primary);
   }
 
   .lobby>.nickname>input {
     width: 100%;
-    font-size: 2rem;
+    font-size: var(--font-size-ui-5xl);
   }
 
   .lobby>.player-color>.colors>div {
@@ -249,6 +249,6 @@
 
   .keyboard-controls>.legend {
     flex-direction: column;
-    font-size: 0.8rem;
+    font-size: var(--font-size-ui-xs);
   }
 }

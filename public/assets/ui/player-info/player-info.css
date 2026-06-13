@@ -18,31 +18,31 @@
 
 .player-info>div .label {
   text-transform: uppercase;
-  font-size: 1.6rem;
+  font-size: var(--font-size-ui-4xl);
   font-weight: bold;
 }
 
 .player-info>div .value {
   text-transform: uppercase;
-  font-size: 1.4rem;
-  background-color: #cfe8ff;
+  font-size: var(--font-size-ui-2xl);
+  background-color: var(--color-status-bg-soft);
   padding: 0.2rem 1rem;
 }
 
 .player-info>div .value.no {
-  color: #1b9f1b;
+  color: var(--color-status-positive);
 }
 
 .player-info>div .value.yes {
-  color: #c13812;
+  color: var(--color-status-negative);
 }
 
 @media only screen and (max-width: 1000px) {
   .player-info>div .label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-ui-xs);
   }
   
   .player-info>div .value {
-    font-size: 1rem;
+    font-size: var(--font-size-ui-md);
   }
 }

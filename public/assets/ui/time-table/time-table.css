@@ -1,9 +1,9 @@
 .time-table {
-  color: #ffffff;
+  color: var(--color-text-primary);
   position: fixed;
   left: 1rem;
   top: 1rem;
-  background-color: #0000006d;
+  background-color: var(--color-surface-overlay);
   padding: 0.5rem 1rem;
 }
 
@@ -16,7 +16,7 @@
     left: 0;
     top: 0;
     padding: 0.2rem 0.5rem;
-    font-size: 0.8rem;
+    font-size: var(--font-size-ui-xs);
   }
 
   .time-table>ol {

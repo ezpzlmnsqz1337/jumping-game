@@ -2,10 +2,10 @@
   position: fixed;
   top: 1rem;
   right: 1rem;
-  color: #ffffff;
-  background-color: #0000006d;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-overlay);
   padding: 0.5rem 1rem;
-  font-size: 1rem;
+  font-size: var(--font-size-ui-md);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -23,7 +23,7 @@
     display: block;
     top: 0;
     right: 0;
-    font-size: 0.8rem;
+    font-size: var(--font-size-ui-xs);
     padding: 0.5rem;
   }
   
