@@ -34,7 +34,7 @@ export class TeleportTrigger extends Trigger {
     player.physics.body.disablePreStep = false;
   }
 
-  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
+  onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
   }
 }

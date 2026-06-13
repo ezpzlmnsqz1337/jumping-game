@@ -37,7 +37,7 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
     this.attachControl(true);
   }
 
-  setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+  setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, _speed: number) {
     if (!this.automaticCameraEnabled) return;
     this.targetAlpha = targetAlpha % (Math.PI * 2);
     this.targetBeta = targetBeta;

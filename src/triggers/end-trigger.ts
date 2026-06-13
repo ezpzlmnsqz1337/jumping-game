@@ -26,7 +26,7 @@ export class EndTrigger extends Trigger {
     gameRoot.demoService.playDemo(demo);
   }
 
-  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
+  onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
   }
 }

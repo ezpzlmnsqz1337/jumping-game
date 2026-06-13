@@ -28,7 +28,7 @@ export class MyFollowCamera extends BABYLON.FollowCamera implements AutomaticCam
     this.attachControl(true);
   }
 
-  setMoveToTarget(targetAlpha: number, targetBeta: number, targetRadius: number, speed: number) {
+  setMoveToTarget(_targetAlpha: number, _targetBeta: number, _targetRadius: number, _speed: number) {
     return;
   }
 

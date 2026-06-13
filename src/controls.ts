@@ -33,7 +33,7 @@ export class GameControls {
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnKeyDownTrigger,
         e => {
-          let key = e.sourceEvent.code as string;
+          const key = e.sourceEvent.code as string;
           if (key in this.keyStatus) {
             this.keyStatus[key as keyof typeof this.keyStatus] = true;
           }
@@ -45,7 +45,7 @@ export class GameControls {
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnKeyUpTrigger,
         e => {
-          let key = e.sourceEvent.code as string;
+          const key = e.sourceEvent.code as string;
           if (key in this.keyStatus) {
             this.keyStatus[key as keyof typeof this.keyStatus] = false;
           }

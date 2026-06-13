@@ -57,7 +57,7 @@ const createJump = (scene:BABYLON.Scene, level: GameLevel, position: BABYLON.Vec
     level
   });
 
-  jumpTrigger.onEnter = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  jumpTrigger.onEnter = (_trigger: BABYLON.Mesh, player: PlayerEntity) => {
     setTimeout(() => {
       const velocity = player.physics.body.getLinearVelocity()
       player.physics.body.setLinearVelocity(velocity.multiply(new BABYLON.Vector3(0.5, 0, 0.5)));

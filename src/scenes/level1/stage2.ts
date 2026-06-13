@@ -45,7 +45,7 @@ export const createStage2 = (scene: BABYLON.Scene, level: GameLevel) => {
   return walls;
 }
 
-const onEnterTriggerAction = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+const onEnterTriggerAction = (_trigger: BABYLON.Mesh, player: PlayerEntity) => {
   const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera
   if (!camera) return
   camera.setMoveToTarget(stage2Camera1.alpha, stage2Camera1.beta, stage2Camera1.radius, 50);

@@ -8,7 +8,7 @@ export interface CreateTriggerOptions {
   position?: BABYLON.Vector3
   scaling?: BABYLON.Vector3
   isVisible?: boolean
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export class Trigger {
@@ -49,7 +49,7 @@ export class Trigger {
     this.mesh.material = material;
   }
 
-  onEnter(trigger: BABYLON.Mesh, player: PlayerEntity) {}
+  onEnter(_trigger: BABYLON.Mesh, _player: PlayerEntity) {}
 
-  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {}
+  onExit(_trigger: BABYLON.Mesh, _player: PlayerEntity) {}
 }

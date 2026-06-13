@@ -3,7 +3,7 @@ import { GameControls } from './controls';
 import { PlayerEntity } from './entities/player-entity';
 import { GameLevel } from './game-level';
 import { MultiplayerSession } from './multiplayer-session';
-import { GameSettings, GameStorage } from './game-storage';
+import { GameStorage } from './game-storage';
 import { UIManager } from './ui/ui-manager';
 import { DemoService } from './services/demo-service';
 

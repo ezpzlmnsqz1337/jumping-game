@@ -9,7 +9,7 @@ export type WallType = 'box' | 'sphere' | 'cylinder';
 export class WallEntity extends GameEntity {
   mesh: BABYLON.Mesh;
 
-  constructor(scene: BABYLON.Scene, level: GameLevel, type: WallType, opts: any, position: BABYLON.Vector3, rotation?: BABYLON.Quaternion) {
+  constructor(scene: BABYLON.Scene, level: GameLevel, type: WallType, opts: Record<string, unknown>, position: BABYLON.Vector3, rotation?: BABYLON.Quaternion) {
     super('wall', level, scene);
     let physicsShapeType: BABYLON.PhysicsShapeType;
     switch (type) {

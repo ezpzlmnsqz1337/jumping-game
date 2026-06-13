@@ -18,7 +18,7 @@ const EventType = Object.freeze({
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;  
 
-  onCreate(options: any) {
+  onCreate(_options: Record<string, unknown>) {
     this.setState(new MyRoomState());    
 
     // stored best times
@@ -35,7 +35,7 @@ export class MyRoom extends Room<MyRoomState> {
       this.updatePlayerInfo(client.sessionId, playerInfo);      
     });
 
-    this.onMessage(EventType.OBJECTS_INFO, (client, message) => {
+    this.onMessage(EventType.OBJECTS_INFO, (_client, _message) => {
       
     });
 
@@ -48,7 +48,7 @@ export class MyRoom extends Room<MyRoomState> {
     });
   }
 
-  onJoin(client: Client, options: any) {
+  onJoin(client: Client, _options: Record<string, unknown>) {
     // create Player instance
     const player = new Player();
 
@@ -59,7 +59,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.broadCastServerMessage(`Player connected.`);
   }
 
-  onLeave(client: Client, consented: boolean) {
+  onLeave(client: Client, _consented: boolean) {
     const playerName = this.state.players.get(client.sessionId).nickname;
     // remove this player from server
     this.state.players.delete(client.sessionId);
@@ -70,7 +70,7 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   onDispose() {
-    console.log("room", this.roomId, "disposing...");
+    console.warn("room", this.roomId, "disposing...");
   }
 
   updatePlayerInfo(playerId: string, playerInfo: Player) {

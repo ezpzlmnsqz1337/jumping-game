@@ -64,20 +64,22 @@ export class MultiplayerSession {
   room!: Colyseus.Room;
   lastTimeSent = performance.now();
 
-  constructor(scene: BABYLON.Scene, player: PlayerEntity, objects: BABYLON.Mesh[]) {
+  constructor(scene: BABYLON.Scene, player: PlayerEntity, _objects: BABYLON.Mesh[]) {
     this.scene = scene;
     this.player = player;
     this.ws = new Colyseus.Client(`ws://${window.location.host}`);
     this.ws.joinOrCreate<MultiplayerGameInfo>("my_room").then(room => {
       this.room = room;
-      console.log(room.sessionId, "joined", room.name);
+      console.warn(room.sessionId, "joined", room.name);
       this.localPlayerId = room.sessionId;
 
       room.onStateChange(async state =>  {
         if (performance.now() - this.lastTimeSent < UPDATE_SPEED_MS) return;
         this.lastTimeSent = performance.now();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await this.updatePlayers((state.players as any).$items);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         gameRoot.uiManager?.timeTableUI.updateUI((state.times as any).$items);
       });
 
@@ -90,12 +92,12 @@ export class MultiplayerSession {
         gameRoot.uiManager?.chatUI.addChatMessage(message);
       });
 
-      room.onError((code, message) => {
-        console.log(room.sessionId, "couldn't join", room.name, code, message);
+      room.onError((_code, message) => {
+        console.warn(room.sessionId, "couldn't join", room.name, message);
       });
 
-      room.onLeave((code) => {
-        console.log(room.sessionId, "player left", room.name);
+      room.onLeave((_code) => {
+        console.warn(room.sessionId, "player left", room.name);
       });
 
       scene.onBeforeRenderObservable.add(() => {
@@ -103,7 +105,7 @@ export class MultiplayerSession {
         // this.sendObjectInfo(objects);
       });
     }).catch(e => {
-      console.log("JOIN ERROR", e);
+      console.warn("JOIN ERROR", e);
     });
   }
 
@@ -111,7 +113,7 @@ export class MultiplayerSession {
     if (this.updating) return;
     this.updating = true;
 
-    for (let [id, info] of playerInfo) {
+    for (const [id, info] of playerInfo) {
       if (id === this.localPlayerId) continue;
       const nickname = info.nickname || 'player';
       const color = info.color || 'blue';
@@ -167,7 +169,7 @@ export class MultiplayerSession {
   }
 
   sendObjectInfo(meshes: BABYLON.Mesh[]) {
-    this.room.send('objects:info', meshes.reduce((acc: any, cur) => {
+    this.room.send('objects:info', meshes.reduce((acc: Record<string, unknown>, cur) => {
       acc[cur.name] = {
         position: { x: cur.position.x, y: cur.position.y, z: cur.position.z },
         rotation: { x: cur.rotationQuaternion?.x, y: cur.rotationQuaternion?.y, z: cur.rotationQuaternion?.z, w: cur.rotationQuaternion?.w }
@@ -180,7 +182,7 @@ export class MultiplayerSession {
     if (this.updatingObjects) return;
     this.updatingObjects = true;
 
-    for (let [id, info] of objectInfo) {
+    for (const [id, info] of objectInfo) {
       if (!this.objects.get(id)) this.objects.set(id, {});
       const o = this.objects.get(id) as ObjectInfo;
       // update local player positions based on server response
@@ -225,7 +227,7 @@ export class MultiplayerSession {
   };
 
   async createMpPlayer(scene: BABYLON.Scene, nickname: string, color?: string) {
-    console.log('Creating player', nickname);
+    console.warn('Creating player', nickname);
     const box = BABYLON.MeshBuilder.CreateBox('player-mp', {
       width: 0.4,
       height: 0.4,
@@ -259,7 +261,7 @@ export class MultiplayerSession {
   }
 
   removePlayer(id: string) {
-    console.log('Removing player', id)
+    console.warn('Removing player', id);
     const player = this.players.get(id);
     if (player && player.mesh) {
       player.mesh?.physicsBody?.dispose();

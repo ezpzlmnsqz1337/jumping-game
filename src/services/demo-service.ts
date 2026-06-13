@@ -9,11 +9,6 @@ interface DemoEntry {
   rotation: BABYLON.Quaternion;
 }
 
-interface DemoRecording {
-  entires: DemoEntry[];
-  time: number;
-}
-
 const SAMPLE_RATE_MS = 1000 / 60;
 
 export class DemoService {

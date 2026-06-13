@@ -53,7 +53,7 @@ export class PlayerEntity extends GameEntity {
     this.physics.body.setLinearDamping(1);
 
     const observable = this.physics.body.getCollisionObservable();
-    const observer = observable.add(collisionEvent => this.handleCollissions(collisionEvent));
+    observable.add(collisionEvent => this.handleCollissions(collisionEvent));
 
     this.changeNickname(this.nickname);
 

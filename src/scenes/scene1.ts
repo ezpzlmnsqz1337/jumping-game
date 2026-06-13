@@ -13,8 +13,8 @@ import { GameLevel } from '../game-level.ts';
 import { ArcRotateCameraOptions, MyArcRotateCamera } from '../cameras/arc-rotate-camera.ts';
 import { FollowCameraOptions, MyFollowCamera } from '../cameras/follow-camera.ts';
 
-const ENABLE_EDITOR = false || import.meta.env.DEV;
-const ENABLE_MULTIPLAYER = false || !import.meta.env.DEV;
+const ENABLE_EDITOR = import.meta.env.DEV;
+const ENABLE_MULTIPLAYER = !import.meta.env.DEV;
 
 const arcRotateCameraOptions: ArcRotateCameraOptions = {
   position: new BABYLON.Vector3(0, 0, 0),
@@ -65,7 +65,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   
   scene.activeCamera = arcRotateCamera;  
 
-  const optimizations = createOptimizations(scene);
+  createOptimizations(scene);
 
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;

@@ -41,7 +41,7 @@ export class AbstractUI {
     await this.loadHtml();
   }
 
-  updateUI(data?: any) {}
+  updateUI(_data?: Record<string, unknown>) {}
 
   show(show: boolean) {
     if (!this.rootElement) return;

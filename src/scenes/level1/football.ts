@@ -14,7 +14,7 @@ export const createBall = (scene: BABYLON.Scene, position: BABYLON.Vector3) => {
   ball.material = material;
   
   // physics
-  const ballAggregate = new BABYLON.PhysicsAggregate(
+  const _ballAggregate = new BABYLON.PhysicsAggregate(
     ball,
     BABYLON.PhysicsShapeType.SPHERE,
     { mass: 1, restitution: 1, friction: 0.4 },

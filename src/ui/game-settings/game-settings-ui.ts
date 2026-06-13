@@ -35,7 +35,7 @@ export class GameSettingsUI extends AbstractUI {
     this.followCameraEnabled = !this.followCameraEnabled;
     this.followCameraCheckBox.checked = this.followCameraEnabled;
 
-    this.automaticCameraCheckBox.checked = (this.scene.activeCamera as any).automaticCameraEnabled;
+    this.automaticCameraCheckBox.checked = (this.scene.activeCamera as {automaticCameraEnabled?: boolean}).automaticCameraEnabled ?? false;
     
     renderingCanvas.focus();
   }
