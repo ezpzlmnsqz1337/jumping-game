@@ -102,3 +102,4 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
   setAutomaticMode(enabled: boolean) {
     this.automaticCameraEnabled = enabled;
   }
+}

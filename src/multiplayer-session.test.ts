@@ -113,7 +113,7 @@ describe('MultiplayerSession interpolation', () => {
     expect(player.targetPosition).toBeUndefined();
   });
 
-  it('disables physics pre-step during interpolation', () => {
+  it('disables physics pre-step during interpolation and re-enables on completion', () => {
     const physicsBody = {
       disablePreStep: false,
     };
@@ -129,14 +129,27 @@ describe('MultiplayerSession interpolation', () => {
 
     session.players.set('remote-1', player);
 
+    const startTime = 5000;
     player.targetPosition = new BABYLON.Vector3(10, 0, 0);
     player.targetRotation = BABYLON.Quaternion.Identity();
-    player.interpolationStartTime = performance.now();
+    player.interpolationStartTime = startTime;
+
+    // Mock performance.now() to return during interpolation
+    vi.spyOn(performance, 'now').mockReturnValue(startTime + 50);
 
     session.applyInterpolation();
 
-    // Should toggle disablePreStep to protect physics updates
+    // Should have disablePreStep = true during interpolation
+    expect(physicsBody.disablePreStep).toBe(true);
+    expect(player.interpolationActive).toBe(true);
+
+    // Now simulate interpolation completing
+    vi.spyOn(performance, 'now').mockReturnValue(startTime + 150);
+    session.applyInterpolation();
+
+    // Should re-enable physics after interpolation completes
     expect(physicsBody.disablePreStep).toBe(false);
+    expect(player.interpolationActive).toBe(false);
   });
 
   it('skips players without interpolation targets', () => {

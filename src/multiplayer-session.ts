@@ -62,6 +62,7 @@ interface PlayerInfo {
   targetRotation?: BABYLON.Quaternion;
   interpolationStartTime?: number;
   interpolationDuration: number;
+  interpolationActive?: boolean; // Track if disablePreStep is currently enabled
 }
 
 export interface ChatMessage {
@@ -210,28 +211,41 @@ export class MultiplayerSession {
     const now = performance.now();
     for (const [, player] of this.players) {
       if (!player.mesh || !player.targetPosition || !player.targetRotation || !player.interpolationStartTime) {
+        // Cleanup: re-enable physics if interpolation was cleared but disablePreStep is still set
+        if (player.mesh && player.interpolationActive && player.mesh.physicsBody) {
+          player.mesh.physicsBody.disablePreStep = false;
+          player.interpolationActive = false;
+        }
         continue;
       }
 
       const elapsed = now - player.interpolationStartTime;
       const t = Math.min(1, elapsed / player.interpolationDuration);
 
+      // Enable physics suspension at start of interpolation
+      if (!player.interpolationActive && player.mesh.physicsBody) {
+        player.mesh.physicsBody.disablePreStep = true;
+        player.interpolationActive = true;
+      }
+
       if (t < 1) {
-        // Interpolate towards target
+        // Interpolate towards target (keep disablePreStep = true throughout)
         const currentPos = player.mesh.position.clone();
         const newPos = BABYLON.Vector3.Lerp(currentPos, player.targetPosition, t);
         const newRot = BABYLON.Quaternion.Slerp(player.mesh.rotationQuaternion || BABYLON.Quaternion.Identity(), player.targetRotation, t);
 
-        player.mesh.physicsBody!.disablePreStep = true;
         player.mesh.position = newPos;
         player.mesh.rotationQuaternion = newRot;
-        player.mesh.physicsBody!.disablePreStep = false;
       } else {
-        // Interpolation complete, snap to target and clear
-        player.mesh.physicsBody!.disablePreStep = true;
+        // Interpolation complete: snap to target, re-enable physics, and cleanup
         player.mesh.position = player.targetPosition.clone();
         player.mesh.rotationQuaternion = player.targetRotation.clone();
-        player.mesh.physicsBody!.disablePreStep = false;
+
+        // Re-enable physics after interpolation is complete
+        if (player.mesh.physicsBody) {
+          player.mesh.physicsBody.disablePreStep = false;
+        }
+        player.interpolationActive = false;
 
         player.interpolationStartTime = undefined;
         player.targetPosition = undefined;
