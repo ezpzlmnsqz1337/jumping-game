@@ -44,6 +44,18 @@ body {
   --font-size-ui-4xl: 1.6rem;
   --font-size-ui-5xl: 2rem;
   --font-size-ui-6xl: 3rem;
+
+  --space-none: 0;
+  --space-xxs: 0.15rem;
+  --space-xs: 0.2rem;
+  --space-sm: 0.3rem;
+  --space-button-y: 0.35rem;
+  --space-md: 0.4rem;
+  --space-lg: 0.5rem;
+  --space-xl: 0.6rem;
+  --space-2xl: 0.7rem;
+  --space-3xl: 1rem;
+  --space-4xl: 2rem;
 }
 
 #render-canvas {

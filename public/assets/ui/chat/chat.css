@@ -4,7 +4,7 @@
   left: 1rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface-overlay);
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
   font-size: var(--font-size-ui-md);
   display: flex;
   flex-direction: column;
@@ -60,7 +60,7 @@
 
 .chat>input {
   background-color: transparent;
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
   border: 0.1rem solid var(--blue);
   color: var(--color-text-primary);
   width: 100%;
@@ -70,7 +70,7 @@
   .chat {
     bottom: 11rem;
     left: 0;
-    padding: 0.5rem;
+    padding: var(--space-lg);
     font-size: var(--font-size-ui-xs);
   }
 }

@@ -14,7 +14,7 @@
   color: var(--color-text-primary);
   height: calc(100vh - 6rem);
   background-color: var(--color-surface-overlay-strong);
-  padding: 2rem;
+  padding: var(--space-4xl);
   z-index: 9999;
   gap: 1rem;
   justify-content: space-between;
@@ -35,7 +35,7 @@
 }
 
 .lobby>.nickname>input {
-  padding: 0.7rem 1rem;
+  padding: var(--space-2xl) var(--space-3xl);
   font-size: var(--font-size-ui-6xl);
   width: 60%;
   text-align: center;
@@ -113,7 +113,7 @@
 .lobby>.enter {
   font-size: var(--font-size-ui-5xl);
   color: var(--color-text-primary);
-  padding: 1rem 2rem;
+  padding: var(--space-3xl) var(--space-4xl);
   width: 20rem;
   background-color: var(--color-brand-primary);
   text-transform: uppercase;
@@ -154,7 +154,7 @@
 }
 
 .keyboard-controls>.legend div {
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
 }
 
 .keyboard-controls>.legend div>.icon {
@@ -211,7 +211,7 @@
 }
 
 .ui-buttons>div {
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
 }
 
 .ui-buttons>.settings:hover {

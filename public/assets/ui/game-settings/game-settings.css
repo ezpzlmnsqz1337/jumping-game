@@ -4,7 +4,7 @@
   right: 1rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface-overlay);
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
   font-size: var(--font-size-ui-md);
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
     top: 0;
     right: 0;
     font-size: var(--font-size-ui-xs);
-    padding: 0.5rem;
+    padding: var(--space-lg);
   }
   
   .game-settings>div {

@@ -1,5 +1,5 @@
 .timer {
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
   position: fixed;
   color: var(--color-text-primary);
   font-weight: bold;
@@ -16,7 +16,7 @@
 
 .timer>div {
   background-color: var(--color-surface-overlay);
-  padding: 0.5rem 1rem;
+  padding: var(--space-lg) var(--space-3xl);
   text-align: center;
   border-radius: 0.2rem;
 }
@@ -27,12 +27,12 @@
 
 @media only screen and (max-width: 1000px) {
   .timer {
-    padding: 0.5rem;
+    padding: var(--space-lg);
     font-size: var(--font-size-ui-2xl);
   }
   
   .timer>div {
-    padding: 0.5rem;
+    padding: var(--space-lg);
     text-align: center;
     border-radius: 0.2rem;
   }
