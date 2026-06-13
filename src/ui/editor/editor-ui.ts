@@ -21,7 +21,9 @@ export class EditorUI extends AbstractUI {
 
   meshNameSpan!: HTMLDivElement;
   meshDetailFields!: Record<string, HTMLSpanElement>;
-  triggerHeading!: HTMLDivElement;
+  tabButtons!: NodeListOf<HTMLButtonElement>;
+  tabContents!: NodeListOf<HTMLDivElement>;
+  triggerTabButton!: HTMLButtonElement;
   transformCheckBox!: HTMLInputElement;
   scalingCheckBox!: HTMLInputElement;
   rotationCheckBox!: HTMLInputElement;
@@ -90,7 +92,7 @@ export class EditorUI extends AbstractUI {
       set('trigger-type', '-');
       set('trigger-debug', '-');
       set('trigger-camera', '-');
-      this.triggerHeading.classList.remove('show');
+      this.triggerTabButton.classList.remove('show');
       return;
     }
 
@@ -153,7 +155,7 @@ export class EditorUI extends AbstractUI {
         | { alpha?: number; beta?: number; radius?: number; speed?: number }
         | undefined;
 
-      this.triggerHeading.classList.add('show');
+      this.triggerTabButton.classList.add('show');
       set('trigger-type', triggerType);
       set('trigger-debug', debugType);
       if (cameraTarget) {
@@ -167,7 +169,7 @@ export class EditorUI extends AbstractUI {
     } else if (metadata.wallType) {
       const opts = (metadata.opts || {}) as Record<string, unknown>;
 
-      this.triggerHeading.classList.remove('show');
+      this.triggerTabButton.classList.remove('show');
       set('trigger-type', '-');
       set('trigger-debug', '-');
       set('trigger-camera', '-');
@@ -182,11 +184,31 @@ export class EditorUI extends AbstractUI {
         set('bounds', `w=${width ?? '-'} h=${height ?? '-'} d=${depth ?? '-'}`);
       }
     } else {
-      this.triggerHeading.classList.remove('show');
+      this.triggerTabButton.classList.remove('show');
       set('trigger-type', '-');
       set('trigger-debug', '-');
       set('trigger-camera', '-');
     }
+  }
+
+  private setupTabNavigation() {
+    this.tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tabName = button.getAttribute('data-tab');
+        if (!tabName) return;
+
+        this.tabButtons.forEach(btn => btn.classList.remove('active'));
+        this.tabContents.forEach(content => content.classList.remove('active'));
+
+        button.classList.add('active');
+        const content = document.querySelector(
+          `.editor .tab-content[data-tab="${tabName}"]`
+        ) as HTMLDivElement;
+        if (content) {
+          content.classList.add('active');
+        }
+      });
+    });
   }
 
   updateMeshDetails(gizmoType: GizmoType, htmlElement: HTMLDivElement) {
@@ -216,7 +238,6 @@ export class EditorUI extends AbstractUI {
     this.gizmoManager.scaleGizmoEnabled = true;
 
     this.gizmoManager.onAttachedToMeshObservable.add(newMesh => {
-      this.meshNameSpan.innerText = newMesh?.name || 'None';
       this.updateMeshDetails('position', this.positionValueDiv);
       this.updateMeshDetails('rotation', this.rotationValueDiv);
       this.updateMeshDetails('scaling', this.scalingValueDiv);
@@ -350,7 +371,11 @@ export class EditorUI extends AbstractUI {
     ) as NodeListOf<HTMLDivElement>;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
-    this.triggerHeading = document.querySelector('.trigger-heading') as HTMLDivElement;
+    this.tabButtons = document.querySelectorAll('.editor .tab-button') as NodeListOf<HTMLButtonElement>;
+    this.tabContents = document.querySelectorAll('.editor .tab-content') as NodeListOf<HTMLDivElement>;
+    this.triggerTabButton = document.querySelector(
+      '.editor .tab-button.trigger-tab'
+    ) as HTMLButtonElement;
     this.meshDetailFields = {
       'mesh-type': document.querySelector('.detail-mesh-type') as HTMLSpanElement,
       'mesh-name': document.querySelector('.detail-mesh-name') as HTMLSpanElement,
@@ -426,6 +451,7 @@ export class EditorUI extends AbstractUI {
       window.location.reload();
     });
 
+    this.setupTabNavigation();
     this.bindMeshInfoUI();
     this.bindCameraInfoUI();
     this.rootElement = this.editorDiv;

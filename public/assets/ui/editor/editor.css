@@ -81,22 +81,54 @@
   word-break: break-word;
 }
 
-.editor .mesh-details-block {
+.editor .mesh-tabs {
   display: flex;
   flex-direction: column;
+  gap: 0.3rem;
 }
 
-.editor .heading-small {
+.editor .tab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.editor .tab-button {
+  padding: 0.3rem 0.6rem;
+  background: #1e1e1e;
+  border: 1px solid #3e3e3e;
   color: #9ad0ff;
-  font-size: 0.9rem;
-  padding-top: 0.3rem;
-  margin-bottom: 0.1rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
 }
 
-.editor .heading-small.trigger-heading {
+.editor .tab-button:hover {
+  border-color: #5e5e5e;
+  background: #2a2a2a;
+}
+
+.editor .tab-button.active {
+  background: #3e3e8e;
+  border-color: #5e5eae;
+  color: #fff;
+}
+
+.editor .tab-button.trigger-tab {
   display: none;
 }
 
-.editor .heading-small.trigger-heading.show {
+.editor .tab-button.trigger-tab.show {
   display: block;
+}
+
+.editor .tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.editor .tab-content.active {
+  display: flex;
 }
