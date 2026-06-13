@@ -37,7 +37,7 @@ export class PlayerInfoUI extends AbstractUI {
 
   protected updateJumping() {
     const newValue = this.player.jumping ? 'Yes' : 'No';
-    if (this.movingDiv.innerText === newValue) return;
+    if (this.jumpingDiv.innerText === newValue) return;
     this.jumpingDiv.innerText = this.player.jumping ? 'Yes' : 'No';
     this.jumpingDiv.classList.toggle('yes', this.player.jumping);
     this.jumpingDiv.classList.toggle('no', !this.player.jumping);

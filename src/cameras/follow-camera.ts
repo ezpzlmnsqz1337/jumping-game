@@ -26,6 +26,13 @@ export class MyFollowCamera extends BABYLON.FollowCamera implements AutomaticCam
     this.upperRadiusLimit = 50;
 
     this.attachControl(true);
+
+    const pointersInput = this.inputs.attached['pointers'] as
+      | { warningEnable?: boolean }
+      | undefined;
+    if (pointersInput) {
+      pointersInput.warningEnable = false;
+    }
   }
 
   setMoveToTarget(

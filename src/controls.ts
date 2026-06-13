@@ -193,7 +193,7 @@ export class GameControls {
       player.mesh.position = spawnPoint.position.clone();
       player.mesh.position.y += 1;
       player.mesh.rotationQuaternion = (
-        spawnPoint.rotationQuaternion || BABYLON.Quaternion.Zero()
+        spawnPoint.rotationQuaternion || BABYLON.Quaternion.Identity()
       ).clone();
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());

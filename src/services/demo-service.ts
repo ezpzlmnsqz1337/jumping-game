@@ -39,14 +39,15 @@ export class DemoService {
   reset(): void {
     this.recording = [];
     if (this.recordingInterval) {
-      clearInterval(this.recordingInterval);
+      clearTimeout(this.recordingInterval);
       this.recordingInterval = null;
     }
   }
 
   stopRecording(): DemoEntry[] {
     if (!this.recordingInterval) return [];
-    if (this.recordingInterval) clearInterval(this.recordingInterval);
+    clearTimeout(this.recordingInterval);
+    this.recordingInterval = null;
 
     localStorage.setItem('demo', JSON.stringify(this.recording));
 
@@ -55,7 +56,8 @@ export class DemoService {
 
   async playDemo(demo: DemoEntry[]): Promise<void> {
     if (this.playingInterval) {
-      clearInterval(this.playingInterval);
+      clearTimeout(this.playingInterval);
+      this.playingInterval = null;
     }
     this.playing = demo;
     this.playingFrameIndex = 0;

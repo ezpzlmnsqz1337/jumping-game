@@ -17,7 +17,7 @@ export class StartTrigger extends Trigger {
     this.level.timer?.reset();
   }
 
-  onExit(trigger: BABYLON.Mesh, _player: PlayerEntity) {
+  onExit(trigger: BABYLON.Mesh, player: PlayerEntity) {
     (trigger.material as BABYLON.StandardMaterial).emissiveColor = BABYLON.Color3.Black();
     this.level.timer?.start();
     gameRoot.demoService.startRecording(player);
