@@ -11,6 +11,7 @@ export class GameSettingsUI extends AbstractUI {
   automaticCameraCheckBox!: HTMLInputElement;
   followCameraCheckBox!: HTMLInputElement;
   collissionsCheckBox!: HTMLInputElement;
+  cameraTriggersCheckBox!: HTMLInputElement;
 
   followCameraEnabled = false;
 
@@ -59,6 +60,17 @@ export class GameSettingsUI extends AbstractUI {
     gameRoot.uiManager?.playerInfoUI.show(this.playerInfoCheckBox.checked);
   }
 
+  toggleCameraTriggers() {
+    const show = this.cameraTriggersCheckBox.checked;
+    this.scene.meshes.forEach(mesh => {
+      const debugType = (mesh.metadata as { debugType?: string } | undefined)?.debugType;
+      if (debugType === 'camera-trigger') {
+        mesh.isVisible = show;
+      }
+    });
+    renderingCanvas.focus();
+  }
+
   async bindUI() {
     await super.bindUI();
     this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLInputElement;
@@ -70,6 +82,9 @@ export class GameSettingsUI extends AbstractUI {
     ) as HTMLInputElement;
     this.collissionsCheckBox = document.querySelector('.collissions-enabled') as HTMLInputElement;
     this.playerInfoCheckBox = document.querySelector('.player-info-enabled') as HTMLInputElement;
+    this.cameraTriggersCheckBox = document.querySelector(
+      '.camera-triggers-enabled'
+    ) as HTMLInputElement;
 
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
 
@@ -93,6 +108,12 @@ export class GameSettingsUI extends AbstractUI {
     this.playerInfoCheckBox.addEventListener('click', () => {
       this.togglePlayerInfo();
     });
+
+    this.cameraTriggersCheckBox.checked = false;
+    this.cameraTriggersCheckBox.addEventListener('click', () => {
+      this.toggleCameraTriggers();
+    });
+    this.toggleCameraTriggers();
 
     this.rootElement = this.gameSettingsDiv;
   }

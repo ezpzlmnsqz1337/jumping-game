@@ -188,6 +188,7 @@ export class GameControls {
     const level = gameRoot.level as GameLevel;
 
     if ('KeyR' === key) {
+      const previousPlayerPosition = player.mesh.position.clone();
       const spawnPoint = level.getRandomSpawnPoint().mesh as BABYLON.Mesh;
       player.physics.body.disablePreStep = true;
       player.mesh.position = spawnPoint.position.clone();
@@ -198,18 +199,34 @@ export class GameControls {
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;
+      this.translateFreeCameraWithPlayer(player, previousPlayerPosition);
     }
   }
 
   loadCheckpoint(player: PlayerEntity, checkpoint: Checkpoint) {
     if (!player.mesh) return;
 
+    const previousPlayerPosition = player.mesh.position.clone();
     player.physics.body.disablePreStep = true;
     player.mesh.position = checkpoint.position.clone();
     player.mesh.rotationQuaternion = checkpoint.rotationQuaternion.clone();
     player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
     player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
     player.physics.body.disablePreStep = false;
+    this.translateFreeCameraWithPlayer(player, previousPlayerPosition);
+  }
+
+  private translateFreeCameraWithPlayer(player: PlayerEntity, previousPlayerPosition: BABYLON.Vector3) {
+    if (!player.mesh) return;
+
+    const activeCamera = player.mesh.getScene().activeCamera;
+    if (!(activeCamera instanceof BABYLON.ArcRotateCamera)) return;
+    if (activeCamera.lockedTarget) return;
+
+    const delta = player.mesh.position.subtract(previousPlayerPosition);
+    if (delta.lengthSquared() === 0) return;
+
+    activeCamera.target = activeCamera.target.add(delta);
   }
 
   handleCollissions(key: string) {

@@ -85,6 +85,7 @@ export const createStage1 = (scene: BABYLON.Scene, level: GameLevel) => {
 
   const trigger = new Trigger(scene, {
     level,
+    debugType: 'camera-trigger',
     position: new BABYLON.Vector3(-3, 1.5, 1),
     width: 2,
     depth: 2,

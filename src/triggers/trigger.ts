@@ -8,6 +8,7 @@ export interface CreateTriggerOptions {
   position?: BABYLON.Vector3;
   scaling?: BABYLON.Vector3;
   isVisible?: boolean;
+  debugType?: 'trigger' | 'camera-trigger';
   [key: string]: unknown;
 }
 
@@ -27,6 +28,7 @@ export class Trigger {
     this.mesh.position = opts.position || new BABYLON.Vector3(0, 0, 0);
     this.mesh.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
     this.mesh.checkCollisions = true;
+    this.mesh.metadata = { debugType: opts.debugType || 'trigger' };
 
     this.mesh.actionManager = new BABYLON.ActionManager(scene);
     this.mesh.actionManager.registerAction(

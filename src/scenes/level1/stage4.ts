@@ -127,6 +127,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
   // front camera trigger
   const trigger1 = new Trigger(scene, {
     level,
+    debugType: 'camera-trigger',
     position: new BABYLON.Vector3(3.5, 27.1, -10.46),
     width: 3,
     depth: 5,
@@ -137,6 +138,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
   // left camera trigger
   const trigger2 = new Trigger(scene, {
     level,
+    debugType: 'camera-trigger',
     position: new BABYLON.Vector3(-1.5, 25.5, -15.66),
     width: 6,
     depth: 3,
@@ -147,6 +149,7 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
   // right camera trigger
   const trigger3 = new Trigger(scene, {
     level,
+    debugType: 'camera-trigger',
     position: new BABYLON.Vector3(-1.77, 27.1, -10.45),
     width: 3,
     depth: 3,
@@ -158,18 +161,21 @@ export const createStage4 = (scene: BABYLON.Scene, level: GameLevel) => {
 };
 
 const showFrontCamera = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  void trigger;
   const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return;
   camera.setMoveToTarget(stage4Camera1.alpha, stage4Camera1.beta, stage4Camera1.radius, 50);
 };
 
 const showCameraLeft = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  void trigger;
   const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return;
   camera.setMoveToTarget(stage4Camera2.alpha, stage4Camera2.beta, stage4Camera2.radius, 50);
 };
 
 const showCameraRight = (trigger: BABYLON.Mesh, player: PlayerEntity) => {
+  void trigger;
   const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
   if (!camera) return;
   camera.setMoveToTarget(stage4Camera3.alpha, stage4Camera3.beta, stage4Camera3.radius, 50);
