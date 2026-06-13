@@ -10,14 +10,12 @@ export type GizmoType = 'position' | 'rotation' | 'scaling';
 
 export class EditorUI extends AbstractUI {
   editorDiv!: HTMLDivElement;
-  editModeCheckBox!: HTMLInputElement;
   levelSourceSpan!: HTMLSpanElement;
   levelSummarySpan!: HTMLSpanElement;
   exportLevelButton!: HTMLButtonElement;
   importLevelButton!: HTMLButtonElement;
   importLevelInput!: HTMLInputElement;
   clearLevelImportButton!: HTMLButtonElement;
-  controlsToggle!: NodeListOf<HTMLDivElement>;
 
   meshNameSpan!: HTMLDivElement;
   meshDetailFields!: Record<string, HTMLSpanElement>;
@@ -37,6 +35,28 @@ export class EditorUI extends AbstractUI {
   gizmoManager?: BABYLON.GizmoManager;
 
   oldMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
+
+  private setEditModeEnabled(enabled: boolean) {
+    this.editorDiv.style.display = enabled ? 'flex' : 'none';
+
+    if (!this.gizmoManager) return;
+
+    this.gizmoManager.attachableMeshes = enabled ? null : [];
+    this.gizmoManager.attachToMesh(null);
+
+    if (enabled) {
+      this.gizmoManager.positionGizmoEnabled = this.transformCheckBox.checked;
+      this.gizmoManager.rotationGizmoEnabled = this.rotationCheckBox.checked;
+      this.gizmoManager.scaleGizmoEnabled = this.scalingCheckBox.checked;
+    } else {
+      this.gizmoManager.positionGizmoEnabled = false;
+      this.gizmoManager.rotationGizmoEnabled = false;
+      this.gizmoManager.scaleGizmoEnabled = false;
+    }
+
+    this.updateEditorSelection(null);
+    this.updateSelectedMeshInfo(null);
+  }
 
   private updateLevelInfo() {
     const level = GameStorage.getLevel();
@@ -195,7 +215,8 @@ export class EditorUI extends AbstractUI {
 
   private setupTabNavigation() {
     this.sectionTabButtons.forEach(button => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
         const sectionName = button.getAttribute('data-tab-section');
         if (!sectionName) return;
 
@@ -213,7 +234,8 @@ export class EditorUI extends AbstractUI {
     });
 
     this.detailTabButtons.forEach(button => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
         const tabName = button.getAttribute('data-tab');
         if (!tabName) return;
 
@@ -379,16 +401,12 @@ export class EditorUI extends AbstractUI {
     if (!this.gizmoManager) return;
     await super.bindUI();
     this.editorDiv = document.querySelector('.editor') as HTMLDivElement;
-    this.editModeCheckBox = document.querySelector('.edit-mode-enabled') as HTMLInputElement;
     this.levelSourceSpan = document.querySelector('.level-source') as HTMLSpanElement;
     this.levelSummarySpan = document.querySelector('.level-summary') as HTMLSpanElement;
     this.exportLevelButton = document.querySelector('.export-level') as HTMLButtonElement;
     this.importLevelButton = document.querySelector('.import-level') as HTMLButtonElement;
     this.importLevelInput = document.querySelector('.import-level-input') as HTMLInputElement;
     this.clearLevelImportButton = document.querySelector('.clear-level-import') as HTMLButtonElement;
-    this.controlsToggle = document.querySelectorAll(
-      '.editor > .editor-controls'
-    ) as NodeListOf<HTMLDivElement>;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
     this.sectionTabButtons = document.querySelectorAll(
@@ -432,20 +450,8 @@ export class EditorUI extends AbstractUI {
     this.rotationValueDiv = document.querySelector('.rotation-value') as HTMLDivElement;
     this.scalingValueDiv = document.querySelector('.scaling-value') as HTMLDivElement;
 
-    this.editorDiv.style.display = 'block';
-    this.editModeCheckBox.checked = true;
+    this.editorDiv.style.display = 'none';
     this.updateLevelInfo();
-
-    this.editModeCheckBox.addEventListener('click', () => {
-      if (!this.gizmoManager) return;
-      this.gizmoManager.attachableMeshes = this.gizmoManager.attachableMeshes === null ? [] : null;
-      this.gizmoManager.attachToMesh(null);
-      this.controlsToggle.forEach(
-        x => (x.style.display = x.style.display === 'none' ? 'flex' : 'none')
-      );
-      this.updateEditorSelection(null);
-      this.updateSelectedMeshInfo(null);
-    });
 
     this.exportLevelButton.addEventListener('click', () => {
       if (!gameRoot.level) return;
@@ -480,6 +486,17 @@ export class EditorUI extends AbstractUI {
     this.setupTabNavigation();
     this.bindMeshInfoUI();
     this.bindCameraInfoUI();
+
+    const gameSettingsEditMode = document.querySelector(
+      '.game-settings .edit-mode-enabled-global'
+    ) as HTMLInputElement | null;
+    this.setEditModeEnabled(gameSettingsEditMode?.checked ?? true);
+
+    window.addEventListener('editor-edit-mode-changed', event => {
+      const customEvent = event as CustomEvent<{ enabled?: boolean }>;
+      this.setEditModeEnabled(Boolean(customEvent.detail?.enabled));
+    });
+
     this.rootElement = this.editorDiv;
   }
 }

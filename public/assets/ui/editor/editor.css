@@ -2,11 +2,11 @@
   display: flex;
   position: fixed;
   right: 1rem;
-  top: 8rem;
+  top: 10rem;
   flex-direction: column;
   color: #ffffff;
   background-color: #0000006d;
-  padding: 0 1rem;
+  padding: 1rem 1rem 0.5rem;
   border-radius: 0.2rem;
 }
 
@@ -39,10 +39,11 @@
   margin: 0;
 }
 
-.editor-controls>div>div {
+.editor-controls .tab-content>div {
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
 }
 
 .editor .heading {

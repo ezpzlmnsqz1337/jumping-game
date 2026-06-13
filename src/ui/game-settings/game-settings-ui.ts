@@ -12,6 +12,7 @@ export class GameSettingsUI extends AbstractUI {
   followCameraCheckBox!: HTMLInputElement;
   collissionsCheckBox!: HTMLInputElement;
   cameraTriggersCheckBox!: HTMLInputElement;
+  editModeCheckBox!: HTMLInputElement;
 
   followCameraEnabled = false;
 
@@ -71,6 +72,12 @@ export class GameSettingsUI extends AbstractUI {
     renderingCanvas.focus();
   }
 
+  toggleEditMode() {
+    const enabled = this.editModeCheckBox.checked;
+    window.dispatchEvent(new CustomEvent('editor-edit-mode-changed', { detail: { enabled } }));
+    renderingCanvas.focus();
+  }
+
   async bindUI() {
     await super.bindUI();
     this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLInputElement;
@@ -85,6 +92,7 @@ export class GameSettingsUI extends AbstractUI {
     this.cameraTriggersCheckBox = document.querySelector(
       '.camera-triggers-enabled'
     ) as HTMLInputElement;
+    this.editModeCheckBox = document.querySelector('.edit-mode-enabled-global') as HTMLInputElement;
 
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
 
@@ -114,6 +122,12 @@ export class GameSettingsUI extends AbstractUI {
       this.toggleCameraTriggers();
     });
     this.toggleCameraTriggers();
+
+    this.editModeCheckBox.checked = true;
+    this.editModeCheckBox.addEventListener('click', () => {
+      this.toggleEditMode();
+    });
+    this.toggleEditMode();
 
     this.rootElement = this.gameSettingsDiv;
   }

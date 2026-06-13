@@ -1,8 +1,8 @@
 <div class="editor" style="display: none">
   <div class="editor-tabs-top">
-    <button class="editor-tab-button active" data-tab-section="editor">Editor</button>
-    <button class="editor-tab-button" data-tab-section="mesh-info">Mesh info</button>
-    <button class="editor-tab-button" data-tab-section="camera">Camera</button>
+    <button type="button" class="editor-tab-button active" data-tab-section="editor">Editor</button>
+    <button type="button" class="editor-tab-button" data-tab-section="mesh-info">Mesh info</button>
+    <button type="button" class="editor-tab-button" data-tab-section="camera">Camera</button>
   </div>
 
   <div class="editor-tab-content active" data-tab-section="editor">
@@ -14,10 +14,6 @@
       <div>
         <span>Level summary</span>
         <span class="level-summary">default</span>
-      </div>
-      <div>
-        <label for="edit-mode-enabled">Edit mode</label>
-        <input type="checkbox" class="edit-mode-enabled" />
       </div>
       <div>
         <span>Export level</span>
@@ -41,70 +37,70 @@
 
       <div class="mesh-tabs">
       <div class="tab-buttons">
-        <button class="tab-button active" data-tab="details">Details</button>
-        <button class="tab-button" data-tab="material">Material</button>
-        <button class="tab-button" data-tab="physics">Physics</button>
-        <button class="tab-button" data-tab="position">Position</button>
-        <button class="tab-button trigger-tab" data-tab="trigger">Trigger</button>
+        <button type="button" class="tab-button active" data-tab="details">Details</button>
+        <button type="button" class="tab-button" data-tab="material">Material</button>
+        <button type="button" class="tab-button" data-tab="physics">Physics</button>
+        <button type="button" class="tab-button" data-tab="position">Position</button>
+        <button type="button" class="tab-button trigger-tab" data-tab="trigger">Trigger</button>
       </div>
 
       <div class="tab-content active" data-tab="details">
         <div><label>Type</label>
-          <div><span class="detail-mesh-type">-</span></div>
+          <span class="detail-mesh-type">-</span>
         </div>
         <div><label>Name</label>
-          <div><span class="detail-mesh-name">-</span></div>
+          <span class="detail-mesh-name">-</span>
         </div>
         <div><label>Id</label>
-          <div><span class="detail-mesh-id">-</span></div>
+          <span class="detail-mesh-id">-</span>
         </div>
         <div><label>Position</label>
-          <div><span class="detail-position">-</span></div>
+          <span class="detail-position">-</span>
         </div>
         <div><label>Rotation</label>
-          <div><span class="detail-rotation">-</span></div>
+          <span class="detail-rotation">-</span>
         </div>
         <div><label>Scaling</label>
-          <div><span class="detail-scaling">-</span></div>
+          <span class="detail-scaling">-</span>
         </div>
         <div><label>Bounds</label>
-          <div><span class="detail-bounds">-</span></div>
+          <span class="detail-bounds">-</span>
         </div>
         <div><label>Visible</label>
-          <div><span class="detail-visible">-</span></div>
+          <span class="detail-visible">-</span>
         </div>
         <div><label>Collisions</label>
-          <div><span class="detail-collisions">-</span></div>
+          <span class="detail-collisions">-</span>
         </div>
       </div>
 
       <div class="tab-content" data-tab="material">
         <div><label>Alpha</label>
-          <div><span class="detail-material-alpha">-</span></div>
+          <span class="detail-material-alpha">-</span>
         </div>
         <div><label>Roughness</label>
-          <div><span class="detail-material-roughness">-</span></div>
+          <span class="detail-material-roughness">-</span>
         </div>
         <div><label>Texture</label>
-          <div><span class="detail-material-texture">-</span></div>
+          <span class="detail-material-texture">-</span>
         </div>
       </div>
 
       <div class="tab-content" data-tab="physics">
         <div><label>Mode</label>
-          <div><span class="detail-physics-mode">-</span></div>
+          <span class="detail-physics-mode">-</span>
         </div>
         <div><label>Shape</label>
-          <div><span class="detail-physics-shape">-</span></div>
+          <span class="detail-physics-shape">-</span>
         </div>
         <div><label>Mass</label>
-          <div><span class="detail-physics-mass">-</span></div>
+          <span class="detail-physics-mass">-</span>
         </div>
         <div><label>Friction</label>
-          <div><span class="detail-physics-friction">-</span></div>
+          <span class="detail-physics-friction">-</span>
         </div>
         <div><label>Restitution</label>
-          <div><span class="detail-physics-restitution">-</span></div>
+          <span class="detail-physics-restitution">-</span>
         </div>
       </div>
 
@@ -134,16 +130,17 @@
 
       <div class="tab-content" data-tab="trigger">
         <div><label>Trigger type</label>
-          <div><span class="detail-trigger-type">-</span></div>
+          <span class="detail-trigger-type">-</span>
         </div>
         <div><label>Debug type</label>
-          <div><span class="detail-trigger-debug">-</span></div>
+          <span class="detail-trigger-debug">-</span>
         </div>
         <div><label>Camera target</label>
-          <div><span class="detail-trigger-camera">-</span></div>
+          <span class="detail-trigger-camera">-</span>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <div class="editor-tab-content" data-tab-section="camera">
