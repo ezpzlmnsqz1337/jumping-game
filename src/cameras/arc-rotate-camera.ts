@@ -90,7 +90,11 @@ export class MyArcRotateCamera extends BABYLON.ArcRotateCamera implements Automa
       this.radius = this.targetRadius;
     }
 
-    if (Math.abs(alphaDelta) < 0.001 && Math.abs(betaDelta) < 0.001 && Math.abs(radiusDelta) < 0.01) {
+    if (
+      Math.abs(alphaDelta) < 0.001 &&
+      Math.abs(betaDelta) < 0.001 &&
+      Math.abs(radiusDelta) < 0.01
+    ) {
       this.movingToTarget = false;
     }
   }

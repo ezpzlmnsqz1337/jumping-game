@@ -216,7 +216,10 @@ export class GameControls {
     this.translateFreeCameraWithPlayer(player, previousPlayerPosition);
   }
 
-  private translateFreeCameraWithPlayer(player: PlayerEntity, previousPlayerPosition: BABYLON.Vector3) {
+  private translateFreeCameraWithPlayer(
+    player: PlayerEntity,
+    previousPlayerPosition: BABYLON.Vector3
+  ) {
     if (!player.mesh) return;
 
     const activeCamera = player.mesh.getScene().activeCamera;

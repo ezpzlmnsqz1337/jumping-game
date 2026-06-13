@@ -101,9 +101,7 @@ export const serializeVector3 = (vector: BABYLON.Vector3): SerializableVector3 =
   z: vector.z,
 });
 
-export const serializeQuaternion = (
-  quaternion: BABYLON.Quaternion
-): SerializableQuaternion => ({
+export const serializeQuaternion = (quaternion: BABYLON.Quaternion): SerializableQuaternion => ({
   x: quaternion.x,
   y: quaternion.y,
   z: quaternion.z,
@@ -113,9 +111,7 @@ export const serializeQuaternion = (
 export const deserializeVector3 = (vector: SerializableVector3): BABYLON.Vector3 =>
   new BABYLON.Vector3(vector.x, vector.y, vector.z);
 
-export const deserializeQuaternion = (
-  quaternion: SerializableQuaternion
-): BABYLON.Quaternion =>
+export const deserializeQuaternion = (quaternion: SerializableQuaternion): BABYLON.Quaternion =>
   new BABYLON.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 
 export const serializeColor3 = (color: BABYLON.Color3): SerializableColor3 => ({

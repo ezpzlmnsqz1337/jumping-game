@@ -219,7 +219,11 @@ describe('EditorUI', () => {
   it('updateSelectedMeshInfo resets fields when no mesh is selected', () => {
     const ui = createUi();
 
-    (ui as unknown as { updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void }).updateSelectedMeshInfo(null);
+    (
+      ui as unknown as {
+        updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void;
+      }
+    ).updateSelectedMeshInfo(null);
 
     expect(ui.meshDetailFields['mesh-type'].innerText).toBe('-');
     expect(ui.meshDetailFields['mesh-name'].innerText).toBe('-');
@@ -256,7 +260,11 @@ describe('EditorUI', () => {
       }),
     } as unknown as BABYLON.Mesh;
 
-    (ui as unknown as { updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void }).updateSelectedMeshInfo(mesh);
+    (
+      ui as unknown as {
+        updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void;
+      }
+    ).updateSelectedMeshInfo(mesh);
 
     expect(ui.meshDetailFields['mesh-type'].innerText).toBe('trigger');
     expect(ui.meshDetailFields['mesh-name'].innerText).toBe('trigger-mesh');
@@ -289,7 +297,11 @@ describe('EditorUI', () => {
       }),
     } as unknown as BABYLON.Mesh;
 
-    (ui as unknown as { updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void }).updateSelectedMeshInfo(mesh);
+    (
+      ui as unknown as {
+        updateSelectedMeshInfo: (mesh: BABYLON.Nullable<BABYLON.AbstractMesh>) => void;
+      }
+    ).updateSelectedMeshInfo(mesh);
 
     expect(ui.meshDetailFields['mesh-type'].innerText).toContain('wall (solid | tex=dark)');
     expect(ui.meshDetailFields['bounds'].innerText).toBe('w=10 h=2 d=1');
@@ -312,20 +324,38 @@ describe('EditorUI', () => {
       </div>
     `;
 
-    ui.sectionTabButtons = document.querySelectorAll('.editor .editor-tab-button') as NodeListOf<HTMLButtonElement>;
-    ui.sectionTabContents = document.querySelectorAll('.editor .editor-tab-content') as NodeListOf<HTMLDivElement>;
-    ui.detailTabButtons = document.querySelectorAll('.editor .tab-button') as NodeListOf<HTMLButtonElement>;
-    ui.detailTabContents = document.querySelectorAll('.editor .tab-content') as NodeListOf<HTMLDivElement>;
+    ui.sectionTabButtons = document.querySelectorAll(
+      '.editor .editor-tab-button'
+    ) as NodeListOf<HTMLButtonElement>;
+    ui.sectionTabContents = document.querySelectorAll(
+      '.editor .editor-tab-content'
+    ) as NodeListOf<HTMLDivElement>;
+    ui.detailTabButtons = document.querySelectorAll(
+      '.editor .tab-button'
+    ) as NodeListOf<HTMLButtonElement>;
+    ui.detailTabContents = document.querySelectorAll(
+      '.editor .tab-content'
+    ) as NodeListOf<HTMLDivElement>;
 
     (ui as unknown as { setupTabNavigation: () => void }).setupTabNavigation();
 
     ui.sectionTabButtons[1].click();
     expect(ui.sectionTabButtons[1].classList.contains('active')).toBe(true);
-    expect((document.querySelector('.editor .editor-tab-content[data-tab-section="s2"]') as HTMLDivElement).classList.contains('active')).toBe(true);
+    expect(
+      (
+        document.querySelector(
+          '.editor .editor-tab-content[data-tab-section="s2"]'
+        ) as HTMLDivElement
+      ).classList.contains('active')
+    ).toBe(true);
 
     ui.detailTabButtons[0].click();
     expect(ui.detailTabButtons[0].classList.contains('active')).toBe(true);
-    expect((document.querySelector('.editor .tab-content[data-tab="t1"]') as HTMLDivElement).classList.contains('active')).toBe(true);
+    expect(
+      (
+        document.querySelector('.editor .tab-content[data-tab="t1"]') as HTMLDivElement
+      ).classList.contains('active')
+    ).toBe(true);
   });
 
   it('bindMeshInfoUI wires gizmo toggles and snap settings', () => {
@@ -349,18 +379,42 @@ describe('EditorUI', () => {
       gizmos: {
         positionGizmo: {
           snapDistance: 0,
-          onDragEndObservable: { add: (cb: () => void) => { onPosDrag.cb = cb; } },
-          onDragObservable: { add: (cb: () => void) => { onPosDrag.cb = cb; } },
+          onDragEndObservable: {
+            add: (cb: () => void) => {
+              onPosDrag.cb = cb;
+            },
+          },
+          onDragObservable: {
+            add: (cb: () => void) => {
+              onPosDrag.cb = cb;
+            },
+          },
         },
         rotationGizmo: {
           snapDistance: 0,
           updateGizmoRotationToMatchAttachedMesh: true,
-          onDragEndObservable: { add: (cb: () => void) => { onRotDrag.cb = cb; } },
-          onDragObservable: { add: (cb: () => void) => { onRotDrag.cb = cb; } },
+          onDragEndObservable: {
+            add: (cb: () => void) => {
+              onRotDrag.cb = cb;
+            },
+          },
+          onDragObservable: {
+            add: (cb: () => void) => {
+              onRotDrag.cb = cb;
+            },
+          },
         },
         scaleGizmo: {
-          onDragEndObservable: { add: (cb: () => void) => { onScaleDrag.cb = cb; } },
-          onDragObservable: { add: (cb: () => void) => { onScaleDrag.cb = cb; } },
+          onDragEndObservable: {
+            add: (cb: () => void) => {
+              onScaleDrag.cb = cb;
+            },
+          },
+          onDragObservable: {
+            add: (cb: () => void) => {
+              onScaleDrag.cb = cb;
+            },
+          },
         },
       },
     } as unknown as BABYLON.GizmoManager;
@@ -430,7 +484,9 @@ describe('EditorUI', () => {
     lockCheckBox.checked = true;
     afterInputs.cb?.();
 
-    expect((document.querySelector('.editor .camera-position .value') as HTMLSpanElement).innerText).toBe('[ 1.00, 2.00, 3.00 ]');
+    expect(
+      (document.querySelector('.editor .camera-position .value') as HTMLSpanElement).innerText
+    ).toBe('[ 1.00, 2.00, 3.00 ]');
     expect(camera.lockedTarget).toBe(playerMesh);
     expect(camera.zoomToMouseLocation).toBe(false);
 
@@ -478,7 +534,11 @@ describe('EditorUI', () => {
       scaleGizmoEnabled: false,
       onAttachedToMeshObservable: { add: vi.fn() },
       gizmos: {
-        positionGizmo: { snapDistance: 0, onDragEndObservable: { add: vi.fn() }, onDragObservable: { add: vi.fn() } },
+        positionGizmo: {
+          snapDistance: 0,
+          onDragEndObservable: { add: vi.fn() },
+          onDragObservable: { add: vi.fn() },
+        },
         rotationGizmo: {
           snapDistance: 0,
           updateGizmoRotationToMatchAttachedMesh: true,
@@ -529,7 +589,9 @@ describe('EditorUI', () => {
     expect(saveSpy).toHaveBeenCalledTimes(1);
     expect(clearSpy).toHaveBeenCalledTimes(0);
 
-    window.dispatchEvent(new CustomEvent('editor-edit-mode-changed', { detail: { enabled: false } }));
+    window.dispatchEvent(
+      new CustomEvent('editor-edit-mode-changed', { detail: { enabled: false } })
+    );
     expect(ui.editorDiv.style.display).toBe('none');
   });
 

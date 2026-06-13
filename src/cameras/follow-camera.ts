@@ -64,7 +64,9 @@ export class MyFollowCamera extends BABYLON.FollowCamera implements AutomaticCam
     if (this.getScene().activeCamera !== this) return;
     if (!this.lockedTarget) return;
 
-    const targetPosition = this.lockedTarget.getAbsolutePosition().add(new BABYLON.Vector3(0, 0.5, 0));
+    const targetPosition = this.lockedTarget
+      .getAbsolutePosition()
+      .add(new BABYLON.Vector3(0, 0.5, 0));
     const desiredCameraPosition = this.position.clone();
     const toCamera = desiredCameraPosition.subtract(targetPosition);
     const distance = toCamera.length();

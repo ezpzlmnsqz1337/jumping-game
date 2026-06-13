@@ -7,9 +7,7 @@ const originalConsoleError = console.error;
 
 beforeAll(() => {
   consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
-    const joined = args
-      .map(arg => (typeof arg === 'string' ? arg : String(arg)))
-      .join(' ');
+    const joined = args.map(arg => (typeof arg === 'string' ? arg : String(arg))).join(' ');
 
     if (joined.includes(JSDOM_NAVIGATION_NOT_IMPLEMENTED)) {
       return;

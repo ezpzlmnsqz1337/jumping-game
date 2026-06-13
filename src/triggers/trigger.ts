@@ -42,7 +42,8 @@ export class Trigger {
     this.mesh.isVisible = opts.isVisible || false;
     this.mesh.position = opts.position || new BABYLON.Vector3(0, 0, 0);
     this.mesh.scaling = opts.scaling || new BABYLON.Vector3(1, 1, 1);
-    this.mesh.rotationQuaternion = opts.rotationQuaternion?.clone() || BABYLON.Quaternion.Identity();
+    this.mesh.rotationQuaternion =
+      opts.rotationQuaternion?.clone() || BABYLON.Quaternion.Identity();
     this.mesh.checkCollisions = true;
     this.mesh.metadata = {
       debugType: this.debugType,

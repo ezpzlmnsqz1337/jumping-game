@@ -9,7 +9,12 @@ import { Trigger } from './triggers/trigger';
 import { EndTrigger } from './triggers/end-trigger';
 import { StartTrigger } from './triggers/start-trigger';
 import { TeleportTrigger } from './triggers/teleport-trigger';
-import { serializeColor3, serializeQuaternion, serializeVector3, type LevelDocument } from './level-document';
+import {
+  serializeColor3,
+  serializeQuaternion,
+  serializeVector3,
+  type LevelDocument,
+} from './level-document';
 
 export class GameLevel {
   name: string;
@@ -119,7 +124,9 @@ export class GameLevel {
         return {
           text: textData.text,
           position: serializeVector3(mesh.position),
-          rotation: mesh.rotationQuaternion ? serializeQuaternion(mesh.rotationQuaternion) : undefined,
+          rotation: mesh.rotationQuaternion
+            ? serializeQuaternion(mesh.rotationQuaternion)
+            : undefined,
           color: textData.color ? serializeColor3(textData.color) : undefined,
         };
       });
@@ -147,7 +154,9 @@ export class GameLevel {
             uScale: groundTexture?.uScale,
             vScale: groundTexture?.vScale,
             roughness: groundMaterial?.roughness,
-            color: groundMaterial?.diffuseColor ? serializeColor3(groundMaterial.diffuseColor) : undefined,
+            color: groundMaterial?.diffuseColor
+              ? serializeColor3(groundMaterial.diffuseColor)
+              : undefined,
           }
         : undefined,
     };

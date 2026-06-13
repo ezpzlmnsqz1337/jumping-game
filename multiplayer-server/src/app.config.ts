@@ -15,11 +15,11 @@ import { MyRoom } from './rooms/MyRoom';
 const serverRoot = path.dirname(path.resolve(process.argv[1]));
 const distPath = path.join(serverRoot, '../dist');
 const configCandidate = (colyseusTools as unknown as { default?: unknown }).default;
-const config = (typeof configCandidate === 'function'
-  ? configCandidate
-  : (configCandidate as { default?: unknown } | undefined)?.default) as (
-  options: ConfigOptions
-) => ConfigOptions;
+const config = (
+  typeof configCandidate === 'function'
+    ? configCandidate
+    : (configCandidate as { default?: unknown } | undefined)?.default
+) as (options: ConfigOptions) => ConfigOptions;
 
 export default config({
   initializeGameServer: (gameServer: Server) => {

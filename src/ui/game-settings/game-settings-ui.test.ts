@@ -57,7 +57,11 @@ describe('GameSettingsUI', () => {
     const scene = {
       activeCamera: arcRotateCamera,
       getCameraByName: (name: string) =>
-        name === 'arcRotateCamera' ? arcRotateCamera : name === 'followCamera' ? followCamera : null,
+        name === 'arcRotateCamera'
+          ? arcRotateCamera
+          : name === 'followCamera'
+            ? followCamera
+            : null,
     };
 
     const ui = new GameSettingsUI(scene as never, { collissionEnabled: true } as never);
@@ -220,7 +224,11 @@ describe('GameSettingsUI', () => {
     const scene = {
       activeCamera: arcRotateCamera,
       getCameraByName: (name: string) =>
-        name === 'arcRotateCamera' ? arcRotateCamera : name === 'followCamera' ? followCamera : null,
+        name === 'arcRotateCamera'
+          ? arcRotateCamera
+          : name === 'followCamera'
+            ? followCamera
+            : null,
       meshes: [],
     };
 

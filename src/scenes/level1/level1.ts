@@ -60,7 +60,9 @@ export class Level1 extends GameLevel {
       trigger.onEnter = (_mesh: BABYLON.Mesh, player: PlayerEntity) => {
         setTimeout(() => {
           const velocity = player.physics.body.getLinearVelocity();
-          player.physics.body.setLinearVelocity(velocity.multiply(new BABYLON.Vector3(0.5, 0, 0.5)));
+          player.physics.body.setLinearVelocity(
+            velocity.multiply(new BABYLON.Vector3(0.5, 0, 0.5))
+          );
           player.jump();
         });
       };
@@ -88,7 +90,9 @@ export class Level1 extends GameLevel {
       }
 
       const material = new BABYLON.StandardMaterial('serializedTextMaterial', scene);
-      material.diffuseColor = textData.color ? deserializeColor3(textData.color) : new BABYLON.Color3(1, 1, 1);
+      material.diffuseColor = textData.color
+        ? deserializeColor3(textData.color)
+        : new BABYLON.Color3(1, 1, 1);
       textMesh.material = material;
       textMesh.metadata = {
         levelTextDecoration: {
@@ -110,7 +114,9 @@ export class Level1 extends GameLevel {
       const width = typeof wall.opts.width === 'number' ? wall.opts.width : 0;
       const depth = typeof wall.opts.depth === 'number' ? wall.opts.depth : 0;
       const height = typeof wall.opts.height === 'number' ? wall.opts.height : 0;
-      return width === 8 && depth === 4 && height === 0.6 && Math.abs(wall.mesh.position.y - 0.3) < 0.001;
+      return (
+        width === 8 && depth === 4 && height === 0.6 && Math.abs(wall.mesh.position.y - 0.3) < 0.001
+      );
     });
 
     if (!hasTextureVariant) {

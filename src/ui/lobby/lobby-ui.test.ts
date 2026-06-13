@@ -284,7 +284,9 @@ describe('LobbyUI', () => {
 
     expect(gameSettingsSpy).toHaveBeenCalled();
     expect(ui.nicknameInput.value).toBe('neo');
-    expect((document.querySelector('.green') as HTMLDivElement).classList.contains('selected')).toBe(true);
+    expect(
+      (document.querySelector('.green') as HTMLDivElement).classList.contains('selected')
+    ).toBe(true);
 
     (document.querySelector('.green') as HTMLDivElement).click();
     expect(player.changeColor).toHaveBeenCalled();

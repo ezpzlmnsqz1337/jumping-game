@@ -69,7 +69,10 @@ export class EditorUI extends AbstractUI {
 
     this.levelSourceSpan.innerText = 'imported JSON';
     this.levelSummarySpan.innerText = `${level.name} | walls: ${level.walls.length} | triggers: ${
-      level.startTriggers.length + level.endTriggers.length + level.teleports.length + level.triggers.length
+      level.startTriggers.length +
+      level.endTriggers.length +
+      level.teleports.length +
+      level.triggers.length
     }`;
   }
 
@@ -406,7 +409,9 @@ export class EditorUI extends AbstractUI {
     this.exportLevelButton = document.querySelector('.export-level') as HTMLButtonElement;
     this.importLevelButton = document.querySelector('.import-level') as HTMLButtonElement;
     this.importLevelInput = document.querySelector('.import-level-input') as HTMLInputElement;
-    this.clearLevelImportButton = document.querySelector('.clear-level-import') as HTMLButtonElement;
+    this.clearLevelImportButton = document.querySelector(
+      '.clear-level-import'
+    ) as HTMLButtonElement;
 
     this.meshNameSpan = document.querySelector('.editor-controls .mesh-name') as HTMLDivElement;
     this.sectionTabButtons = document.querySelectorAll(
@@ -415,8 +420,12 @@ export class EditorUI extends AbstractUI {
     this.sectionTabContents = document.querySelectorAll(
       '.editor .editor-tab-content'
     ) as NodeListOf<HTMLDivElement>;
-    this.detailTabButtons = document.querySelectorAll('.editor .tab-button') as NodeListOf<HTMLButtonElement>;
-    this.detailTabContents = document.querySelectorAll('.editor .tab-content') as NodeListOf<HTMLDivElement>;
+    this.detailTabButtons = document.querySelectorAll(
+      '.editor .tab-button'
+    ) as NodeListOf<HTMLButtonElement>;
+    this.detailTabContents = document.querySelectorAll(
+      '.editor .tab-content'
+    ) as NodeListOf<HTMLDivElement>;
     this.triggerTabButton = document.querySelector(
       '.editor .tab-button.trigger-tab'
     ) as HTMLButtonElement;
@@ -437,7 +446,9 @@ export class EditorUI extends AbstractUI {
       'physics-shape': document.querySelector('.detail-physics-shape') as HTMLSpanElement,
       'physics-mass': document.querySelector('.detail-physics-mass') as HTMLSpanElement,
       'physics-friction': document.querySelector('.detail-physics-friction') as HTMLSpanElement,
-      'physics-restitution': document.querySelector('.detail-physics-restitution') as HTMLSpanElement,
+      'physics-restitution': document.querySelector(
+        '.detail-physics-restitution'
+      ) as HTMLSpanElement,
       'trigger-type': document.querySelector('.detail-trigger-type') as HTMLSpanElement,
       'trigger-debug': document.querySelector('.detail-trigger-debug') as HTMLSpanElement,
       'trigger-camera': document.querySelector('.detail-trigger-camera') as HTMLSpanElement,
