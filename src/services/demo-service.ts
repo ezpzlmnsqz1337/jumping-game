@@ -2,6 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import { getModel } from '../assets/models';
 import { GameEntity } from '../entities/game-entity';
 import { PlayerEntity } from '../entities/player-entity';
+import { LevelTimer } from '../level-timer';
 
 interface DemoEntry {
   position: BABYLON.Vector3;
@@ -80,11 +81,7 @@ export class DemoService {
   scene: BABYLON.Scene | null = null;
 
   private formatTimeMs(ms: number): string {
-    const date = new Date(ms);
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-    const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
-    return `${minutes}:${seconds}.${milliseconds}`;
+    return LevelTimer.formatTime(new Date(ms));
   }
 
   private defaultMetadata(

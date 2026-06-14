@@ -37,11 +37,19 @@ export class TimeTableUI extends AbstractUI {
   updateReplayMetadata(metadata: ReplayMetadata): void {
     if (!this.replayMetadataDiv) return;
 
-    this.replayMetadataDiv.innerHTML = [
-      `<span class="replay-metadata__primary">Map: ${metadata.mapName}</span>`,
-      `<span class="replay-metadata__secondary">Ghost: ${metadata.timeStr} - ${metadata.playerName}</span>`,
-    ].join('');
+    // Clear previous content and rebuild with DOM methods (safer than innerHTML)
+    this.replayMetadataDiv.textContent = '';
 
+    const primarySpan = document.createElement('span');
+    primarySpan.className = 'replay-metadata__primary';
+    primarySpan.textContent = `Map: ${metadata.mapName}`;
+
+    const secondarySpan = document.createElement('span');
+    secondarySpan.className = 'replay-metadata__secondary';
+    secondarySpan.textContent = `Ghost: ${metadata.timeStr} - ${metadata.playerName}`;
+
+    this.replayMetadataDiv.appendChild(primarySpan);
+    this.replayMetadataDiv.appendChild(secondarySpan);
     this.replayMetadataDiv.style.display = 'block';
   }
 

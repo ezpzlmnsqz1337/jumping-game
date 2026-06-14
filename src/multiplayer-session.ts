@@ -117,11 +117,11 @@ export class MultiplayerSession {
         room.onStateChange(async state => {
           if (performance.now() - this.lastStateSyncAt < UPDATE_SPEED_MS) return;
           this.lastStateSyncAt = performance.now();
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await this.updatePlayers((state.players as any).$items);
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          gameRoot.uiManager?.timeTableUI.updateUI((state.times as any).$items);
+          // Colyseus state schema uses internal $items — access with known shape
+          const statePlayers = state.players as unknown as { $items: Map<string, PlayerInfo> };
+          await this.updatePlayers(statePlayers.$items);
+          const stateTimes = state.times as unknown as { $items: Map<string, TimeEntry> };
+          gameRoot.uiManager?.timeTableUI.updateUI(stateTimes.$items);
         });
 
         room.onMessage('player:disconnected', message => {
