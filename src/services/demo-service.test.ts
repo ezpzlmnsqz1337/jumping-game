@@ -53,6 +53,8 @@ describe('DemoService replay format', () => {
     expect(replay?.frames[0].position).toEqual({ x: 10, y: 11, z: 12 });
     expect(replay?.metadata.mapName).toBe('level1');
     expect(replay?.metadata.source).toBe('migrated-legacy');
+    expect(replay?.metadata.timeMs).toBeGreaterThan(0);
+    expect(replay?.metadata.timeStr).not.toBe('00:00.000');
     expect(type).toBe('local-best');
   });
 
@@ -101,8 +103,27 @@ describe('DemoService replay format', () => {
     expect(replay).toBeTruthy();
     expect(replay?.version).toBe(REPLAY_FORMAT_VERSION);
     expect(replay?.metadata.source).toBe('bundled');
+    expect(replay?.metadata.timeMs).toBeGreaterThan(0);
+    expect(replay?.metadata.timeStr).not.toBe('00:00.000');
     expect(fetch).toHaveBeenCalledWith('assets/demo/map-record.json');
     expect(localStorage.getItem('replay_bundled_record_level1')).toContain('"version":1');
+  });
+
+  it('estimates time from frame count for legacy replay', () => {
+    const service = new DemoService();
+    const frameCount = 600; // 10 seconds at 60fps
+    const frames = Array.from({ length: frameCount }, (_, i) => ({
+      position: { _x: i, _y: 0, _z: 0 },
+      rotation: { _x: 0, _y: 0, _z: 0, _w: 1 },
+    }));
+    localStorage.setItem('demo', JSON.stringify(frames));
+
+    const { replay } = service.loadStoredReplay('level1');
+
+    expect(replay).toBeTruthy();
+    // 600 frames * (1000/60) ms per frame = 10000ms = 10 seconds
+    expect(replay?.metadata.timeMs).toBe(10000);
+    expect(replay?.metadata.timeStr).toBe('00:10.000');
   });
 
   it('warns when migrating legacy stored replay', () => {
@@ -124,5 +145,70 @@ describe('DemoService replay format', () => {
     expect(warnSpy).toHaveBeenCalledWith(
       '[Replay] Migrated legacy generic replay data to local-best v1 format.'
     );
+  });
+
+  it('re-estimates time for v1 replay with timeMs=0 (stale localStorage)', () => {
+    const service = new DemoService();
+    // Simulate a v1 replay stored with timeMs: 0 (as produced by the old defaultMetadata)
+    const frames = Array.from({ length: 120 }, (_, i) => ({
+      position: { x: i, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+    }));
+    const staleReplay = {
+      version: REPLAY_FORMAT_VERSION,
+      frames,
+      metadata: {
+        playerName: 'Map record',
+        timeMs: 0,
+        timeStr: '00:00.000',
+        completedAt: '2026-01-01T00:00:00.000Z',
+        mapName: 'level1',
+        replayVersion: 1,
+        source: 'bundled',
+      },
+    };
+    localStorage.setItem('replay_bundled_record_level1', JSON.stringify(staleReplay));
+
+    const { replay, type } = service.loadStoredReplay('level1');
+
+    expect(replay).toBeTruthy();
+    expect(replay?.metadata.timeMs).toBeGreaterThan(0);
+    expect(replay?.metadata.timeStr).not.toBe('00:00.000');
+    expect(replay?.metadata.source).toBe('bundled');
+    expect(type).toBe('bundled-record');
+
+    // The stale data should have been migrated (saved back with corrected time)
+    const stored = JSON.parse(localStorage.getItem('replay_bundled_record_level1')!);
+    expect(stored.metadata.timeMs).toBeGreaterThan(0);
+    expect(stored.metadata.timeStr).not.toBe('00:00.000');
+  });
+
+  it('preserves valid timeMs from existing v1 replay', () => {
+    const service = new DemoService();
+    const frames = Array.from({ length: 10 }, (_, i) => ({
+      position: { x: i, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0, w: 1 },
+    }));
+    const goodReplay = {
+      version: REPLAY_FORMAT_VERSION,
+      frames,
+      metadata: {
+        playerName: 'Player1',
+        timeMs: 5000,
+        timeStr: '00:05.000',
+        completedAt: '2026-01-01T00:00:00.000Z',
+        mapName: 'level1',
+        replayVersion: 1,
+        source: 'local',
+      },
+    };
+    localStorage.setItem('replay_local_best_level1', JSON.stringify(goodReplay));
+
+    const { replay, type } = service.loadStoredReplay('level1');
+
+    expect(replay).toBeTruthy();
+    expect(replay?.metadata.timeMs).toBe(5000);
+    expect(replay?.metadata.timeStr).toBe('00:05.000');
+    expect(type).toBe('local-best');
   });
 });

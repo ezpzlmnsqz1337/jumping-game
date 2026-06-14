@@ -79,11 +79,24 @@ export class DemoService {
   playingEntity: BABYLON.Mesh | null = null;
   scene: BABYLON.Scene | null = null;
 
-  private defaultMetadata(mapName: string, source: ReplayMetadata['source']): ReplayMetadata {
+  private formatTimeMs(ms: number): string {
+    const date = new Date(ms);
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+    const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
+    return `${minutes}:${seconds}.${milliseconds}`;
+  }
+
+  private defaultMetadata(
+    mapName: string,
+    source: ReplayMetadata['source'],
+    estimatedTimeMs?: number
+  ): ReplayMetadata {
+    const timeMs = estimatedTimeMs ?? 0;
     return {
       playerName: 'Map record',
-      timeMs: 0,
-      timeStr: '00:00.000',
+      timeMs,
+      timeStr: timeMs > 0 ? this.formatTimeMs(timeMs) : '00:00.000',
       completedAt: new Date().toISOString(),
       mapName,
       replayVersion: REPLAY_FORMAT_VERSION,
@@ -153,16 +166,22 @@ export class DemoService {
   private normalizeMetadata(
     metadata: unknown,
     mapName: string,
-    defaultSource: ReplayMetadata['source']
+    defaultSource: ReplayMetadata['source'],
+    frameCount = 0
   ): ReplayMetadata {
-    const defaults = this.defaultMetadata(mapName, defaultSource);
+    const estimatedTimeMs = frameCount > 0 ? frameCount * SAMPLE_RATE_MS : undefined;
+    const defaults = this.defaultMetadata(mapName, defaultSource, estimatedTimeMs);
 
     const playerName = readString(metadata, 'playerName') ?? defaults.playerName;
-    const timeStr = readString(metadata, 'timeStr') ?? defaults.timeStr;
     const mapNameValue = readString(metadata, 'mapName') ?? defaults.mapName;
 
     const timeMsValue = readNumber(metadata, 'timeMs');
-    const timeMs = timeMsValue === null || timeMsValue < 0 ? defaults.timeMs : timeMsValue;
+    // Treat timeMs <= 0 as missing — legacy replays had no timer data
+    const timeMs = timeMsValue !== null && timeMsValue > 0 ? timeMsValue : defaults.timeMs;
+
+    const timeStrValue = readString(metadata, 'timeStr');
+    const timeStr =
+      timeStrValue && timeMsValue !== null && timeMsValue > 0 ? timeStrValue : defaults.timeStr;
 
     const completedAt = readString(metadata, 'completedAt') ?? defaults.completedAt;
     const completedAtDate = new Date(completedAt);
@@ -198,12 +217,13 @@ export class DemoService {
         .filter((frame): frame is ReplayFrameData => frame !== null);
       if (frames.length === 0) return { replay: null, migrated: false };
 
+      const estimatedTimeMs = frames.length * SAMPLE_RATE_MS;
       const source = defaultSource === 'local' ? 'migrated-legacy' : defaultSource;
       return {
         replay: {
           version: REPLAY_FORMAT_VERSION,
           frames,
-          metadata: this.defaultMetadata(mapName, source),
+          metadata: this.defaultMetadata(mapName, source, estimatedTimeMs),
         },
         migrated: true,
       };
@@ -219,8 +239,17 @@ export class DemoService {
 
     if (frames.length === 0) return { replay: null, migrated: false };
 
-    const metadata = this.normalizeMetadata(payload.metadata, mapName, defaultSource);
-    const migrated = !isRecord(payload.metadata) || typeof payload.metadata.source !== 'string';
+    const rawTimeMs = isRecord(payload.metadata) ? readNumber(payload.metadata, 'timeMs') : null;
+    const metadata = this.normalizeMetadata(
+      payload.metadata,
+      mapName,
+      defaultSource,
+      frames.length
+    );
+    const migrated =
+      !isRecord(payload.metadata) ||
+      typeof payload.metadata.source !== 'string' ||
+      (rawTimeMs !== null && rawTimeMs <= 0);
 
     return {
       replay: {
