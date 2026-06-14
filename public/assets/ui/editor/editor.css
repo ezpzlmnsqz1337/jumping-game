@@ -1,30 +1,30 @@
 .editor {
+  background-color: var(--color-surface-overlay);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
   display: flex;
+  flex-direction: column;
+  padding: var(--space-3xl) var(--space-3xl) var(--space-lg);
   position: fixed;
   right: 1rem;
   top: 11rem;
-  flex-direction: column;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface-overlay);
-  padding: var(--space-3xl) var(--space-3xl) var(--space-lg);
-  border-radius: 0.2rem;
 }
 
 .editor-controls {
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
-  color: var(--color-text-primary);
 }
 
 .edit-mode>div,
 .editor-controls>div,
 .editor .camera>div {
-  flex: 1;
+  column-gap: var(--space-3xl);
   display: flex;
-  column-gap: 1rem;
-  padding: var(--space-md) var(--space-none);
+  flex: 1;
   flex-direction: row;
   justify-content: space-between;
+  padding: var(--space-md) var(--space-none);
 }
 
 .editor>div>label {
@@ -32,16 +32,16 @@
 }
 
 .editor-controls>div>span {
-  margin-bottom: 0;
+  margin-bottom: var(--space-none);
 }
 
 .editor-controls>div input[type="checkbox"] {
-  margin: 0;
+  margin: var(--space-none);
 }
 
 .editor-controls .tab-content>div {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-lg);
   justify-content: space-between;
   padding: var(--space-md) var(--space-none);
 }
@@ -49,7 +49,7 @@
 .editor .heading {
   color: var(--color-brand-primary);
   font-size: var(--font-size-ui-xl);
-  padding-top: 0.5rem;
+  padding-top: var(--space-lg);
 }
 
 .editor .camera {
@@ -58,16 +58,16 @@
 }
 
 .editor .camera>div>input[type="checkbox"] {
-  margin-right: 0;
+  margin-right: var(--space-none);
 }
 
 .editor button {
-  border: 0;
-  border-radius: 0.2rem;
-  padding: var(--space-button-y) var(--space-xl);
   background: var(--color-brand-primary);
+  border: 0;
+  border-radius: var(--radius-sm);
   color: var(--color-text-primary);
   cursor: pointer;
+  padding: var(--space-button-y) var(--space-xl);
 }
 
 .editor .import-level-input {
@@ -83,23 +83,23 @@
 }
 
 .editor .editor-tabs-top {
+  border-bottom: var(--border-width-thick) solid var(--color-brand-divider);
   display: flex;
   flex-wrap: wrap;
-  gap: 0.2rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-brand-divider);
-  padding-bottom: 0.3rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
 }
 
 .editor .editor-tab-button {
-  border: 0;
-  border-radius: 0.2rem;
-  padding: var(--space-button-y) var(--space-xl);
   background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
   color: var(--color-brand-primary-muted);
   cursor: pointer;
   font-size: var(--font-size-ui-sm);
-  transition: all 0.2s ease;
+  padding: var(--space-button-y) var(--space-xl);
+  transition: all var(--transition-normal) ease;
 }
 
 .editor .editor-tab-button:hover {
@@ -115,7 +115,7 @@
 .editor .editor-tab-content {
   display: none;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: var(--space-sm);
 }
 
 .editor .editor-tab-content.active {
@@ -125,24 +125,24 @@
 .editor .mesh-tabs {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: var(--space-sm);
 }
 
 .editor .tab-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.2rem;
+  gap: var(--space-xs);
 }
 
 .editor .tab-button {
-  border: 0;
-  border-radius: 0.2rem;
-  padding: var(--space-button-y) var(--space-xl);
   background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
   color: var(--color-brand-primary-muted);
   cursor: pointer;
   font-size: var(--font-size-ui-xs);
-  transition: all 0.2s ease;
+  padding: var(--space-button-y) var(--space-xl);
+  transition: all var(--transition-normal) ease;
 }
 
 .editor .tab-button:hover {
@@ -166,7 +166,7 @@
 .editor .tab-content {
   display: none;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: var(--space-sm);
 }
 
 .editor .tab-content.active {

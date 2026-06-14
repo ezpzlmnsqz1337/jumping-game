@@ -1,43 +1,43 @@
 .game-settings {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  color: var(--color-text-primary);
   background-color: var(--color-surface-overlay);
-  padding: var(--space-lg) var(--space-3xl);
-  font-size: var(--font-size-ui-md);
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  font-size: var(--font-size-ui-md);
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-3xl);
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
 }
 
 .game-settings>div {
   display: flex;
-  justify-content: space-between;
   flex-direction: row;
-  gap: 1rem;
+  gap: var(--space-3xl);
+  justify-content: space-between;
 }
 
 .game-settings > .settings-note {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  color: var(--color-text-secondary);
   display: block;
   font-size: var(--font-size-ui-sm);
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-  padding-bottom: var(--space-sm);
   margin-bottom: var(--space-xs);
+  padding-bottom: var(--space-sm);
 }
 
 @media only screen and (max-width: 1000px) {
   .game-settings {
     display: block;
-    top: 0;
-    right: 0;
     font-size: var(--font-size-ui-xs);
     padding: var(--space-lg);
+    right: 0;
+    top: 0;
   }
-  
+
   .game-settings>div {
-    gap: 0.5rem;
+    gap: var(--space-lg);
   }
 
   .game-settings > .settings-note {

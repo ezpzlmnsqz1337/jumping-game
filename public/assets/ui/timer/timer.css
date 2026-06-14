@@ -1,26 +1,26 @@
 .timer {
-  padding: var(--space-lg) var(--space-3xl);
-  position: fixed;
-  color: var(--color-text-primary);
-  font-weight: bold;
-  font-size: var(--font-size-ui-5xl);
-  bottom: 6.5rem;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-  flex-direction: column;
   align-items: center;
+  bottom: 6.5rem;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-ui-5xl);
+  font-weight: bold;
+  justify-content: center;
+  left: 0;
+  padding: var(--space-lg) var(--space-3xl);
   pointer-events: none;
+  position: fixed;
+  right: 0;
+  z-index: var(--z-ui);
 }
 
 .timer>div {
   background-color: var(--color-surface-overlay);
+  border-radius: var(--radius-sm);
   padding: var(--space-lg) var(--space-3xl);
-  text-align: center;
-  border-radius: 0.2rem;
   pointer-events: auto;
+  text-align: center;
 }
 
 .timer>div>.checkpoints {
@@ -29,9 +29,9 @@
 
 .timer > div > .run-status,
 .timer > div > .connection-status {
-  margin-top: var(--space-sm);
   font-size: var(--font-size-ui-sm);
   font-weight: 600;
+  margin-top: var(--space-sm);
 }
 
 .timer > div > .run-status.state-ready {
@@ -60,19 +60,19 @@
 
 @media only screen and (max-width: 1000px) {
   .timer {
-    padding: var(--space-lg);
-    font-size: var(--font-size-ui-2xl);
     bottom: 6.5rem;
+    font-size: var(--font-size-ui-2xl);
     left: 0;
+    padding: var(--space-lg);
     right: 0;
   }
-  
+
   .timer>div {
+    border-radius: var(--radius-sm);
     padding: var(--space-lg);
     text-align: center;
-    border-radius: 0.2rem;
   }
-  
+
   .timer>div>.checkpoints {
     font-size: var(--font-size-ui-xs);
   }

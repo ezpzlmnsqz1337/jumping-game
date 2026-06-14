@@ -1,25 +1,25 @@
 .chat {
-  position: fixed;
-  bottom: 7rem;
-  left: 1rem;
-  color: var(--color-text-primary);
   background-color: var(--color-surface-overlay);
-  padding: var(--space-lg) var(--space-3xl);
-  font-size: var(--font-size-ui-md);
+  bottom: 7rem;
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  z-index: 50;
+  font-size: var(--font-size-ui-md);
+  gap: var(--space-lg);
+  left: 1rem;
+  padding: var(--space-lg) var(--space-3xl);
+  position: fixed;
+  z-index: var(--z-overlay);
 }
 
 .chat>.chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+  max-height: var(--size-chat-max-height);
+  max-width: var(--size-chat-max-width);
   overflow-y: auto;
-  max-width: 30rem;
-  max-height: 20rem;
-  margin-bottom: 1rem;
 }
 
 .chat>.chat-messages>div {
@@ -60,17 +60,17 @@
 
 .chat>input {
   background-color: transparent;
-  padding: var(--space-lg) var(--space-3xl);
-  border: 0.1rem solid var(--blue);
+  border: 0.1rem solid var(--color-brand-primary);
   color: var(--color-text-primary);
+  padding: var(--space-lg) var(--space-3xl);
   width: 100%;
 }
 
 @media only screen and (max-width: 1000px) {
   .chat {
     bottom: 11rem;
+    font-size: var(--font-size-ui-xs);
     left: 0;
     padding: var(--space-lg);
-    font-size: var(--font-size-ui-xs);
   }
 }

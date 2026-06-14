@@ -1,21 +1,21 @@
 .lobby-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   bottom: 0;
-  z-index: 999;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: var(--z-modal);
 }
 
 .lobby {
+  background-color: var(--color-surface-overlay-strong);
+  color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
-  margin: 3rem;
-  color: var(--color-text-primary);
-  height: calc(100vh - 6rem);
-  background-color: var(--color-surface-overlay-strong);
+  height: calc(100vh - var(--space-5xl) * 2);
+  margin: var(--space-5xl);
   padding: var(--space-4xl);
-  z-index: 9999;
+  z-index: var(--z-modal-top);
 }
 
 /* Dev-mode only section */
@@ -42,11 +42,11 @@
 }
 
 .map-info .map-label {
-  font-size: var(--font-size-ui-sm);
   color: var(--color-text-secondary);
-  text-transform: uppercase;
+  font-size: var(--font-size-ui-sm);
   letter-spacing: 0.05em;
   margin-bottom: var(--space-sm);
+  text-transform: uppercase;
 }
 
 .map-info .map-name {
@@ -56,32 +56,32 @@
 }
 
 .map-info .map-meta {
-  font-size: var(--font-size-ui-md);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-md);
 }
 
 /* Controls section */
 .controls {
+  border-top: var(--border-width-thick) solid var(--color-surface-overlay);
   margin-top: var(--space-3xl);
   padding-top: var(--space-3xl);
-  border-top: 2px solid var(--color-surface-overlay);
 }
 
 .controls-heading {
-  text-align: center;
   margin-bottom: var(--space-xl);
+  text-align: center;
 }
 
 .keyboard-controls {
+  align-items: center;
   display: flex;
   gap: var(--space-3xl);
   justify-content: center;
-  align-items: center;
 }
 
 .keyboard-controls > .keyboard {
+  max-width: var(--size-keyboard-max-width);
   width: 40%;
-  max-width: 24rem;
 }
 
 .keyboard-controls > .legend {
@@ -94,8 +94,8 @@
 }
 
 .keyboard-controls > .legend > div > .icon {
-  font-weight: bold;
   display: inline-block;
+  font-weight: bold;
   min-width: 4.5rem;
   text-align: center;
 }
@@ -142,21 +142,21 @@
 
 /* Reusable heading classes */
 .heading-xl {
-  font-size: var(--font-size-ui-5xl);
   color: var(--color-brand-primary);
+  font-size: var(--font-size-ui-5xl);
   margin-bottom: var(--space-3xl);
   text-align: center;
 }
 
 .heading-md {
-  font-size: var(--font-size-ui-xl);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-xl);
   margin-bottom: var(--space-lg);
 }
 
 .heading-sm {
-  font-size: var(--font-size-ui-md);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-md);
   margin-bottom: var(--space-lg);
 }
 
@@ -177,8 +177,8 @@
 /* Scrollable views area */
 .lm-views {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
+  overflow-y: auto;
 }
 
 /* Level list */
@@ -191,15 +191,15 @@
 }
 
 .level-entry {
-  display: flex;
   align-items: center;
+  background-color: var(--color-surface-overlay);
+  border: var(--border-width-thick) solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
   gap: var(--space-xl);
   padding: var(--space-lg) var(--space-2xl);
-  background-color: var(--color-surface-overlay);
-  border-radius: 0.3rem;
-  cursor: pointer;
-  transition: background-color 0.15s;
-  border: 2px solid transparent;
+  transition: background-color var(--transition-fast);
 }
 
 .level-entry:hover {
@@ -211,12 +211,12 @@
 }
 
 .level-entry.selected {
-  border-color: var(--color-brand-primary);
   background-color: color-mix(
     in srgb,
     var(--color-surface-overlay) 60%,
     var(--color-brand-primary)
   );
+  border-color: var(--color-brand-primary);
 }
 
 .level-entry .level-info {
@@ -229,47 +229,47 @@
 }
 
 .level-entry .level-meta {
-  font-size: var(--font-size-ui-sm);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-sm);
   margin-top: var(--space-xxs);
 }
 
 .level-entry .level-source-badge {
+  background-color: var(--color-surface-overlay-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-ui-xs);
   padding: var(--space-xxs) var(--space-md);
-  border-radius: 0.2rem;
-  background-color: var(--color-surface-overlay-strong);
-  color: var(--color-text-secondary);
 }
 
 /* Player Setup (always at bottom) */
 .player-setup {
+  align-items: center;
+  border-top: var(--border-width-thick) solid var(--color-surface-overlay);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2xl);
-  padding-top: var(--space-3xl);
-  border-top: 2px solid var(--color-surface-overlay);
-  margin-top: var(--space-3xl);
   flex-shrink: 0;
+  gap: var(--space-2xl);
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-3xl);
 }
 
 .nickname {
-  width: 100%;
-  max-width: 40rem;
+  max-width: var(--size-input-max-width);
   text-align: center;
+  width: 100%;
 }
 
 .nickname input {
-  padding: var(--space-2xl) var(--space-3xl);
-  font-size: var(--font-size-ui-4xl);
-  width: 100%;
-  text-align: center;
-  border: 0.2rem solid var(--color-brand-primary);
   background-color: var(--color-surface-overlay);
-  color: var(--color-text-primary);
-  border-radius: 0.2rem;
+  border: 0.2rem solid var(--color-brand-primary);
+  border-radius: var(--radius-sm);
   box-sizing: border-box;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-ui-4xl);
+  padding: var(--space-2xl) var(--space-3xl);
+  text-align: center;
+  width: 100%;
 }
 
 .nickname input.invalid {
@@ -282,31 +282,31 @@
 }
 
 .player-color {
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .colors {
   display: flex;
-  gap: var(--space-2xl);
   flex-wrap: wrap;
+  gap: var(--space-2xl);
 }
 
 .colors > div {
-  height: 5rem;
-  width: 5rem;
-  opacity: 0.3;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: transform 0.1s ease-out;
+  height: 5rem;
+  opacity: 0.3;
   transform: scale(1);
-  border-radius: 0.3rem;
+  transition: transform var(--transition-fast) ease-out;
+  width: 5rem;
 }
 
 .colors > div:hover,
 .colors > div.selected {
-  transform: scale(1.15);
   opacity: 1;
+  transform: scale(1.15);
 }
 
 .colors > div.blue {
@@ -332,18 +332,18 @@
 }
 
 .play-btn {
-  font-size: var(--font-size-ui-2xl);
-  color: var(--color-text-primary);
-  padding: var(--space-2xl) var(--space-4xl);
   background-color: var(--color-brand-primary);
   border: none;
-  border-radius: 0.2rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
   cursor: pointer;
+  font-size: var(--font-size-ui-2xl);
   font-weight: bold;
+  margin-top: var(--space-lg);
+  max-width: var(--size-input-max-width);
+  padding: var(--space-2xl) var(--space-4xl);
   text-transform: uppercase;
   width: 100%;
-  max-width: 40rem;
-  margin-top: var(--space-lg);
 }
 
 .play-btn:hover {
@@ -352,32 +352,32 @@
 
 /* Editor actions (dev-only) */
 .editor-actions {
-  display: flex;
-  gap: var(--space-lg);
   align-items: center;
+  display: flex;
   flex-wrap: wrap;
+  gap: var(--space-lg);
   margin-bottom: var(--space-3xl);
 }
 
 .editor-actions input.new-level-name {
-  padding: var(--space-lg) var(--space-2xl);
-  font-size: var(--font-size-ui-lg);
-  border: 2px solid var(--color-surface-overlay);
   background-color: var(--color-surface-overlay);
+  border: var(--border-width-thick) solid var(--color-surface-overlay);
+  border-radius: var(--radius-sm);
   color: var(--color-text-primary);
-  border-radius: 0.2rem;
-  min-width: 16rem;
+  font-size: var(--font-size-ui-lg);
+  min-width: var(--size-input-min-width);
+  padding: var(--space-lg) var(--space-2xl);
 }
 
 .editor-actions button {
-  padding: var(--space-lg) var(--space-2xl);
-  font-size: var(--font-size-ui-md);
   background-color: var(--color-brand-primary);
-  color: var(--color-text-primary);
   border: none;
-  border-radius: 0.2rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
   cursor: pointer;
+  font-size: var(--font-size-ui-md);
   font-weight: 600;
+  padding: var(--space-lg) var(--space-2xl);
 }
 
 .editor-actions button:hover {
@@ -397,12 +397,12 @@
 }
 
 .stored-level-entry {
-  display: flex;
   align-items: center;
+  background-color: var(--color-surface-overlay);
+  border-radius: var(--radius-sm);
+  display: flex;
   gap: var(--space-xl);
   padding: var(--space-md) var(--space-2xl);
-  background-color: var(--color-surface-overlay);
-  border-radius: 0.2rem;
 }
 
 .stored-level-entry .sl-name {
@@ -411,20 +411,20 @@
 }
 
 .stored-level-entry .sl-meta {
-  font-size: var(--font-size-ui-sm);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-sm);
 }
 
 .stored-level-entry button {
-  padding: var(--space-sm) var(--space-lg);
-  font-size: var(--font-size-ui-sm);
-  border: none;
-  border-radius: 0.2rem;
-  cursor: pointer;
-  font-weight: 600;
   background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
-  transition: color 0.15s;
+  cursor: pointer;
+  font-size: var(--font-size-ui-sm);
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-lg);
+  transition: color var(--transition-fast);
 }
 
 .stored-level-entry button:hover {
@@ -441,20 +441,20 @@
 
 .no-levels {
   color: var(--color-text-secondary);
-  font-style: italic;
   font-size: var(--font-size-ui-md);
+  font-style: italic;
   padding: var(--space-2xl);
   text-align: center;
 }
 
 /* Settings button */
 .ui-buttons {
+  bottom: 6.5rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-ui-6xl);
   position: fixed;
   right: 0;
-  bottom: 6.5rem;
-  font-size: var(--font-size-ui-6xl);
-  color: var(--color-text-primary);
-  z-index: 9999;
+  z-index: var(--z-modal-top);
 }
 
 .ui-buttons > div {
@@ -467,32 +467,18 @@
 }
 
 @media only screen and (max-width: 1000px) {
-  .lobby {
-    margin: 0;
-    padding: var(--space-xl);
-  }
-
   .colors > div {
     height: 4rem;
     width: 4rem;
   }
 
   .editor-actions {
-    flex-direction: column;
     align-items: stretch;
+    flex-direction: column;
   }
 
   .editor-actions input.new-level-name {
     min-width: auto;
-  }
-
-  .lobby-columns,
-  .is-dev .lobby-columns {
-    flex-direction: column;
-  }
-
-  .level-list {
-    max-height: 30vh;
   }
 
   .keyboard-controls {
@@ -510,5 +496,19 @@
 
   .keyboard-controls > .legend > div > .icon {
     min-width: 3.5rem;
+  }
+
+  .level-list {
+    max-height: 30vh;
+  }
+
+  .lobby {
+    margin: 0;
+    padding: var(--space-xl);
+  }
+
+  .lobby-columns,
+  .is-dev .lobby-columns {
+    flex-direction: column;
   }
 }

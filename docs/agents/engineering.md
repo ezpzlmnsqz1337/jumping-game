@@ -17,13 +17,17 @@
 - Document assumptions in PR/summary when touching gameplay math or netcode.
 - If a fix needs a tradeoff (fairness vs smoothness, realism vs responsiveness), prefer responsive gameplay unless user asks for strict simulation.
 
-## CSS Design Token Convention
+## CSS Best Practices
 
-- All UI colors must use `--color-*` variables from `src/style.css`. Do not hardcode hex/rgb values in `.css` files.
-- All UI font sizes must use `--font-size-ui-*` variables. Do not hardcode `rem`/`px` font sizes.
-- All UI padding values must use `--space-*` variables. Do not hardcode `rem`/`px` spacing.
-- When adding a genuinely new value that has no matching token, add the token to `src/style.css` first with a semantic name, then use it.
-- Existing palette color names (`--blue`, `--red`, etc.) are for gameplay/player-color use only; use `--color-*` tokens for UI chrome.
+CSS conventions are documented in `docs/agents/css.md`. It covers design tokens, selector rules, layout practices, and code review checklist. **Read it before writing any CSS.**
+
+### Design Token Convention (Quick Reference)
+
+- All UI colors must use `--color-*` variables from `src/style.css`. No hardcoded hex/rgb.
+- All UI font sizes must use `--font-size-ui-*` variables. No hardcoded `rem`/`px`.
+- All UI spacing must use `--space-*` variables. No hardcoded `rem`/`px`.
+- Palette colors (`--blue`, `--red`, etc.) are for gameplay only — never for UI chrome.
+- If a token is missing, add it to `src/style.css` first.
 
 ## Definition Of Done For Typical Changes
 

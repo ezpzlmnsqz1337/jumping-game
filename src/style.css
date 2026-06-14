@@ -56,6 +56,28 @@ body {
   --space-2xl: 0.7rem;
   --space-3xl: 1rem;
   --space-4xl: 2rem;
+  --space-5xl: 3rem;
+
+  --radius-sm: 0.2rem;
+  --radius-md: 0.3rem;
+
+  --z-canvas: 1;
+  --z-ui: 10;
+  --z-overlay: 50;
+  --z-modal: 999;
+  --z-modal-top: 9999;
+
+  --transition-fast: 0.15s;
+  --transition-normal: 0.2s;
+
+  --border-width-thick: 2px;
+
+  --size-player-bar: 100px;
+  --size-chat-max-width: 30rem;
+  --size-chat-max-height: 20rem;
+  --size-input-max-width: 40rem;
+  --size-input-min-width: 16rem;
+  --size-keyboard-max-width: 24rem;
 }
 
 #render-canvas {

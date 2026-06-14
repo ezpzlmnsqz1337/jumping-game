@@ -37,6 +37,7 @@ npm run start:server
 - Overview and architecture: `docs/agents/overview.md`
 - Environment and commands: `docs/agents/environment.md`
 - Engineering agreements and done criteria: `docs/agents/engineering.md`
+- CSS conventions and best practices: `docs/agents/css.md`
 - CI, linting, formatting, and tests: `docs/agents/ci-cd.md`
 - Fragile systems and regression risks: `docs/agents/fragile-areas.md`
 - Prioritized improvement roadmap: `docs/agents/roadmap.md`

@@ -1,10 +1,10 @@
 .time-table {
-  color: var(--color-text-primary);
-  position: fixed;
-  left: 1rem;
-  top: 1rem;
   background-color: var(--color-surface-overlay);
+  color: var(--color-text-primary);
+  left: 1rem;
   padding: var(--space-lg) var(--space-3xl);
+  position: fixed;
+  top: 1rem;
 }
 
 .time-table>ol>li {
@@ -12,24 +12,24 @@
 }
 
 .time-table > .replay-metadata {
-  margin-top: var(--space-sm);
-  font-size: var(--font-size-ui-sm);
   color: var(--color-text-secondary);
+  font-size: var(--font-size-ui-sm);
+  margin-top: var(--space-sm);
 }
 
 @media only screen and (max-width: 1000px) {
   .time-table {
-    left: 0;
-    top: 0;
-    padding: var(--space-xs) var(--space-lg);
     font-size: var(--font-size-ui-xs);
+    left: 0;
+    padding: var(--space-xs) var(--space-lg);
+    top: 0;
   }
 
   .time-table>ol {
+    margin: var(--space-sm) 0;
     padding: var(--space-none) var(--space-none) var(--space-none) var(--space-3xl);
-    margin: 0.3rem 0;
   }
-  
+
   .time-table>ol>li {
     padding: var(--space-xxs);
   }
