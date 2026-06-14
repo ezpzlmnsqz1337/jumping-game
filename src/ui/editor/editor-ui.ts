@@ -5,6 +5,7 @@ import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
 import { GameStorage } from '../../game-storage';
 import gameRoot from '../../game-root';
 import { isLevelDocument } from '../../level-document';
+import { renderingCanvas } from '../ui-manager';
 
 export type GizmoType = 'position' | 'rotation' | 'scaling';
 
@@ -27,6 +28,7 @@ export class EditorUI extends AbstractUI {
   transformCheckBox!: HTMLInputElement;
   scalingCheckBox!: HTMLInputElement;
   rotationCheckBox!: HTMLInputElement;
+  cameraTriggersCheckBox!: HTMLInputElement;
 
   positionValueDiv!: HTMLDivElement;
   rotationValueDiv!: HTMLDivElement;
@@ -408,6 +410,17 @@ export class EditorUI extends AbstractUI {
     });
   }
 
+  private toggleCameraTriggers() {
+    const show = this.cameraTriggersCheckBox.checked;
+    this.scene.meshes?.forEach(mesh => {
+      const debugType = (mesh.metadata as { debugType?: string } | undefined)?.debugType;
+      if (debugType === 'camera-trigger') {
+        mesh.isVisible = show;
+      }
+    });
+    renderingCanvas?.focus();
+  }
+
   async bindUI() {
     if (!this.gizmoManager) return;
     await super.bindUI();
@@ -505,6 +518,15 @@ export class EditorUI extends AbstractUI {
     this.setupTabNavigation();
     this.bindMeshInfoUI();
     this.bindCameraInfoUI();
+
+    this.cameraTriggersCheckBox = document.querySelector(
+      '.camera-triggers-enabled'
+    ) as HTMLInputElement;
+    this.cameraTriggersCheckBox.checked = false;
+    this.cameraTriggersCheckBox.addEventListener('click', () => {
+      this.toggleCameraTriggers();
+    });
+    this.toggleCameraTriggers();
 
     const gameSettingsEditMode = document.querySelector(
       '.game-settings .edit-mode-enabled-global'

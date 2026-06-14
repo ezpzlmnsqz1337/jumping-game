@@ -28,6 +28,7 @@ function createUi() {
   ui.transformCheckBox = document.createElement('input');
   ui.rotationCheckBox = document.createElement('input');
   ui.scalingCheckBox = document.createElement('input');
+  ui.cameraTriggersCheckBox = document.createElement('input');
   ui.transformCheckBox.checked = true;
   ui.rotationCheckBox.checked = false;
   ui.scalingCheckBox.checked = true;
@@ -103,6 +104,7 @@ function renderBindDom() {
       <input class="transform-enabled" type="checkbox" />
       <input class="scaling-enabled" type="checkbox" />
       <input class="rotation-enabled" type="checkbox" />
+      <input class="camera-triggers-enabled" type="checkbox" />
 
       <div class="transform-value"></div>
       <div class="rotation-value"></div>
@@ -623,5 +625,31 @@ describe('EditorUI', () => {
     (ui as unknown as { updateLevelInfo: () => void }).updateLevelInfo();
     expect(ui.levelSourceSpan.innerText).toBe('imported JSON');
     expect(ui.levelSummarySpan.innerText).toBe('CustomLevel | walls: 2 | triggers: 4');
+  });
+
+  it('toggleCameraTriggers updates only trigger mesh visibility', () => {
+    document.body.innerHTML = '<canvas id="render-canvas"></canvas>';
+
+    const triggerMesh = {
+      metadata: { debugType: 'camera-trigger' },
+      isVisible: false,
+    };
+    const regularMesh = {
+      metadata: { debugType: 'other' },
+      isVisible: false,
+    };
+
+    const ui = new EditorUI({ meshes: [triggerMesh, regularMesh] } as never, {} as never);
+    ui.cameraTriggersCheckBox = document.createElement('input');
+
+    ui.cameraTriggersCheckBox.checked = true;
+    (ui as unknown as { toggleCameraTriggers: () => void }).toggleCameraTriggers();
+    expect(triggerMesh.isVisible).toBe(true);
+    expect(regularMesh.isVisible).toBe(false);
+
+    ui.cameraTriggersCheckBox.checked = false;
+    (ui as unknown as { toggleCameraTriggers: () => void }).toggleCameraTriggers();
+    expect(triggerMesh.isVisible).toBe(false);
+    expect(regularMesh.isVisible).toBe(false);
   });
 });

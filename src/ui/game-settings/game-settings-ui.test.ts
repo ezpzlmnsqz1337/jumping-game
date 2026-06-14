@@ -87,36 +87,6 @@ describe('GameSettingsUI', () => {
     expect(arcRotateCamera.restoreState).toHaveBeenCalledTimes(1);
   });
 
-  it('toggleCameraTriggers updates only trigger mesh visibility', async () => {
-    const { GameSettingsUI } = await import('./game-settings-ui');
-
-    const triggerMesh = {
-      metadata: { debugType: 'camera-trigger' },
-      isVisible: false,
-    };
-    const regularMesh = {
-      metadata: { debugType: 'other' },
-      isVisible: false,
-    };
-
-    const scene = {
-      meshes: [triggerMesh, regularMesh],
-    };
-
-    const ui = new GameSettingsUI(scene as never, { collisionEnabled: true } as never);
-    ui.cameraTriggersCheckBox = document.createElement('input');
-
-    ui.cameraTriggersCheckBox.checked = true;
-    ui.toggleCameraTriggers();
-    expect(triggerMesh.isVisible).toBe(true);
-    expect(regularMesh.isVisible).toBe(false);
-
-    ui.cameraTriggersCheckBox.checked = false;
-    ui.toggleCameraTriggers();
-    expect(triggerMesh.isVisible).toBe(false);
-    expect(regularMesh.isVisible).toBe(false);
-  });
-
   it('togglePlayerInfo delegates visibility to PlayerInfo UI', async () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameSettingsUI } = await import('./game-settings-ui');
@@ -170,32 +140,6 @@ describe('GameSettingsUI', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  it('toggleCameraTriggers safely ignores meshes without metadata', async () => {
-    const { GameSettingsUI } = await import('./game-settings-ui');
-
-    const triggerMesh = {
-      metadata: { debugType: 'camera-trigger' },
-      isVisible: false,
-    };
-    const noMetadataMesh = {
-      metadata: undefined,
-      isVisible: false,
-    };
-
-    const scene = {
-      meshes: [triggerMesh, noMetadataMesh],
-    };
-
-    const ui = new GameSettingsUI(scene as never, { collisionEnabled: true } as never);
-    ui.cameraTriggersCheckBox = document.createElement('input');
-    ui.cameraTriggersCheckBox.checked = true;
-
-    ui.toggleCameraTriggers();
-
-    expect(triggerMesh.isVisible).toBe(true);
-    expect(noMetadataMesh.isVisible).toBe(false);
-  });
-
   it('bindUI initializes checkboxes and wires click handlers', async () => {
     const { GameSettingsUI } = await import('./game-settings-ui');
 
@@ -206,7 +150,6 @@ describe('GameSettingsUI', () => {
       <input class="follow-camera-enabled" type="checkbox" />
       <input class="collissions-enabled" type="checkbox" />
       <input class="player-info-enabled" type="checkbox" />
-      <input class="camera-triggers-enabled" type="checkbox" />
       <div class="edit-mode-visibility">
         <input class="edit-mode-enabled-global" type="checkbox" />
       </div>
@@ -244,7 +187,6 @@ describe('GameSettingsUI', () => {
     const toggleFollowSpy = vi.spyOn(ui, 'toggleFollowCamera');
     const toggleCollissionsSpy = vi.spyOn(ui, 'toggleCollissions');
     const togglePlayerInfoSpy = vi.spyOn(ui, 'togglePlayerInfo');
-    const toggleCameraTriggersSpy = vi.spyOn(ui, 'toggleCameraTriggers');
     const toggleEditModeSpy = vi.spyOn(ui, 'toggleEditMode');
 
     await ui.bindUI();
@@ -253,21 +195,18 @@ describe('GameSettingsUI', () => {
     expect(ui.collissionsCheckBox.checked).toBe(true);
     expect(ui.playerInfoCheckBox.checked).toBe(true);
     expect(ui.rootElement).toBe(ui.gameSettingsDiv);
-    expect(toggleCameraTriggersSpy).toHaveBeenCalledTimes(1);
     expect(toggleEditModeSpy).toHaveBeenCalledTimes(1);
 
     ui.automaticCameraCheckBox.click();
     ui.followCameraCheckBox.click();
     ui.collissionsCheckBox.click();
     ui.playerInfoCheckBox.click();
-    ui.cameraTriggersCheckBox.click();
     ui.editModeCheckBox.click();
 
     expect(toggleAutomaticSpy).toHaveBeenCalled();
     expect(toggleFollowSpy).toHaveBeenCalled();
     expect(toggleCollissionsSpy).toHaveBeenCalled();
     expect(togglePlayerInfoSpy).toHaveBeenCalled();
-    expect(toggleCameraTriggersSpy).toHaveBeenCalledTimes(2);
     expect(toggleEditModeSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -280,7 +219,6 @@ describe('GameSettingsUI', () => {
       <input class="follow-camera-enabled" type="checkbox" />
       <input class="collissions-enabled" type="checkbox" />
       <input class="player-info-enabled" type="checkbox" />
-      <input class="camera-triggers-enabled" type="checkbox" />
       <div class="edit-mode-visibility">
         <input class="edit-mode-enabled-global" type="checkbox" />
       </div>
