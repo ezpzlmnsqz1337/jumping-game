@@ -25,6 +25,37 @@
   font-size: var(--font-size-ui-md);
 }
 
+.timer > div > .run-status,
+.timer > div > .connection-status {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-ui-sm);
+  font-weight: 600;
+}
+
+.timer > div > .run-status.state-ready {
+  color: var(--green);
+}
+
+.timer > div > .run-status.state-running {
+  color: var(--yellow);
+}
+
+.timer > div > .run-status.state-finished {
+  color: var(--blue);
+}
+
+.timer > div > .run-status.state-reset {
+  color: var(--orange);
+}
+
+.timer > div > .connection-status.state-online {
+  color: var(--green);
+}
+
+.timer > div > .connection-status.state-offline {
+  color: var(--red);
+}
+
 @media only screen and (max-width: 1000px) {
   .timer {
     padding: var(--space-lg);
@@ -38,6 +69,11 @@
   }
   
   .timer>div>.checkpoints {
+    font-size: var(--font-size-ui-xs);
+  }
+
+  .timer > div > .run-status,
+  .timer > div > .connection-status {
     font-size: var(--font-size-ui-xs);
   }
 }

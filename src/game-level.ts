@@ -115,6 +115,7 @@ export class GameLevel {
     this.timer.armRun();
     this.resetPlayerProgress(player);
     gameRoot.demoService.reset();
+    gameRoot.uiManager?.timerUI.showRunStatus('ready');
     return true;
   }
 
@@ -122,6 +123,7 @@ export class GameLevel {
     if (!this.timer?.startRun()) return false;
 
     gameRoot.demoService.startRecording(player);
+    gameRoot.uiManager?.timerUI.showRunStatus('running');
     return true;
   }
 
@@ -161,6 +163,7 @@ export class GameLevel {
 
     gameRoot.demoService.saveReplay(replay);
     gameRoot.uiManager?.timeTableUI.updateReplayMetadata(replay.metadata);
+    gameRoot.uiManager?.timerUI.showRunStatus('finished', replay.metadata.timeStr);
     if (this.scene) {
       gameRoot.demoService.playReplay(replay, this.scene);
     }
@@ -173,6 +176,7 @@ export class GameLevel {
     this.resetPlayerProgress(player);
     this.timer?.resetRun();
     gameRoot.demoService.reset();
+    gameRoot.uiManager?.timerUI.showRunStatus('reset');
 
     player.physics.body.disablePreStep = true;
     player.mesh.position = destination.clone();

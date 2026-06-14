@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TimerUI } from './timer-ui';
 
 type TimerPlayer = {
@@ -11,6 +11,14 @@ type TimerPlayer = {
 };
 
 describe('TimerUI', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('updateTime renders latest timer string', () => {
     const timer = { getTimeAsString: vi.fn(() => '00:10.500') };
     const player: TimerPlayer = {
@@ -75,5 +83,45 @@ describe('TimerUI', () => {
 
     ui.show(false);
     expect(ui.rootElement.style.display).toBe('none');
+  });
+
+  it('showRunStatus renders and auto-hides status message', () => {
+    const player: TimerPlayer = {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+    };
+    const ui = new TimerUI({} as never, player as never);
+    ui.runStatusDiv = document.createElement('div');
+
+    ui.showRunStatus('finished', '00:20.000');
+
+    expect(ui.runStatusDiv.innerText).toContain('Run finished: 00:20.000');
+    expect(ui.runStatusDiv.style.display).toBe('block');
+    expect(ui.runStatusDiv.className).toContain('state-finished');
+
+    vi.advanceTimersByTime(4000);
+    expect(ui.runStatusDiv.style.display).toBe('none');
+  });
+
+  it('showConnectionStatus keeps offline message visible', () => {
+    const player: TimerPlayer = {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+    };
+    const ui = new TimerUI({} as never, player as never);
+    ui.connectionStatusDiv = document.createElement('div');
+
+    ui.showConnectionStatus('offline', 'reconnecting');
+
+    expect(ui.connectionStatusDiv.innerText).toContain('Multiplayer disconnected (reconnecting)');
+    expect(ui.connectionStatusDiv.style.display).toBe('block');
+    expect(ui.connectionStatusDiv.className).toContain('state-offline');
+
+    vi.advanceTimersByTime(10000);
+    expect(ui.connectionStatusDiv.style.display).toBe('block');
   });
 });

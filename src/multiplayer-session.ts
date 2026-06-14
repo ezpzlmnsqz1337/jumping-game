@@ -97,6 +97,7 @@ export class MultiplayerSession {
         this.room = room;
         console.warn(room.sessionId, 'joined', room.name);
         this.localPlayerId = room.sessionId;
+        gameRoot.uiManager?.timerUI.showConnectionStatus('online', room.name);
 
         room.onStateChange(async state => {
           if (performance.now() - this.lastStateSyncAt < UPDATE_SPEED_MS) return;
@@ -119,10 +120,12 @@ export class MultiplayerSession {
 
         room.onError((_code, message) => {
           console.warn(room.sessionId, "couldn't join", room.name, message);
+          gameRoot.uiManager?.timerUI.showConnectionStatus('offline', 'join error');
         });
 
         room.onLeave(_code => {
           console.warn(room.sessionId, 'player left', room.name);
+          gameRoot.uiManager?.timerUI.showConnectionStatus('offline', 'session closed');
         });
 
         scene.onBeforeRenderObservable.add(() => {
@@ -133,6 +136,7 @@ export class MultiplayerSession {
       })
       .catch(e => {
         console.warn('JOIN ERROR', e);
+        gameRoot.uiManager?.timerUI.showConnectionStatus('offline', 'cannot connect');
       });
   }
 

@@ -26,6 +26,14 @@
   color: var(--color-brand-primary);
 }
 
+.lobby .onboarding-note {
+  text-align: center;
+  background-color: color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
+  padding: var(--space-lg) var(--space-2xl);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
+  font-size: var(--font-size-ui-md);
+}
+
 .lobby>.nickname {
   display: flex;
   flex-direction: column;
@@ -227,6 +235,10 @@
   .lobby .heading {
     font-size: var(--font-size-ui-3xl);
     color: var(--color-brand-primary);
+  }
+
+  .lobby .onboarding-note {
+    font-size: var(--font-size-ui-xs);
   }
 
   .lobby>.nickname>input {
