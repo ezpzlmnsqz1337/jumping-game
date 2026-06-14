@@ -64,4 +64,11 @@ describe('AbstractUI', () => {
     ui.show(false);
     expect(ui.rootElement.style.display).toBe('none');
   });
+
+  it('show does nothing when rootElement is not set', () => {
+    const ui = new TestUI({} as never, 'demo', {} as never);
+    // rootElement is undefined by default
+    expect(() => ui.show(true)).not.toThrow();
+    expect(() => ui.show(false)).not.toThrow();
+  });
 });

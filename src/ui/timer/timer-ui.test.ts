@@ -21,13 +21,25 @@ describe('TimerUI', () => {
     vi.useRealTimers();
   });
 
+  function createPlayer(overrides?: Partial<TimerPlayer>): TimerPlayer {
+    return {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+      ...overrides,
+    };
+  }
+
+  function createUi(player?: TimerPlayer) {
+    const ui = new TimerUI({} as never, (player ?? createPlayer()) as never);
+    return ui;
+  }
+
   it('updateTime renders latest timer string', () => {
     const timer = { getTimeAsString: vi.fn(() => '00:10.500') };
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: { timer },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const player = createPlayer({ level: { timer } });
+    const ui = createUi(player);
     ui.uiTimerDiv = document.createElement('div');
 
     ui.updateTime();
@@ -37,13 +49,7 @@ describe('TimerUI', () => {
   });
 
   it('updateCheckpoints applies singular/plural label', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.uiCheckpointsDiv = document.createElement('div');
 
     ui.updateCheckpoints(1);
@@ -54,13 +60,13 @@ describe('TimerUI', () => {
   });
 
   it('updateUI updates both timer and checkpoint count', () => {
-    const player: TimerPlayer = {
+    const player = createPlayer({
       checkpoints: [{}, {}],
       level: {
         timer: { getTimeAsString: () => '01:23.456' },
       },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    });
+    const ui = createUi(player);
     ui.uiTimerDiv = document.createElement('div');
     ui.uiCheckpointsDiv = document.createElement('div');
 
@@ -71,13 +77,7 @@ describe('TimerUI', () => {
   });
 
   it('show toggles timer root display using flex', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.rootElement = document.createElement('div');
 
     ui.show(true);
@@ -88,13 +88,7 @@ describe('TimerUI', () => {
   });
 
   it('showRunStatus renders and auto-hides status message', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.runStatusDiv = document.createElement('div');
 
     ui.showRunStatus('finished', '00:20.000');
@@ -108,13 +102,7 @@ describe('TimerUI', () => {
   });
 
   it('showConnectionStatus keeps offline message visible', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.connectionStatusDiv = document.createElement('div');
 
     ui.showConnectionStatus('offline', 'reconnecting');
@@ -128,13 +116,7 @@ describe('TimerUI', () => {
   });
 
   it('showRunStatus includes reset detail when provided', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.runStatusDiv = document.createElement('div');
 
     ui.showRunStatus('reset', 'teleport');
@@ -143,13 +125,7 @@ describe('TimerUI', () => {
   });
 
   it('updateUI hides connection status when multiplayer is disabled', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.uiTimerDiv = document.createElement('div');
     ui.uiCheckpointsDiv = document.createElement('div');
     ui.connectionStatusDiv = document.createElement('div');
@@ -162,13 +138,7 @@ describe('TimerUI', () => {
   });
 
   it('updateUI shows reconnecting state when multiplayer exists but room is unavailable', () => {
-    const player: TimerPlayer = {
-      checkpoints: [],
-      level: {
-        timer: { getTimeAsString: () => '00:00.000' },
-      },
-    };
-    const ui = new TimerUI({} as never, player as never);
+    const ui = createUi();
     ui.uiTimerDiv = document.createElement('div');
     ui.uiCheckpointsDiv = document.createElement('div');
     ui.connectionStatusDiv = document.createElement('div');

@@ -16,6 +16,11 @@ interface MockPlayer {
       setAngularVelocity: ReturnType<typeof vi.fn>;
     };
   };
+  level?: {
+    timer: {
+      getTimeAsString: ReturnType<typeof vi.fn>;
+    };
+  };
 }
 
 describe('GameLevel run transitions', () => {
@@ -64,19 +69,19 @@ describe('GameLevel run transitions', () => {
       lastCheckpointIndex: 4,
     } as MockPlayer;
 
-    expect(level.armRunFromStart(player as any)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
+    expect(level.armRunFromStart(player as never)).toBe(true);
     expect(level.timer.state).toBe('armed');
     expect(player.checkpoints).toEqual([]);
     expect(player.lastCheckpointIndex).toBe(0);
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('ready');
 
-    expect(level.startRunFromStart(player as any)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
+    expect(level.startRunFromStart(player as never)).toBe(true);
     expect(level.timer.state).toBe('running');
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledWith(player);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('running');
 
-    expect(level.startRunFromStart(player as any)).toBe(false); // eslint-disable-line @typescript-eslint/no-explicit-any
+    expect(level.startRunFromStart(player as never)).toBe(false);
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledTimes(1);
   });
 
@@ -152,6 +157,13 @@ describe('GameLevel run transitions', () => {
     );
   });
 
+  it('finishRun returns false when run was never started', () => {
+    const level = new GameLevel('test');
+    const player = { nickname: 'test', checkpoints: [] } as never;
+    expect(level.finishRun(player)).toBe(false);
+    expect(gameRoot.demoService.stopRecording).not.toHaveBeenCalled();
+  });
+
   it('resets and teleports the player deterministically', () => {
     const level = new GameLevel('test');
     level.timer = new LevelTimer();
@@ -173,7 +185,7 @@ describe('GameLevel run transitions', () => {
     } as MockPlayer;
     const destination = new BABYLON.Vector3(4, 5, 6);
 
-    expect(level.resetRunForTeleport(player as any, destination)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
+    expect(level.resetRunForTeleport(player as never, destination)).toBe(true);
     expect(level.timer.state).toBe('idle');
     expect(player.checkpoints).toEqual([]);
     expect(player.lastCheckpointIndex).toBe(0);

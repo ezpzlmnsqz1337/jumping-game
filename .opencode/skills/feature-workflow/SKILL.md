@@ -60,13 +60,20 @@ Phase 8: Synthesize & Create PR
 - After QA passes, a pull request is created with `gh pr create`
 - You do the final review and merge — the team never merges their own PRs
 
-## Tips
+## Testing Conventions
 
-- Be specific about what you want. "Add a speed-run leaderboard" is better than "Add leaderboard".
-- Mention which systems the feature touches (camera, physics, multiplayer, UI).
-- The feature-lead will track progress with todowrite. You can check the todo list to see where the team is.
-- You can interrupt and redirect at any point. Just tell the feature-lead what to adjust.
-- If a subagent's output isn't what you expected, ask the feature-lead to redo that phase.
+All tests must follow the conventions in `docs/agents/engineering.md` (section: Unit Testing Conventions).
+Key rules:
+- **S/S/R naming**: `Subject_scenario_expectedResult`
+- **One logical assertion per test** — split tests that verify multiple behaviors
+- **No test-as-documentation** — pure constant assertions belong in `docs/`, not test files
+- **Factory helpers** for common setup, not `beforeEach` bloat
+- **No `as never`** — use typed mock interfaces instead
+- **Fake timers** for time-dependent code, not real `setTimeout`
+
+The `@team-tester` subagent is responsible for writing and maintaining tests that follow these conventions.
+
+## Tips
 
 ## Example Prompts
 

@@ -77,3 +77,74 @@ describe('LevelTimer anti-cheat validation', () => {
     expect(result.valid).toBe(true);
   });
 });
+
+describe('LevelTimer state machine', () => {
+  it('armRun transitions from idle to armed', () => {
+    const timer = new LevelTimer();
+    expect(timer.state).toBe('idle');
+    expect(timer.armRun()).toBe(true);
+    expect(timer.state).toBe('armed');
+  });
+
+  it('armRun returns false when already running', () => {
+    const timer = new LevelTimer();
+    timer.state = 'running';
+    expect(timer.armRun()).toBe(false);
+    expect(timer.state).toBe('running');
+  });
+
+  it('startRun transitions from armed to running', () => {
+    const timer = new LevelTimer();
+    timer.armRun();
+    const result = timer.startRun();
+    expect(result).toBe(true);
+    expect(timer.state).toBe('running');
+    expect(timer.active).toBe(true);
+  });
+
+  it('startRun returns false when not armed', () => {
+    const timer = new LevelTimer();
+    expect(timer.state).toBe('idle');
+    expect(timer.startRun()).toBe(false);
+  });
+
+  it('startRun returns false when already running', () => {
+    const timer = new LevelTimer();
+    timer.state = 'running';
+    expect(timer.startRun()).toBe(false);
+  });
+
+  it('finishRun transitions from running to finished', () => {
+    const timer = new LevelTimer();
+    timer.state = 'running';
+    timer.startedAt = Date.now();
+    expect(timer.finishRun()).toBe(true);
+    expect(timer.state).toBe('finished');
+    expect(timer.active).toBe(false);
+  });
+
+  it('finishRun returns false when not running', () => {
+    const timer = new LevelTimer();
+    expect(timer.finishRun()).toBe(false);
+    expect(timer.state).toBe('idle');
+  });
+
+  it('resetRun transitions any state to idle', () => {
+    const timer = new LevelTimer();
+    timer.state = 'running';
+    timer.startedAt = 1000;
+    timer.finishedAt = 5000;
+    timer.resetRun();
+    expect(timer.state).toBe('idle');
+    expect(timer.active).toBe(false);
+    expect(timer.startedAt).toBe(0);
+    expect(timer.finishedAt).toBe(0);
+  });
+
+  it('getTime returns 0 when idle or armed', () => {
+    const timer = new LevelTimer();
+    expect(timer.state).toBe('idle');
+    expect(timer.getTime()).toBe(0);
+    expect(timer.getTimeAsString()).toBe('00:00.000');
+  });
+});
