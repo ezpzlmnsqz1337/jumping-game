@@ -6,7 +6,7 @@
 - Core loop: move, rotate, jump as a cube character and reach finish as fast as possible.
 - Timing logic: start trigger resets/starts run, end trigger stops run.
 - Extra systems: replay ghost (best run), multiplayer, chat, UI overlays, teleports, camera switching, sounds.
-- Status: playable, but several systems are intentionally experimental and partially broken (especially multiplayer physics and camera collision behavior).
+- Status: playable, with recent stabilization work completed for trigger/timer orchestration, remote-player interpolation, anti-cheat validation, and first-pass physics/camera robustness.
 
 ## Tech Stack
 

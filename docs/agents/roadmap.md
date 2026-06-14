@@ -1,50 +1,37 @@
 # High-Value Improvement Roadmap
 
-## Near-Term Implementation Plan
+## Recently Completed
 
-1. Centralize trigger and timer run-state transitions so start, end, and teleport behavior is deterministic.
-2. Add deterministic trigger tests for start/end/reset sequencing.
-3. Reduce client network chatter by throttling player-state sends and skipping unchanged snapshots.
+1. Trigger and timer reliability
+- Centralized run-state transitions through GameLevel orchestration methods.
+- Added anti-cheat sanity checks for impossible run times and invalid checkpoint counts.
+- Added deterministic trigger/timer unit coverage.
 
-Prioritize in this order unless user requests otherwise.
+2. Multiplayer smoothing
+- Added interpolation for remote player transforms to reduce visible jitter.
+- Improved update handling to reduce abrupt remote snaps.
 
-## 1) Multiplayer authority and smoothing
+3. Camera robustness (phase 1)
+- Added explicit automatic mode API for both follow and arc-rotate camera flows.
+- Kept wall-obstruction handling in follow camera.
 
-- Move to clearer server-authoritative state for player transforms.
-- Add interpolation/extrapolation to reduce jitter.
-- Keep local prediction minimal and reversible.
+4. Physics stability (phase 1)
+- Kept remote-player physics pre-step suspended for the entire interpolation window.
+- Added collision layer audit helpers and tests to detect contradictory mask setups.
 
-## 1) Trigger and timer reliability
+## Next Priorities
 
-- Centralize run-state transitions: idle -> running -> finished.
-- Enforce anti-cheat sanity checks for impossible times/paths.
-- Add deterministic trigger tests.
-
-## 2) Camera robustness
-
-- Add camera obstruction handling (raycast/shape-cast push-in).
-- Improve follow/manual mode handoff and defaults.
-
-## 3) Multiplayer authority and smoothing
-
-- Move to clearer server-authoritative state for player transforms.
-- Add interpolation/extrapolation to reduce jitter.
-- Keep local prediction minimal and reversible.
-
-## 4) Physics stability
-
-- Normalize fixed update cadence assumptions.
-- Audit collider layers/masks and remove contradictory combinations.
-- Reduce desync from direct transform writes on remote physics bodies.
-
-## 5) Replay/ghost quality
-
+1. Replay and ghost quality
 - Version and validate replay format.
-- Add fail-safe when replay data is missing/corrupt.
-- Store and surface metadata (player name, time, date, map/version).
+- Add fail-safe when replay data is missing or corrupt.
+- Store and surface metadata (player name, time, date, map, version).
 
-## 6) UX polish
+2. UX polish
+- Improve onboarding in lobby and settings flows.
+- Add clearer feedback for start, end, and teleport events.
+- Add clearer multiplayer connection and status indicators.
 
-- Improve onboarding in lobby/settings UI.
-- Better feedback for start/end/teleport events.
-- Add clearer multiplayer connection/status indicators.
+3. Multiplayer authority hardening (optional, deeper pass)
+- Move further toward server-authoritative transform resolution.
+- Add bounded extrapolation for packet gaps and lag spikes.
+- Keep local prediction minimal and reversible.

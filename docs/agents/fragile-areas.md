@@ -1,10 +1,10 @@
 # Known Fragile Areas
 
-- Multiplayer physics consistency and collision behavior are unstable.
-- Camera system can clip/wall-pass and does not robustly handle obstructions.
+- Multiplayer physics consistency and collision behavior are improved but still sensitive under lag spikes and packet gaps.
+- Camera system has better mode handoff controls, but edge-case clipping can still appear in dense geometry.
 - Player collision toggle in multiplayer is gameplay-useful but technically fragile.
 - Ghost replay/demo should be protected against invalid/incomplete recording data.
-- Trigger ordering (start/end/reset/teleport) can regress if event sequencing changes.
+- Trigger ordering (start/end/reset/teleport) is centralized, but can regress if new trigger paths bypass GameLevel transition methods.
 
 ## Level Editor
 
