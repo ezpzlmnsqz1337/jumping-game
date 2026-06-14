@@ -11,6 +11,12 @@
   padding: var(--space-sm);
 }
 
+.time-table > .replay-metadata {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-ui-sm);
+  color: var(--color-text-secondary);
+}
+
 @media only screen and (max-width: 1000px) {
   .time-table {
     left: 0;
@@ -26,5 +32,9 @@
   
   .time-table>ol>li {
     padding: var(--space-xxs);
+  }
+
+  .time-table > .replay-metadata {
+    font-size: var(--font-size-ui-xs);
   }
 }

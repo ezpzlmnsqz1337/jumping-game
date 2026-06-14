@@ -99,14 +99,15 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   }
 
   // demo
-  if (!localStorage.getItem('demo')) {
-    const demo = await fetch('assets/demo/map-record.json');
-    const demoJson = await demo.json();
-    localStorage.setItem('demo', JSON.stringify(demoJson));
-  }
-  const lastDemo = localStorage.getItem('demo');
-  if (lastDemo) {
-    setTimeout(() => gameRoot.demoService.playDemo(JSON.parse(lastDemo)), 1000);
+  const replay = await gameRoot.demoService.loadOrCreateStoredReplay(
+    'assets/demo/map-record.json',
+    gameRoot.level.name
+  );
+  if (replay) {
+    gameRoot.uiManager?.timeTableUI.updateReplayMetadata(replay.metadata);
+    setTimeout(() => {
+      void gameRoot.demoService.playReplay(replay, scene);
+    }, 1000);
   }
 
   return scene;

@@ -148,7 +148,22 @@ export class GameLevel {
       ?.play();
 
     const demo = gameRoot.demoService.stopRecording();
-    gameRoot.demoService.playDemo(demo);
+    const replay = gameRoot.demoService.createReplayPayload(demo, {
+      playerName: player.nickname,
+      timeMs: this.timer.getTime(),
+      timeStr: this.timer.getTimeAsString(),
+      completedAt: new Date().toISOString(),
+      mapName: this.name,
+      source: 'local',
+    });
+
+    if (!replay) return true;
+
+    gameRoot.demoService.saveReplay(replay);
+    gameRoot.uiManager?.timeTableUI.updateReplayMetadata(replay.metadata);
+    if (this.scene) {
+      gameRoot.demoService.playReplay(replay, this.scene);
+    }
     return true;
   }
 

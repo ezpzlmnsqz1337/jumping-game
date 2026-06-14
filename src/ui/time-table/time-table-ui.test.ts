@@ -80,4 +80,26 @@ describe('TimeTableUI', () => {
     expect(items).toHaveLength(2);
     expect(ui.noOfTimes).toBe(2);
   });
+
+  it('renders replay metadata details', () => {
+    const ui = new TimeTableUI({} as never, {} as never);
+    ui.replayMetadataDiv = document.createElement('div');
+
+    ui.updateReplayMetadata({
+      playerName: 'runner',
+      timeMs: 45234,
+      timeStr: '00:45.234',
+      completedAt: '2026-01-01T00:00:00.000Z',
+      mapName: 'level1',
+      replayVersion: 1,
+      source: 'local',
+    });
+
+    expect(ui.replayMetadataDiv.innerText).toContain('Ghost: runner');
+    expect(ui.replayMetadataDiv.innerText).toContain('Time: 00:45.234');
+    expect(ui.replayMetadataDiv.innerText).toContain('Map: level1');
+    expect(ui.replayMetadataDiv.innerText).toContain('Source: Local record');
+    expect(ui.replayMetadataDiv.innerText).toContain('Replay v1');
+    expect(ui.replayMetadataDiv.style.display).toBe('block');
+  });
 });

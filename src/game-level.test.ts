@@ -13,7 +13,9 @@ describe('GameLevel run transitions', () => {
       reset: vi.fn(),
       startRecording: vi.fn(),
       stopRecording: vi.fn(() => [{ frame: 1 }]),
-      playDemo: vi.fn(),
+      createReplayPayload: vi.fn(() => ({ version: 1, frames: [{ frame: 1 }] })),
+      saveReplay: vi.fn(),
+      playReplay: vi.fn(),
     } as never;
     gameRoot.multiplayer = {
       sendTimeToServer: vi.fn(),
@@ -75,7 +77,15 @@ describe('GameLevel run transitions', () => {
     );
     expect(sound.play).toHaveBeenCalledTimes(1);
     expect(gameRoot.demoService.stopRecording).toHaveBeenCalledTimes(1);
-    expect(gameRoot.demoService.playDemo).toHaveBeenCalledWith([{ frame: 1 }]);
+    expect(gameRoot.demoService.createReplayPayload).toHaveBeenCalledWith(
+      [{ frame: 1 }],
+      expect.objectContaining({
+        playerName: 'runner',
+        mapName: 'test',
+      })
+    );
+    expect(gameRoot.demoService.saveReplay).toHaveBeenCalledTimes(1);
+    expect(gameRoot.demoService.playReplay).toHaveBeenCalledTimes(1);
 
     expect(level.finishRun(player)).toBe(false);
     expect(gameRoot.multiplayer?.sendTimeToServer).toHaveBeenCalledTimes(1);
