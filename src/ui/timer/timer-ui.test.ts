@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TimerUI } from './timer-ui';
+import gameRoot from '../../game-root';
 
 type TimerPlayer = {
   checkpoints: unknown[];
@@ -16,6 +17,7 @@ describe('TimerUI', () => {
   });
 
   afterEach(() => {
+    gameRoot.multiplayer = undefined;
     vi.useRealTimers();
   });
 
@@ -122,6 +124,60 @@ describe('TimerUI', () => {
     expect(ui.connectionStatusDiv.className).toContain('state-offline');
 
     vi.advanceTimersByTime(10000);
+    expect(ui.connectionStatusDiv.style.display).toBe('block');
+  });
+
+  it('showRunStatus includes reset detail when provided', () => {
+    const player: TimerPlayer = {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+    };
+    const ui = new TimerUI({} as never, player as never);
+    ui.runStatusDiv = document.createElement('div');
+
+    ui.showRunStatus('reset', 'teleport');
+
+    expect(ui.runStatusDiv.innerText).toBe('Run reset (teleport)');
+  });
+
+  it('updateUI hides connection status when multiplayer is disabled', () => {
+    const player: TimerPlayer = {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+    };
+    const ui = new TimerUI({} as never, player as never);
+    ui.uiTimerDiv = document.createElement('div');
+    ui.uiCheckpointsDiv = document.createElement('div');
+    ui.connectionStatusDiv = document.createElement('div');
+    ui.connectionStatusDiv.style.display = 'block';
+
+    gameRoot.multiplayer = undefined;
+    ui.updateUI();
+
+    expect(ui.connectionStatusDiv.style.display).toBe('none');
+  });
+
+  it('updateUI shows reconnecting state when multiplayer exists but room is unavailable', () => {
+    const player: TimerPlayer = {
+      checkpoints: [],
+      level: {
+        timer: { getTimeAsString: () => '00:00.000' },
+      },
+    };
+    const ui = new TimerUI({} as never, player as never);
+    ui.uiTimerDiv = document.createElement('div');
+    ui.uiCheckpointsDiv = document.createElement('div');
+    ui.connectionStatusDiv = document.createElement('div');
+    ui.connectionStatusDiv.style.display = 'none';
+
+    gameRoot.multiplayer = {} as never;
+    ui.updateUI();
+
+    expect(ui.connectionStatusDiv.innerText).toContain('Multiplayer disconnected (reconnecting)');
     expect(ui.connectionStatusDiv.style.display).toBe('block');
   });
 });

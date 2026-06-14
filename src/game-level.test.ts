@@ -7,24 +7,38 @@ import { LevelTimer } from './level-timer';
 describe('GameLevel run transitions', () => {
   const originalDemoService = gameRoot.demoService;
   const originalMultiplayer = gameRoot.multiplayer;
+  const originalUiManager = gameRoot.uiManager;
 
   beforeEach(() => {
     gameRoot.demoService = {
       reset: vi.fn(),
       startRecording: vi.fn(),
       stopRecording: vi.fn(() => [{ frame: 1 }]),
-      createReplayPayload: vi.fn(() => ({ version: 1, frames: [{ frame: 1 }] })),
+      createReplayPayload: vi.fn(() => ({
+        version: 1,
+        frames: [{ frame: 1 }],
+        metadata: { timeStr: '00:30.000' },
+      })),
       saveReplay: vi.fn(),
       playReplay: vi.fn(),
     } as never;
     gameRoot.multiplayer = {
       sendTimeToServer: vi.fn(),
     } as never;
+    gameRoot.uiManager = {
+      timerUI: {
+        showRunStatus: vi.fn(),
+      },
+      timeTableUI: {
+        updateReplayMetadata: vi.fn(),
+      },
+    } as never;
   });
 
   afterEach(() => {
     gameRoot.demoService = originalDemoService;
     gameRoot.multiplayer = originalMultiplayer;
+    gameRoot.uiManager = originalUiManager;
     vi.restoreAllMocks();
   });
 
@@ -41,10 +55,12 @@ describe('GameLevel run transitions', () => {
     expect(player.checkpoints).toEqual([]);
     expect(player.lastCheckpointIndex).toBe(0);
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);
+    expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('ready');
 
     expect(level.startRunFromStart(player)).toBe(true);
     expect(level.timer.state).toBe('running');
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledWith(player);
+    expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('running');
 
     expect(level.startRunFromStart(player)).toBe(false);
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledTimes(1);
@@ -85,6 +101,11 @@ describe('GameLevel run transitions', () => {
       })
     );
     expect(gameRoot.demoService.saveReplay).toHaveBeenCalledTimes(1);
+    expect(gameRoot.uiManager?.timeTableUI.updateReplayMetadata).toHaveBeenCalledTimes(1);
+    expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith(
+      'finished',
+      expect.any(String)
+    );
     expect(gameRoot.demoService.playReplay).toHaveBeenCalledTimes(1);
 
     expect(level.finishRun(player)).toBe(false);
@@ -111,6 +132,10 @@ describe('GameLevel run transitions', () => {
     expect(level.finishRun(player)).toBe(false);
     expect(level.timer.state).toBe('idle'); // Run should be reset
     expect(gameRoot.multiplayer?.sendTimeToServer).not.toHaveBeenCalled();
+    expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith(
+      'reset',
+      'Run too short (likely invalid)'
+    );
   });
 
   it('resets and teleports the player deterministically', () => {
@@ -142,5 +167,6 @@ describe('GameLevel run transitions', () => {
     expect(setLinearVelocity).toHaveBeenCalledWith(BABYLON.Vector3.Zero());
     expect(setAngularVelocity).toHaveBeenCalledWith(BABYLON.Vector3.Zero());
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);
+    expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('reset', 'teleport');
   });
 });

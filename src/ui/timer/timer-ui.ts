@@ -11,7 +11,6 @@ export class TimerUI extends AbstractUI {
   connectionStatusDiv!: HTMLDivElement;
 
   runStatusTimeout: ReturnType<typeof setTimeout> | null = null;
-  connectionStatusTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'timer', player);
@@ -50,8 +49,8 @@ export class TimerUI extends AbstractUI {
         : status === 'running'
           ? 'Run started'
           : status === 'finished'
-            ? `Run finished${detail ? `: ${detail}` : ''}`
-            : 'Run reset';
+          ? `Run finished${detail ? `: ${detail}` : ''}`
+            : `Run reset${detail ? ` (${detail})` : ''}`;
 
     this.runStatusDiv.innerText = text;
     this.runStatusDiv.className = `run-status state-${status}`;
@@ -74,19 +73,19 @@ export class TimerUI extends AbstractUI {
     this.connectionStatusDiv.innerText = text;
     this.connectionStatusDiv.className = `connection-status state-${status}`;
     this.connectionStatusDiv.style.display = 'block';
-
-    if (status === 'online') {
-      if (this.connectionStatusTimeout) clearTimeout(this.connectionStatusTimeout);
-      this.connectionStatusTimeout = setTimeout(() => {
-        if (!this.connectionStatusDiv) return;
-        this.connectionStatusDiv.style.display = 'none';
-      }, 3000);
-    }
   }
 
   updateUI(): void {
     this.updateTime();
     this.updateCheckpoints(this.player.checkpoints.length);
+
+    const hasMultiplayer = Boolean(gameRoot.multiplayer);
+    if (!hasMultiplayer) {
+      if (this.connectionStatusDiv) {
+        this.connectionStatusDiv.style.display = 'none';
+      }
+      return;
+    }
 
     const mpOnline = Boolean(gameRoot.multiplayer?.room);
     if (!mpOnline && this.connectionStatusDiv?.style.display === 'none') {

@@ -18,6 +18,15 @@
   gap: 1rem;
 }
 
+.game-settings > .settings-note {
+  display: block;
+  font-size: var(--font-size-ui-sm);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
 @media only screen and (max-width: 1000px) {
   .game-settings {
     display: block;
@@ -29,5 +38,9 @@
   
   .game-settings>div {
     gap: 0.5rem;
+  }
+
+  .game-settings > .settings-note {
+    font-size: var(--font-size-ui-xs);
   }
 }

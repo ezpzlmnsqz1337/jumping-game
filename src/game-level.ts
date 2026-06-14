@@ -135,6 +135,7 @@ export class GameLevel {
     if (!validation.valid) {
       console.warn('Run rejected:', validation.reason);
       this.timer.resetRun();
+      gameRoot.uiManager?.timerUI.showRunStatus('reset', validation.reason);
       return false;
     }
 
@@ -176,7 +177,7 @@ export class GameLevel {
     this.resetPlayerProgress(player);
     this.timer?.resetRun();
     gameRoot.demoService.reset();
-    gameRoot.uiManager?.timerUI.showRunStatus('reset');
+    gameRoot.uiManager?.timerUI.showRunStatus('reset', 'teleport');
 
     player.physics.body.disablePreStep = true;
     player.mesh.position = destination.clone();

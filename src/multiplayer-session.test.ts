@@ -24,7 +24,6 @@ describe('MultiplayerSession interpolation', () => {
     session = new MultiplayerSession(mockScene, mockPlayer, []);
     session.localPlayerId = 'local-id';
   });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
