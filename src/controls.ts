@@ -200,6 +200,10 @@ export class GameControls {
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;
       this.translateFreeCameraWithPlayer(player, previousPlayerPosition);
+
+      if (gameRoot.multiplayer) {
+        gameRoot.multiplayer.pendingTeleportFlag = true;
+      }
     }
   }
 
@@ -214,6 +218,10 @@ export class GameControls {
     player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
     player.physics.body.disablePreStep = false;
     this.translateFreeCameraWithPlayer(player, previousPlayerPosition);
+
+    if (gameRoot.multiplayer) {
+      gameRoot.multiplayer.pendingTeleportFlag = true;
+    }
   }
 
   private translateFreeCameraWithPlayer(

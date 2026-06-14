@@ -42,7 +42,7 @@ describe('MultiplayerSession interpolation', () => {
           status: 'playing',
           nickname: 'alice',
           color: 'blue',
-          collissionEnabled: true,
+          collisionEnabled: true,
           interpolationDuration: 33,
         },
       ],

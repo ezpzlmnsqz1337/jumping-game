@@ -179,6 +179,10 @@ export class GameLevel {
     gameRoot.demoService.reset();
     gameRoot.uiManager?.timerUI.showRunStatus('reset', 'teleport');
 
+    if (gameRoot.multiplayer) {
+      gameRoot.multiplayer.pendingTeleportFlag = true;
+    }
+
     player.physics.body.disablePreStep = true;
     player.mesh.position = destination.clone();
     player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());

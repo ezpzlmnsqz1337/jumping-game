@@ -28,7 +28,7 @@ export class PlayerEntity extends GameEntity {
   lastCheckpointIndex = 0;
   color = 'blue';
   status: PlayerStatus = 'in_lobby';
-  collissionEnabled = true;
+  collisionEnabled = true;
 
   constructor(
     nickname: string = 'player',
@@ -71,7 +71,7 @@ export class PlayerEntity extends GameEntity {
     this.changeNickname(this.nickname);
 
     this.physics.shape.filterMembershipMask = FILTER_GROUP_PLAYER;
-    const playerMask = this.collissionEnabled
+    const playerMask = this.collisionEnabled
       ? FILTER_MASK_PLAYER_WITH_COLLISSIONS
       : FILTER_MASK_PLAYER_NO_COLLISSIONS;
     this.physics.shape.filterCollideMask = playerMask;

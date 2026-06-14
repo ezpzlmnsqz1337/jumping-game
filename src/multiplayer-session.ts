@@ -24,7 +24,8 @@ interface PlayerInfoMessage {
   nickname: string;
   color: string;
   status: PlayerStatus;
-  collissionEnabled: boolean;
+  collisionEnabled: boolean;
+  teleported?: boolean;
 }
 
 interface Position {
@@ -59,7 +60,7 @@ interface PlayerInfo {
   mesh?: BABYLON.Mesh;
   status: PlayerStatus;
   color?: string;
-  collissionEnabled?: boolean;
+  collisionEnabled?: boolean;
   targetPosition?: BABYLON.Vector3;
   targetRotation?: BABYLON.Quaternion;
   interpolationStartTime?: number;
@@ -94,6 +95,7 @@ export class MultiplayerSession {
   lastStateSyncAt = performance.now();
   lastPlayerInfoSentAt = 0;
   lastPlayerInfoSignature = '';
+  pendingTeleportFlag = false;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity, _objects: BABYLON.Mesh[]) {
     this.scene = scene;
@@ -119,6 +121,10 @@ export class MultiplayerSession {
 
         room.onMessage('player:disconnected', message => {
           this.removePlayer(message);
+        });
+
+        room.onMessage('player:correction', message => {
+          this.handleServerCorrection(message);
         });
 
         room.onMessage('chat:update', message => {
@@ -174,7 +180,7 @@ export class MultiplayerSession {
         player.status = info.status;
         player.nickname = nickname;
         player.color = color;
-        player.collissionEnabled = info.collissionEnabled;
+        player.collisionEnabled = info.collisionEnabled;
 
         // create mesh for another player if player mesh doesn't exist
         if (!player.mesh) {
@@ -219,7 +225,7 @@ export class MultiplayerSession {
         }
 
         // collissions toggle
-        const shouldHaveCollission = this.player.collissionEnabled && player.collissionEnabled;
+        const shouldHaveCollission = this.player.collisionEnabled && player.collisionEnabled;
         player.mesh.getChildMeshes().forEach(x => {
           if (!x.name.includes('player')) return;
           const material = x.material as BABYLON.PBRMaterial;
@@ -409,7 +415,7 @@ export class MultiplayerSession {
 
   getPlayerInfoMessage(): PlayerInfoMessage {
     const mesh = this.player.mesh as BABYLON.Mesh;
-    return {
+    const msg: PlayerInfoMessage = {
       position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
       rotation: {
         x: mesh.rotationQuaternion?.x ?? 0,
@@ -420,12 +426,19 @@ export class MultiplayerSession {
       nickname: this.player.nickname,
       color: this.player.color,
       status: this.player.status as PlayerStatus,
-      collissionEnabled: this.player.collissionEnabled,
+      collisionEnabled: this.player.collisionEnabled,
     };
+
+    if (this.pendingTeleportFlag) {
+      msg.teleported = true;
+      this.pendingTeleportFlag = false;
+    }
+
+    return msg;
   }
 
   getPlayerInfoSignature(message: PlayerInfoMessage) {
-    const { position, rotation, nickname, color, status, collissionEnabled } = message;
+    const { position, rotation, nickname, color, status, collisionEnabled, teleported } = message;
     return [
       position.x,
       position.y,
@@ -437,8 +450,34 @@ export class MultiplayerSession {
       nickname,
       color,
       status,
-      collissionEnabled ? '1' : '0',
+      collisionEnabled ? '1' : '0',
+      teleported ? '1' : '0'
     ].join('|');
+  }
+
+  handleServerCorrection(message: { position: Position; rotation: Rotation }) {
+    if (!this.player.mesh || !this.player.physics) return;
+    
+    // Snap local player back to server-approved transform
+    this.player.mesh.position = new BABYLON.Vector3(
+      message.position.x,
+      message.position.y,
+      message.position.z
+    );
+    this.player.mesh.rotationQuaternion = new BABYLON.Quaternion(
+      message.rotation.x,
+      message.rotation.y,
+      message.rotation.z,
+      message.rotation.w
+    );
+    
+    // Kill any invalid momentum
+    this.player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
+    this.player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
+
+    // Force an immediate info update so the server knows we accepted the correction
+    this.lastPlayerInfoSentAt = 0;
+    this.maybeSendPlayerInfo();
   }
 
   async createMpPlayer(scene: BABYLON.Scene, nickname: string, color?: string) {
@@ -490,11 +529,11 @@ export class MultiplayerSession {
 
   toggleCollissions() {
     if (!this.player.mesh) return;
-    this.player.collissionEnabled = !this.player.collissionEnabled;
+    this.player.collisionEnabled = !this.player.collisionEnabled;
     // player mask
     const body = this.player.mesh.physicsBody;
 
-    const playerMask = this.player.collissionEnabled
+    const playerMask = this.player.collisionEnabled
       ? FILTER_MASK_PLAYER_WITH_COLLISSIONS
       : FILTER_MASK_PLAYER_NO_COLLISSIONS;
 

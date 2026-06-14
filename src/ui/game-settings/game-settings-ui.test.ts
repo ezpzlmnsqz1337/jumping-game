@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type SettingsPlayer = {
-  collissionEnabled: boolean;
+  collisionEnabled: boolean;
 };
 
 type SettingsCamera = {
@@ -27,7 +27,7 @@ describe('GameSettingsUI', () => {
     };
 
     const scene = { activeCamera };
-    const player: SettingsPlayer = { collissionEnabled: true };
+    const player: SettingsPlayer = { collisionEnabled: true };
     const ui = new GameSettingsUI(scene as never, player as never);
     ui.automaticCameraCheckBox = document.createElement('input');
 
@@ -64,7 +64,7 @@ describe('GameSettingsUI', () => {
             : null,
     };
 
-    const ui = new GameSettingsUI(scene as never, { collissionEnabled: true } as never);
+    const ui = new GameSettingsUI(scene as never, { collisionEnabled: true } as never);
     ui.followCameraCheckBox = document.createElement('input');
     ui.automaticCameraCheckBox = document.createElement('input');
 
@@ -103,7 +103,7 @@ describe('GameSettingsUI', () => {
       meshes: [triggerMesh, regularMesh],
     };
 
-    const ui = new GameSettingsUI(scene as never, { collissionEnabled: true } as never);
+    const ui = new GameSettingsUI(scene as never, { collisionEnabled: true } as never);
     ui.cameraTriggersCheckBox = document.createElement('input');
 
     ui.cameraTriggersCheckBox.checked = true;
@@ -126,7 +126,7 @@ describe('GameSettingsUI', () => {
       playerInfoUI: { show },
     } as never;
 
-    const ui = new GameSettingsUI({} as never, { collissionEnabled: true } as never);
+    const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
     ui.playerInfoCheckBox = document.createElement('input');
 
     ui.playerInfoCheckBox.checked = true;
@@ -145,7 +145,7 @@ describe('GameSettingsUI', () => {
     const toggleCollissions = vi.fn();
     gameRoot.multiplayer = { toggleCollissions } as never;
 
-    const player = { collissionEnabled: false } as SettingsPlayer;
+    const player = { collisionEnabled: false } as SettingsPlayer;
     const ui = new GameSettingsUI({} as never, player as never);
     ui.collissionsCheckBox = document.createElement('input');
 
@@ -158,7 +158,7 @@ describe('GameSettingsUI', () => {
   it('toggleEditMode dispatches editor edit mode event', async () => {
     const { GameSettingsUI } = await import('./game-settings-ui');
 
-    const ui = new GameSettingsUI({} as never, { collissionEnabled: true } as never);
+    const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
     ui.editModeCheckBox = document.createElement('input');
     ui.editModeCheckBox.checked = false;
 
@@ -186,7 +186,7 @@ describe('GameSettingsUI', () => {
       meshes: [triggerMesh, noMetadataMesh],
     };
 
-    const ui = new GameSettingsUI(scene as never, { collissionEnabled: true } as never);
+    const ui = new GameSettingsUI(scene as never, { collisionEnabled: true } as never);
     ui.cameraTriggersCheckBox = document.createElement('input');
     ui.cameraTriggersCheckBox.checked = true;
 
@@ -232,7 +232,7 @@ describe('GameSettingsUI', () => {
       meshes: [],
     };
 
-    const player = { collissionEnabled: true } as SettingsPlayer;
+    const player = { collisionEnabled: true } as SettingsPlayer;
     const ui = new GameSettingsUI(scene as never, player as never);
 
     ui.loadCss = vi.fn();

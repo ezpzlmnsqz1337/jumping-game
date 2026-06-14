@@ -18,7 +18,7 @@ export class Player extends Schema {
   @type(Rotation) rotation: Rotation = new Rotation();
   @type('string') status: string = 'in_lobby';
   @type('string') color: string = 'blue';
-  @type('boolean') collissionEnabled: boolean = true;
+  @type('boolean') collisionEnabled: boolean = true;
   @type('string') nickname: string = 'player';
 }
 

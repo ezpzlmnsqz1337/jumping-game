@@ -7,6 +7,7 @@ const EventType = Object.freeze({
   PLAYER_CONNECTED: 'player:connected',
   PLAYER_DISCONNECTED: 'player:disconnected',
   PLAYER_INFO: 'player:info',
+  PLAYER_CORRECTION: 'player:correction',
   PLAYER_ID: 'player:id',
   GAME_INFO: 'game:info',
   ADD_TIME: 'add:time',
@@ -15,8 +16,14 @@ const EventType = Object.freeze({
   OBJECTS_INFO: 'objects:info',
 });
 
+// Maximum allowed speed in units per second before server rejects update
+const MAX_ALLOWED_SPEED = 250;
+const MAX_TELEPORT_RATE_MS = 1000;
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
+  playerLastUpdate: Map<string, number> = new Map();
+  playerLastTeleport: Map<string, number> = new Map();
 
   onCreate(_options: Record<string, unknown>) {
     this.setState(new MyRoomState());
@@ -62,7 +69,7 @@ export class MyRoom extends Room<MyRoomState> {
     );
 
     this.onMessage(EventType.PLAYER_INFO, (client, playerInfo) => {
-      this.updatePlayerInfo(client.sessionId, playerInfo);
+      this.updatePlayerInfo(client, playerInfo);
     });
 
     this.onMessage(EventType.OBJECTS_INFO, (_client, _message) => {});
@@ -83,6 +90,7 @@ export class MyRoom extends Room<MyRoomState> {
     // place player in the map of players by its sessionId
     // (client.sessionId is unique per connection!)
     this.state.players.set(client.sessionId, player);
+    this.playerLastUpdate.set(client.sessionId, Date.now());
     // emit essage to chat
     this.broadCastServerMessage(`Player connected.`);
   }
@@ -91,6 +99,8 @@ export class MyRoom extends Room<MyRoomState> {
     const playerName = this.state.players.get(client.sessionId).nickname;
     // remove this player from server
     this.state.players.delete(client.sessionId);
+    this.playerLastUpdate.delete(client.sessionId);
+    this.playerLastTeleport.delete(client.sessionId);
     // emit a message to all players to remove this player
     this.broadcast(EventType.PLAYER_DISCONNECTED, client.sessionId);
     // emit essage to chat
@@ -101,8 +111,44 @@ export class MyRoom extends Room<MyRoomState> {
     console.warn('room', this.roomId, 'disposing...');
   }
 
-  updatePlayerInfo(playerId: string, playerInfo: Player) {
+  updatePlayerInfo(client: Client, playerInfo: Player & { teleported?: boolean }) {
+    const playerId = client.sessionId;
     const player = this.state.players.get(playerId);
+    if (!player) return;
+
+    const now = Date.now();
+    const lastUpdateAt = this.playerLastUpdate.get(playerId) || now;
+    // Set a minimum delta time to avoid extremely large speed calculations from sub-millisecond deltas
+    const deltaTime = Math.max(0.016, (now - lastUpdateAt) / 1000); // minimum 16ms
+    this.playerLastUpdate.set(playerId, now);
+
+    // Calculate distance moved
+    const dx = player.position.x - playerInfo.position.x;
+    const dy = player.position.y - playerInfo.position.y;
+    const dz = player.position.z - playerInfo.position.z;
+    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    const speed = distance / deltaTime;
+
+    // Handle teleport flag from client
+    let isTeleport = false;
+    if (playerInfo.teleported) {
+      const lastTeleportAt = this.playerLastTeleport.get(playerId) || 0;
+      if (now - lastTeleportAt > MAX_TELEPORT_RATE_MS) {
+        isTeleport = true;
+        this.playerLastTeleport.set(playerId, now);
+      }
+    }
+
+    // Server authoritative speed validation
+    if (!isTeleport && distance > 0.1 && speed > MAX_ALLOWED_SPEED) {
+      console.warn(`[Correction] Player ${playerId} moved too fast (${speed.toFixed(2)} u/s). Rubber-banding to last valid position.`);
+      client.send(EventType.PLAYER_CORRECTION, {
+        position: { x: player.position.x, y: player.position.y, z: player.position.z },
+        rotation: { x: player.rotation.x, y: player.rotation.y, z: player.rotation.z, w: player.rotation.w }
+      });
+      return; // Reject the update
+    }
+
     player.position.x = playerInfo.position.x;
     player.position.y = playerInfo.position.y;
     player.position.z = playerInfo.position.z;
@@ -113,7 +159,7 @@ export class MyRoom extends Room<MyRoomState> {
     player.rotation.w = playerInfo.rotation.w;
 
     player.nickname = playerInfo.nickname;
-    player.collissionEnabled = playerInfo.collissionEnabled;
+    player.collisionEnabled = playerInfo.collisionEnabled;
     player.color = playerInfo.color;
     player.status = playerInfo.status;
   }

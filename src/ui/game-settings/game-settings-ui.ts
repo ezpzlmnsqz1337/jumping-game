@@ -46,7 +46,7 @@ export class GameSettingsUI extends AbstractUI {
 
   toggleCollissions() {
     gameRoot.multiplayer?.toggleCollissions();
-    this.collissionsCheckBox.checked = this.player.collissionEnabled;
+    this.collissionsCheckBox.checked = this.player.collisionEnabled;
     renderingCanvas.focus();
   }
 
@@ -106,7 +106,7 @@ export class GameSettingsUI extends AbstractUI {
       this.toggleFollowCamera();
     });
 
-    this.collissionsCheckBox.checked = this.player.collissionEnabled;
+    this.collissionsCheckBox.checked = this.player.collisionEnabled;
 
     this.collissionsCheckBox.addEventListener('click', () => {
       this.toggleCollissions();

@@ -30,17 +30,17 @@
 - Added explicit start/end/teleport run-status feedback in timer UI.
 - Added multiplayer connection status indicators for connect/disconnect/reconnect states.
 
+7. Multiplayer authority hardening
+- Moved further toward server-authoritative transform resolution with distance and speed validation.
+- Kept local prediction minimal and capped. Added client correction via rubber-banding when cheating or severe desync occurs.
+- Implemented rate-limited teleport flags to allow legitimate instant movement.
+
 ## Next Priorities
 
-1. Multiplayer authority hardening (optional, deeper pass)
-- Move further toward server-authoritative transform resolution.
-- Extend bounded extrapolation pass with stronger server correction policies.
-- Keep local prediction minimal, reversible, and capped under prolonged packet loss.
-
-2. UX polish (phase 2)
+1. UX polish (phase 2)
 - Tune message timing/priority to reduce overlap between timer, connection, and chat surfaces.
 - Add optional toast/sound mapping for key state transitions.
 
-3. Replay and ghost quality (phase 2)
+2. Replay and ghost quality (phase 2)
 - Consider separate local-best vs bundled-map-record storage slots.
 - Add explicit migration telemetry/debug counters for replay upgrades.

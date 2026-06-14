@@ -64,15 +64,17 @@ describe("MyRoom unit behavior", () => {
     assert.strictEqual(room.state.times[2].nickname, "A");
   });
 
-  it("updates player transform and profile", () => {
+  it("updates player transform and profile within speed limit", () => {
     const room = new MyRoom();
     room.setState(new MyRoomState());
 
     const existing = new Player();
     room.state.players.set("p1", existing);
+    room.playerLastUpdate.set("p1", Date.now() - 100); // 100ms ago
 
     const incoming = new Player();
-    incoming.position.x = 1;
+    // Move 10 units in 0.1 seconds = 100 units/second (under 250 units/second limit)
+    incoming.position.x = 10;
     incoming.position.y = 2;
     incoming.position.z = 3;
     incoming.rotation.x = 4;
@@ -80,14 +82,14 @@ describe("MyRoom unit behavior", () => {
     incoming.rotation.z = 6;
     incoming.rotation.w = 7;
     incoming.nickname = "runner";
-    incoming.collissionEnabled = false;
+    incoming.collisionEnabled = false;
     incoming.color = "red";
     incoming.status = "in_game";
 
-    room.updatePlayerInfo("p1", incoming);
+    room.updatePlayerInfo({ sessionId: "p1", send: () => {} } as never, incoming);
 
     const updated = room.state.players.get("p1");
-    assert.strictEqual(updated.position.x, 1);
+    assert.strictEqual(updated.position.x, 10);
     assert.strictEqual(updated.position.y, 2);
     assert.strictEqual(updated.position.z, 3);
     assert.strictEqual(updated.rotation.x, 4);
@@ -95,9 +97,72 @@ describe("MyRoom unit behavior", () => {
     assert.strictEqual(updated.rotation.z, 6);
     assert.strictEqual(updated.rotation.w, 7);
     assert.strictEqual(updated.nickname, "runner");
-    assert.strictEqual(updated.collissionEnabled, false);
+    assert.strictEqual(updated.collisionEnabled, false);
     assert.strictEqual(updated.color, "red");
     assert.strictEqual(updated.status, "in_game");
+  });
+
+  it("rejects fast movement and sends correction", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const existing = new Player();
+    existing.position.x = 0;
+    existing.position.y = 0;
+    existing.position.z = 0;
+    room.state.players.set("p1", existing);
+    
+    // Simulate previous update exactly 100ms ago to control delta
+    room.playerLastUpdate.set("p1", Date.now() - 100);
+
+    const incoming = new Player();
+    incoming.position.x = 50; // Move 50 units in 0.1s = 500 units/sec (limit is 250)
+    incoming.position.y = 0;
+    incoming.position.z = 0;
+
+    let sentCorrection = false;
+    room.updatePlayerInfo({ 
+      sessionId: "p1", 
+      send: (type: string, data: any) => {
+        if (type === 'player:correction') {
+          sentCorrection = true;
+          assert.strictEqual(data.position.x, 0);
+        }
+      } 
+    } as never, incoming as any);
+
+    const updated = room.state.players.get("p1");
+    // Position should NOT have been updated to 50
+    assert.strictEqual(updated.position.x, 0);
+    assert.strictEqual(sentCorrection, true);
+  });
+
+  it("allows fast movement when teleport flag is present", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const existing = new Player();
+    room.state.players.set("p1", existing);
+    room.playerLastUpdate.set("p1", Date.now() - 100);
+
+    const incoming = new Player();
+    incoming.position.x = 50; // Move 50 units in 0.1s = 500 units/sec
+
+    let sentCorrection = false;
+    
+    // We only send it ONCE WITH the flag, no need to send it without the flag first (which triggers the correction that isn't cleared)
+    (incoming as any).teleported = true;
+    
+    room.updatePlayerInfo({ 
+      sessionId: "p1", 
+      send: (type: string) => {
+        if (type === 'player:correction') sentCorrection = true;
+      } 
+    } as never, incoming as any);
+
+    const updated = room.state.players.get("p1");
+    assert.strictEqual(updated.position.x, 50); // Allowed because of teleport flag
+    assert.strictEqual(sentCorrection, false);
   });
 
   it("adds chat message and broadcasts player message", () => {
