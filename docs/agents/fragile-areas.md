@@ -13,3 +13,12 @@
 - **Edit mode toggle lives in Game Settings**, not inside the editor panel. It dispatches a `CustomEvent('editor-edit-mode-changed', { detail: { enabled } })` on `window`. The `EditorUI` listens for this event to show/hide itself and configure gizmos.
 - **Level document trigger arrays must be initialized before `createWalls()`** in `game-level.ts` or camera triggers created during stage setup will be lost on export.
 - **Level import overwrites localStorage** and reloads the page. Validation via `isLevelDocument()` runs before saving to prevent corrupt state.
+
+## Lobby UI
+
+- **Controls section** was restored from git history (`7c06a5d^`). Lives at `public/assets/ui/lobby/lobby.html:33-56`. Uses `.keyboard-controls` flex layout with keyboard image between two legend columns. The keyboard image is at `public/assets/images/keyboard-controls.png`.
+- **Consolidated heading classes** in `public/assets/ui/lobby/lobby.css:143-160`: `.heading-xl` (2rem, brand-primary, centered), `.heading-md` (1.2rem, text-secondary), `.heading-sm` (1rem, text-secondary). All headings in the lobby now use these classes instead of raw element selectors.
+- **Dev/prod mode toggle**: `h1.heading-xl.dev-only` shows "Singleplayer" in dev mode; `h1.heading-xl.prod-only` shows "Multiplayer" in production. The `.dev-only` / `.prod-only` classes rely on `.is-dev` / `:not(.is-dev)` on `.lobby-wrapper` and `import.meta.env.DEV` in `lobby-ui.ts:230`.
+- **Two-column layout** for dev mode: `.lobby-columns` wraps "Select Level" and "Level Editor" side-by-side. `.is-dev .lobby-columns { display: flex; }` — the base rule intentionally omits `display` so `.dev-only { display: none }` takes effect in production.
+- **Player setup** is now a vertical stacked layout (nickname → color → play button), full-width inputs with 40rem max. Color swatches are squares (`border-radius: 0.3rem`), not circles.
+- **Nickname input** uses centered text, blue brand border, and large padding/font matching the original pre-refactor style.

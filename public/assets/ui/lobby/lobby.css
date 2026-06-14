@@ -60,29 +60,125 @@
   color: var(--color-text-secondary);
 }
 
+/* Controls section */
+.controls {
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-3xl);
+  border-top: 2px solid var(--color-surface-overlay);
+}
+
+.controls-heading {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.keyboard-controls {
+  display: flex;
+  gap: var(--space-3xl);
+  justify-content: center;
+  align-items: center;
+}
+
+.keyboard-controls > .keyboard {
+  width: 40%;
+  max-width: 24rem;
+}
+
+.keyboard-controls > .legend {
+  font-size: var(--font-size-ui-sm);
+  white-space: nowrap;
+}
+
+.keyboard-controls > .legend > div {
+  padding: var(--space-xs) 0;
+}
+
+.keyboard-controls > .legend > div > .icon {
+  font-weight: bold;
+  display: inline-block;
+  min-width: 4.5rem;
+  text-align: center;
+}
+
+.keyboard-controls > .legend > .movement > .icon {
+  color: var(--blue);
+}
+
+.keyboard-controls > .legend > .jumping > .icon {
+  color: var(--red);
+}
+
+.keyboard-controls > .legend > .turning > .icon {
+  color: var(--yellow);
+}
+
+.keyboard-controls > .legend > .arrow-keys > .icon {
+  color: var(--green);
+}
+
+.keyboard-controls > .legend > .checkpoints > .icon {
+  color: var(--purple);
+}
+
+.keyboard-controls > .legend > .reset > .icon {
+  color: var(--pink);
+}
+
+.keyboard-controls > .legend > .collisions > .icon {
+  color: var(--orange);
+}
+
+.keyboard-controls > .legend > .follow-camera > .icon {
+  color: var(--light-blue);
+}
+
+.keyboard-controls > .legend > .open-lobby > .icon {
+  color: var(--magenta);
+}
+
+.keyboard-controls > .legend > .open-chat > .icon {
+  color: var(--dark-gray);
+}
+
+/* Reusable heading classes */
+.heading-xl {
+  font-size: var(--font-size-ui-5xl);
+  color: var(--color-brand-primary);
+  margin-bottom: var(--space-3xl);
+  text-align: center;
+}
+
+.heading-md {
+  font-size: var(--font-size-ui-xl);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+.heading-sm {
+  font-size: var(--font-size-ui-md);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Two-column layout (dev-only) */
+.lobby-columns {
+  gap: var(--space-3xl);
+}
+
+.lobby-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.is-dev .lobby-columns {
+  display: flex;
+}
+
 /* Scrollable views area */
 .lm-views {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-}
-
-.lm-view h2 {
-  font-size: var(--font-size-ui-3xl);
-  margin-bottom: var(--space-2xl);
-  color: var(--color-brand-primary);
-}
-
-.lm-view h3 {
-  font-size: var(--font-size-ui-xl);
-  margin-bottom: var(--space-lg);
-  color: var(--color-text-secondary);
-}
-
-.lm-view h4 {
-  font-size: var(--font-size-ui-md);
-  margin-bottom: var(--space-lg);
-  color: var(--color-text-secondary);
 }
 
 /* Level list */
@@ -149,31 +245,27 @@
 /* Player Setup (always at bottom) */
 .player-setup {
   display: flex;
-  align-items: flex-end;
-  gap: var(--space-3xl);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xl);
   padding-top: var(--space-3xl);
   border-top: 2px solid var(--color-surface-overlay);
   margin-top: var(--space-3xl);
   flex-shrink: 0;
 }
 
-.player-setup .nickname {
-  flex: 1;
-  min-width: 0;
-}
-
-.player-setup label {
-  display: block;
-  font-size: var(--font-size-ui-md);
-  margin-bottom: var(--space-sm);
-  color: var(--color-text-secondary);
+.nickname {
+  width: 100%;
+  max-width: 40rem;
+  text-align: center;
 }
 
 .nickname input {
-  padding: var(--space-xl) var(--space-2xl);
-  font-size: var(--font-size-ui-xl);
+  padding: var(--space-2xl) var(--space-3xl);
+  font-size: var(--font-size-ui-4xl);
   width: 100%;
-  border: 2px solid var(--color-surface-overlay);
+  text-align: center;
+  border: 0.2rem solid var(--color-brand-primary);
   background-color: var(--color-surface-overlay);
   color: var(--color-text-primary);
   border-radius: 0.2rem;
@@ -186,27 +278,29 @@
 
 .nickname .error {
   color: var(--red);
-  font-size: var(--font-size-ui-sm);
+  font-size: var(--font-size-ui-lg);
 }
 
-.player-setup .player-color {
-  flex-shrink: 0;
+.player-color {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .colors {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-2xl);
   flex-wrap: wrap;
 }
 
 .colors > div {
-  height: 3rem;
-  width: 3rem;
+  height: 5rem;
+  width: 5rem;
   opacity: 0.3;
   cursor: pointer;
   transition: transform 0.1s ease-out;
   transform: scale(1);
-  border-radius: 50%;
+  border-radius: 0.3rem;
 }
 
 .colors > div:hover,
@@ -240,14 +334,16 @@
 .play-btn {
   font-size: var(--font-size-ui-2xl);
   color: var(--color-text-primary);
-  padding: var(--space-xl) var(--space-4xl);
+  padding: var(--space-2xl) var(--space-4xl);
   background-color: var(--color-brand-primary);
   border: none;
   border-radius: 0.2rem;
   cursor: pointer;
   font-weight: bold;
   text-transform: uppercase;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 40rem;
+  margin-top: var(--space-lg);
 }
 
 .play-btn:hover {
@@ -376,18 +472,9 @@
     padding: var(--space-xl);
   }
 
-  .player-setup {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .player-setup .nickname {
-    min-width: 0;
-  }
-
   .colors > div {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 4rem;
+    width: 4rem;
   }
 
   .editor-actions {
@@ -399,7 +486,29 @@
     min-width: auto;
   }
 
+  .lobby-columns,
+  .is-dev .lobby-columns {
+    flex-direction: column;
+  }
+
   .level-list {
     max-height: 30vh;
+  }
+
+  .keyboard-controls {
+    flex-direction: column;
+  }
+
+  .keyboard-controls > .keyboard {
+    width: 100%;
+  }
+
+  .keyboard-controls > .legend {
+    font-size: var(--font-size-ui-xs);
+    white-space: normal;
+  }
+
+  .keyboard-controls > .legend > div > .icon {
+    min-width: 3.5rem;
   }
 }
