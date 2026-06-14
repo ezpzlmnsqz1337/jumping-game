@@ -4,12 +4,13 @@
 
 html,
 body {
-  overflow: hidden;
-  width: 100%;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   height: 100%;
   margin: 0;
+  overflow: hidden;
   padding: 0;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  width: 100%;
+
   --blue: #1995ff;
   --red: #ff1919;
   --green: #79ff30;
@@ -19,22 +20,20 @@ body {
   --orange: #ff8930;
   --light-blue: #00eaf2;
   --magenta: #f234f7;
-  --gray: #999999;
+  --gray: #999;
   --dark-gray: #595959;
-
-  --color-text-primary: #ffffff;
+  --color-text-primary: #fff;
   --color-text-secondary: #a0a0a0;
   --color-surface-overlay: #0000006d;
   --color-surface-overlay-strong: #000000c3;
   --color-brand-primary: #1d96ff;
   --color-brand-primary-muted: #9ad0ff;
   --color-brand-primary-hover: #005cac;
-  --color-brand-divider: rgba(29, 150, 255, 0.3);
-  --color-brand-hover-overlay: rgba(29, 150, 255, 0.2);
+  --color-brand-divider: rgb(29 150 255 / 30%);
+  --color-brand-hover-overlay: rgb(29 150 255 / 20%);
   --color-status-bg-soft: #cfe8ff;
   --color-status-positive: var(--green);
   --color-status-negative: var(--red);
-
   --font-size-ui-xs: 0.8rem;
   --font-size-ui-sm: 0.9rem;
   --font-size-ui-md: 1rem;
@@ -45,7 +44,6 @@ body {
   --font-size-ui-4xl: 1.6rem;
   --font-size-ui-5xl: 2rem;
   --font-size-ui-6xl: 3rem;
-
   --space-none: 0;
   --space-xxs: 0.15rem;
   --space-xs: 0.2rem;
@@ -58,32 +56,34 @@ body {
   --space-3xl: 1rem;
   --space-4xl: 2rem;
   --space-5xl: 3rem;
-
   --radius-sm: 0.2rem;
   --radius-md: 0.3rem;
-
   --z-canvas: 1;
   --z-ui: 10;
   --z-overlay: 50;
   --z-modal: 999;
   --z-modal-top: 9999;
-
   --transition-fast: 0.15s;
   --transition-normal: 0.2s;
-
   --border-width-thick: 2px;
-
   --size-player-bar: 100px;
   --size-chat-max-width: 30rem;
   --size-chat-max-height: 20rem;
   --size-input-max-width: 40rem;
   --size-input-min-width: 16rem;
   --size-keyboard-max-width: 24rem;
+  --size-color-swatch: 5rem;
+  --size-editor-info-max-width: 15rem;
+  --space-chat-bottom: 7rem;
+  --space-player-info-bottom: 0.5rem;
+  --color-status-running: var(--yellow);
+  --color-status-finished: var(--blue);
+  --color-status-reset: var(--orange);
 }
 
 #render-canvas {
-  width: 100%;
   height: 100%;
-  touch-action: none;
   outline: none;
+  touch-action: none;
+  width: 100%;
 }

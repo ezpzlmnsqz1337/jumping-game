@@ -1,12 +1,12 @@
 .chat {
   background-color: var(--color-surface-overlay);
-  bottom: 7rem;
+  bottom: var(--space-chat-bottom);
   color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
   font-size: var(--font-size-ui-md);
   gap: var(--space-lg);
-  left: 1rem;
+  left: var(--space-3xl);
   padding: var(--space-lg) var(--space-3xl);
   position: fixed;
   z-index: var(--z-overlay);
@@ -66,9 +66,9 @@
   width: 100%;
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .chat {
-    bottom: 11rem;
+    bottom: calc(var(--space-chat-bottom) + var(--space-4xl));
     font-size: var(--font-size-ui-xs);
     left: 0;
     padding: var(--space-lg);

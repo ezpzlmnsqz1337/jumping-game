@@ -1,12 +1,12 @@
 .player-info {
   background-color: var(--color-surface-overlay);
   border-radius: var(--radius-sm);
-  bottom: 0.5rem;
+  bottom: var(--space-player-info-bottom);
   color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  left: 1rem;
+  left: var(--space-3xl);
   padding: var(--space-md) var(--space-lg);
   position: fixed;
   z-index: var(--z-overlay);
@@ -60,12 +60,12 @@
 }
 
 .status-badge:not(.active) {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(255 255 255 / 8%);
   color: var(--color-text-primary);
   opacity: 0.5;
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .player-info {
     bottom: 0.5rem;
     font-size: var(--font-size-ui-xs);

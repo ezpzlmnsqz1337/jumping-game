@@ -6,7 +6,7 @@
   flex-direction: column;
   padding: var(--space-3xl) var(--space-3xl) var(--space-lg);
   position: fixed;
-  right: 1rem;
+  right: var(--space-3xl);
   top: 11rem;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .editor>div>label {
-  width: 5rem;
+  width: var(--size-editor-info-max-width);
 }
 
 .editor-controls>div>span {
@@ -79,9 +79,9 @@
 .editor .walls-value,
 .editor .triggers-value {
   color: var(--color-brand-primary-muted);
-  max-width: 15rem;
+  max-width: var(--size-editor-info-max-width);
+  overflow-wrap: anywhere;
   text-align: right;
-  word-break: break-word;
 }
 
 .editor .editor-tabs-top {

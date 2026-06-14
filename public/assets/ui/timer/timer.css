@@ -39,15 +39,15 @@
 }
 
 .timer > div > .run-status.state-running {
-  color: var(--yellow);
+  color: var(--color-status-running);
 }
 
 .timer > div > .run-status.state-finished {
-  color: var(--blue);
+  color: var(--color-status-finished);
 }
 
 .timer > div > .run-status.state-reset {
-  color: var(--orange);
+  color: var(--color-status-reset);
 }
 
 .timer > div > .connection-status.state-online {
@@ -58,7 +58,7 @@
   color: var(--color-status-negative);
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .timer {
     bottom: 0;
     font-size: var(--font-size-ui-2xl);
