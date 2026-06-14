@@ -122,11 +122,15 @@ describe('LobbyUI', () => {
       changeNickname: vi.fn(),
     };
 
+    const chatShow = vi.fn();
+    const playerInfoShow = vi.fn();
     gameRoot.uiManager = {
       timerUI: { show: vi.fn() },
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera: vi.fn() },
       editorUI: { show: vi.fn() },
+      chatUI: { show: chatShow },
+      playerInfoUI: { show: playerInfoShow },
     } as never;
 
     const ui = new LobbyUI(
@@ -151,6 +155,8 @@ describe('LobbyUI', () => {
     expect(player.status).toBe('in_lobby');
     expect(camera.useAutoRotationBehavior).toBe(true);
     expect(openSound.play).toHaveBeenCalled();
+    expect(chatShow).toHaveBeenCalledWith(false);
+    expect(playerInfoShow).toHaveBeenCalledWith(false);
 
     ui.closeLobby();
 
@@ -160,6 +166,8 @@ describe('LobbyUI', () => {
     expect(player.status).toBe('playing');
     expect(camera.useAutoRotationBehavior).toBe(false);
     expect(closeSound.play).toHaveBeenCalled();
+    expect(chatShow).toHaveBeenCalledWith(true);
+    expect(playerInfoShow).toHaveBeenCalledWith(true);
   });
 
   it('play is a no-op while player is in chat', async () => {
@@ -205,6 +213,8 @@ describe('LobbyUI', () => {
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera },
       editorUI: { show: vi.fn() },
+      chatUI: { show: vi.fn() },
+      playerInfoUI: { show: vi.fn() },
     } as never;
 
     const camera: TestCamera = {
