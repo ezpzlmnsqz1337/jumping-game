@@ -23,6 +23,7 @@ body {
   --dark-gray: #595959;
 
   --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
   --color-surface-overlay: #0000006d;
   --color-surface-overlay-strong: #000000c3;
   --color-brand-primary: #1d96ff;
@@ -31,8 +32,8 @@ body {
   --color-brand-divider: rgba(29, 150, 255, 0.3);
   --color-brand-hover-overlay: rgba(29, 150, 255, 0.2);
   --color-status-bg-soft: #cfe8ff;
-  --color-status-positive: #1b9f1b;
-  --color-status-negative: #c13812;
+  --color-status-positive: var(--green);
+  --color-status-negative: var(--red);
 
   --font-size-ui-xs: 0.8rem;
   --font-size-ui-sm: 0.9rem;

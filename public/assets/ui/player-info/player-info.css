@@ -37,7 +37,7 @@
 .debug-value {
   font-size: var(--font-size-ui-sm);
   font-variant-numeric: tabular-nums;
-  font-weight: bold;
+  font-weight: 700;
   min-width: 3rem;
 }
 
@@ -79,5 +79,10 @@
 
   .debug-value {
     min-width: 2rem;
+  }
+
+  .status-badge {
+    font-size: var(--font-size-ui-xs);
+    padding: var(--space-xxs) var(--space-xs);
   }
 }
