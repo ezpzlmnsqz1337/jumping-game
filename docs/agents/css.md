@@ -36,7 +36,7 @@ Tokens are defined in `src/style.css` on `body`. Always use tokens — never har
 
 ### Spacing Tokens
 
-`--space-none` through `--space-4xl` for all padding, margin, and gap values.
+`--space-none` through `--space-5xl` for all padding, margin, and gap values.
 
 ### Missing Tokens You May Need
 
@@ -72,30 +72,16 @@ This is the single biggest issue in the codebase today. Hardcoded values are fou
 }
 ```
 
-#### Known Hardcoded Values to Fix
+#### Known Hardcoded Values Remaining
 
 | File | Value | Should Be |
 |---|---|---|
-| `editor.css` | `column-gap: 1rem` | `var(--space-3xl)` |
-| `editor.css` | `gap: 0.5rem` | `var(--space-lg)` |
-| `editor.css` | `gap: 0.2rem` | `var(--space-xs)` |
-| `editor.css` | `gap: 0.3rem` | `var(--space-sm)` |
-| `editor.css` | `margin-bottom: 0.5rem` | `var(--space-lg)` |
-| `editor.css` | `padding-top: 0.5rem` | `var(--space-lg)` |
-| `editor.css` | `padding-bottom: 0.3rem` | `var(--space-sm)` |
-| `editor.css` | `border-bottom: 2px` | Add `--border-width-thick` token |
-| `chat.css` | `gap: 0.5rem` | `var(--space-lg)` |
-| `chat.css` | `margin-bottom: 1rem` | `var(--space-3xl)` |
-| `chat.css` | `max-width: 30rem` | `--size-chat-max-width` token |
-| `chat.css` | `max-height: 20rem` | `--size-chat-max-height` token |
-| `lobby.css` | `margin: 3rem` | `--space-4xl` or `--size-lobby-margin` |
-| `lobby.css` | `max-width: 40rem` | `--size-input-max-width` token |
-| `lobby.css` | `min-width: 16rem` | `--size-input-min-width` token |
-| `player-info.css` | `height: 100px` | `--size-player-bar` token |
-| `timer.css` | `border-radius: 0.2rem` | `--radius-sm` token |
-| (many files) | `border-radius: 0.2rem` | `--radius-sm` token |
-| (many files) | `border-radius: 0.3rem` | `--radius-md` token |
-| (lobby.css) | `z-index: 999`, `z-index: 9999` | `--z-overlay` / `--z-modal` tokens |
+| `editor.css` | `top: 11rem` | Token or documented spacing value |
+| `editor.css` | `max-width: 15rem` | `--size-editor-info-max-width` token |
+| `editor.css` | `width: 5rem` (label) | Token for label width |
+| `chat.css` | `bottom: 7rem` | Token or documented spacing — clears player-info HUD |
+| `chat.css` responsive | `bottom: 11rem` | Token or documented spacing |
+| `nickname input` in lobby | `border: 0.2rem solid` | `var(--border-width-thick)` (0.2rem ≈ 3.2px vs token's 2px) |
 
 ### 2. No Magic Numbers
 

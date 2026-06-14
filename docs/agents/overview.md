@@ -43,12 +43,13 @@
   - `src/level-document.ts` serialization schema for level JSON (walls, triggers, texts, environment).
   - `src/game-storage.ts` localStorage persistence for imported level documents.
   - `src/game-level.ts` base level class; `serialize()` exports a `LevelDocument`.
-  - `public/assets/ui/editor/` in-game level editor UI (tabbed: Editor / Mesh Info / Camera).
-  - `public/` assets, UI html/css fragments, textures, models, sounds.
+- `public/assets/ui/editor/` in-game level editor UI (tabbed: Editor / Mesh Info / Camera). Editor tab includes camera-triggers visibility toggle and level info rows (name, walls, triggers).
+- `public/assets/ui/player-info/` debug HUD panel. Toggled via F2 or backtick. Shows FPS, vertical/horizontal speed, and MOVING/JUMPING status badges. Starts hidden; state syncs with the game-settings checkbox.
+- `public/` assets, UI html/css fragments, textures, models, sounds.
 - CSS design tokens (defined once in `src/style.css` on `body`):
   - `--color-*` semantic color variables.
   - `--font-size-ui-*` scale from `xs` (0.8rem) to `6xl` (3rem).
-  - `--space-*` spacing scale from `xxs` to `4xl` plus `--space-button-y`.
+  - `--space-*` spacing scale from `none` to `5xl` plus `--space-button-y`.
 - Multiplayer server:
   - `multiplayer-server/src/index.ts` server bootstrap.
   - `multiplayer-server/src/rooms/MyRoom.ts` room logic.

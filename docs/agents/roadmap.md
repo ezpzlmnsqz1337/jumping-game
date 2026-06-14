@@ -56,6 +56,17 @@
 - Fixed all ESLint errors (unused catch bindings, `any` casts).
 - Formatted all source files with Prettier.
 
+12. CSS and UI cleanup
+- Added `--color-text-secondary` design token (was referenced but never defined).
+- Unified `--color-status-positive`/`--color-status-negative` to alias `--green`/`--red` (were unused dark variants).
+- Normalized all `font-weight: bold` to numeric `700` for consistency.
+- Replaced `.debug-dot` colored dots with `.status-badge` pill badges (white=active, gray=inactive).
+- Restructured PlayerInfoUI debug HUD into 3-row layout: FPS, VS/HS speeds, MOVING/JUMPING badges.
+- Moved camera-triggers visibility toggle from Game Settings to Editor tab content.
+- Split editor level summary from single line into individual rows (name, walls, triggers).
+- Fixed PlayerInfoUI checkbox/F2 desync — `toggle()` now syncs game-settings checkbox; `show()` updates internal `enabled` flag.
+- Fixed collision toggle checkbox staying checked in single-player — now toggles `player.collisionEnabled` directly when `multiplayer` is absent.
+
 ## Next Priorities
 
 1. Investigate and fix the `__playground_message_types` warning from `@colyseus/playground` monkey-patch.

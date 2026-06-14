@@ -25,8 +25,9 @@ CSS conventions are documented in `docs/agents/css.md`. It covers design tokens,
 
 - All UI colors must use `--color-*` variables from `src/style.css`. No hardcoded hex/rgb.
 - All UI font sizes must use `--font-size-ui-*` variables. No hardcoded `rem`/`px`.
-- All UI spacing must use `--space-*` variables. No hardcoded `rem`/`px`.
-- Palette colors (`--blue`, `--red`, etc.) are for gameplay only — never for UI chrome.
+- All UI spacing must use `--space-*` variables (scale from `none` to `5xl`). No hardcoded `rem`/`px`.
+- Palette colors (`--blue`, `--red`, etc.) are for gameplay only — never for UI chrome. Exception: `--color-status-positive` and `--color-status-negative` alias `--green` and `--red` respectively for status indicators (ready/online, offline/reset).
+- Status badges use `.active` class to toggle between white (active) and gray (inactive) appearance — no separate color tokens needed.
 - If a token is missing, add it to `src/style.css` first.
 
 ## Definition Of Done For Typical Changes

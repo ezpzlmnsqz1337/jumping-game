@@ -11,8 +11,19 @@
 
 - **GizmoManager `attachableMeshes` semantics**: `null` = all meshes are pickable (edit mode ON); `[]` = nothing is pickable (edit mode OFF). This is the inverse of what reads naturally — assigning `[]` when enabling edit mode blocks all selection.
 - **Edit mode toggle lives in Game Settings**, not inside the editor panel. It dispatches a `CustomEvent('editor-edit-mode-changed', { detail: { enabled } })` on `window`. The `EditorUI` listens for this event to show/hide itself and configure gizmos.
+- **Camera triggers visibility toggle** has moved from Game Settings to the Editor tab content. The `toggleCameraTriggers()` method lives in `EditorUI` and iterates `scene.meshes` to toggle visibility of meshes with `debugType === 'camera-trigger'`. Uses `renderingCanvas?.focus()` (null-safe) to return focus after toggle.
 - **Level document trigger arrays must be initialized before `createWalls()`** in `game-level.ts` or camera triggers created during stage setup will be lost on export.
 - **Level import overwrites localStorage** and reloads the page. Validation via `isLevelDocument()` runs before saving to prevent corrupt state.
+
+## Debug HUD (Player Info)
+
+- **PlayerInfoUI** starts hidden (`enabled = false`). Toggled via F2 (keyup on document) or backtick (keypress). The `toggle()` method syncs the game-settings `.player-info-enabled` checkbox to reflect the current state.
+- **`show()` sets `this.enabled`** — calling `show(true)` or `show(false)` also updates the internal enabled flag. Always use `show()` rather than setting `enabled` and `display` separately.
+- **The game-settings checkbox defaults to unchecked** (`checked = false`) to match the hidden initial state.
+
+## Game Settings
+
+- **Collision toggle** (`toggleCollissions`) only takes effect via `gameRoot.multiplayer.toggleCollissions()` when multiplayer is active. In single-player, it falls back to toggling `player.collisionEnabled` directly so the checkbox stays in sync.
 
 ## Lobby UI
 
