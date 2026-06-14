@@ -71,6 +71,13 @@ Key rules:
 - **No `as never`** — use typed mock interfaces instead
 - **Fake timers** for time-dependent code, not real `setTimeout`
 
+## CSS Conventions
+
+CSS guidelines are in `docs/agents/css.md`. Key automated checks:
+- **`npm run lint:css`** — enforces alphabetical property order via stylelint
+- **`npm run lint:css:fix`** — auto-fixes property ordering
+- Always use design tokens from `src/style.css` — never hardcode values
+
 The `@team-tester` subagent is responsible for writing and maintaining tests that follow these conventions.
 
 ## Tips
