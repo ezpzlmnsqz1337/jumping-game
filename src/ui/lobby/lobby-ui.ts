@@ -229,6 +229,7 @@ export class LobbyUI extends AbstractUI {
 
     this.lobbyDiv.classList.toggle('is-dev', this.isDev);
     this.lobbyDiv.style.display = this.open ? 'block' : 'none';
+    this.showOtherUIs(!this.open);
 
     const gameSettings = GameStorage.getGameSettings();
 
