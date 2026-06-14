@@ -1,0 +1,16 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+    "no-descending-specificity": null,
+    "selector-class-pattern": null,
+    "keyframes-name-pattern": null,
+    "no-duplicate-selectors": true,
+    "color-named": "never",
+    "unit-allowed-list": ["rem", "em", "%", "vh", "vw", "fr", "px", "s", "ms", "deg"],
+    "declaration-no-important": true,
+    "number-max-precision": 3,
+    "at-rule-no-deprecated": null
+  }
+}

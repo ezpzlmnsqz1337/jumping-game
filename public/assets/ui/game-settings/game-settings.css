@@ -7,8 +7,8 @@
   gap: var(--space-lg);
   padding: var(--space-lg) var(--space-3xl);
   position: fixed;
-  right: 1rem;
-  top: 1rem;
+  right: var(--space-3xl);
+  top: var(--space-3xl);
 }
 
 .game-settings>div {
@@ -27,13 +27,13 @@
   padding-bottom: var(--space-sm);
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .game-settings {
     display: block;
     font-size: var(--font-size-ui-xs);
     padding: var(--space-lg);
-    right: 0;
-    top: 0;
+    right: var(--space-none);
+    top: var(--space-none);
   }
 
   .game-settings>div {

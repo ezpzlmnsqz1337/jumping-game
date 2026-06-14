@@ -1,10 +1,10 @@
 .time-table {
   background-color: var(--color-surface-overlay);
   color: var(--color-text-primary);
-  left: 1rem;
+  left: var(--space-3xl);
   padding: var(--space-lg) var(--space-3xl);
   position: fixed;
-  top: 1rem;
+  top: var(--space-3xl);
 }
 
 .time-table>ol>li {
@@ -27,12 +27,12 @@
   font-size: var(--font-size-ui-xs);
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .time-table {
     font-size: var(--font-size-ui-xs);
-    left: 0;
+    left: var(--space-none);
     padding: var(--space-xs) var(--space-lg);
-    top: 0;
+    top: var(--space-none);
   }
 
   .time-table>ol {
