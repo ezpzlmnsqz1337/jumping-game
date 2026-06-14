@@ -44,7 +44,7 @@ export default config({
      */
     app.get('/api/levels', (_req: Request, res: Response) => {
       res.json([
-        { name: 'level1', walls: 0, triggers: 0 },
+        { name: 'level1', walls: 153, triggers: 2 },
       ]);
     });
 

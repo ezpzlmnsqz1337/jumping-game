@@ -11,12 +11,6 @@ import { isLevelDocument } from '../../level-document';
 
 const LevelsKey = 'level-manager-selected-level';
 
-interface ServerLevelSummary {
-  name: string;
-  walls: number;
-  triggers: number;
-}
-
 export class LobbyUI extends AbstractUI {
   // Play view
   nicknameInput!: HTMLInputElement;
@@ -97,14 +91,21 @@ export class LobbyUI extends AbstractUI {
   }
 
   private async refreshLevelList() {
-    if (!this.levelListDiv) return;
-
-    this.levelListDiv.innerHTML = '';
-
     if (this.isDev) {
       this.refreshClientLevelList();
     } else {
-      await this.refreshServerLevelList();
+      this.refreshCurrentMapInfo();
+    }
+  }
+
+  private refreshCurrentMapInfo() {
+    const mapNameEl = document.querySelector('.map-info .map-name');
+    const mapMetaEl = document.querySelector('.map-info .map-meta');
+    if (mapNameEl && gameRoot.level) {
+      mapNameEl.textContent = gameRoot.level.name;
+    }
+    if (mapMetaEl && gameRoot.level) {
+      mapMetaEl.textContent = `${gameRoot.level.walls.length} walls`;
     }
   }
 
@@ -141,52 +142,6 @@ export class LobbyUI extends AbstractUI {
 
       this.levelListDiv.appendChild(entry);
     });
-  }
-
-  private async refreshServerLevelList() {
-    try {
-      const response = await fetch('/api/levels');
-      if (!response.ok) {
-        this.showServerError();
-        return;
-      }
-      const levels: ServerLevelSummary[] = await response.json();
-
-      if (levels.length === 0) {
-        this.levelListDiv.innerHTML = '<div class="no-levels">No levels available on server.</div>';
-        return;
-      }
-
-      levels.forEach(level => {
-        const entry = document.createElement('div');
-        entry.className = `level-entry${level.name === this.selectedLevelName ? ' selected' : ''}`;
-        entry.dataset.levelName = level.name;
-
-        entry.innerHTML = `
-          <div class="level-info">
-            <div class="level-name">${level.name}</div>
-            <div class="level-meta">${level.walls} walls &middot; ${level.triggers} triggers</div>
-          </div>
-        `;
-
-        entry.addEventListener('click', () => {
-          this.levelListDiv
-            .querySelectorAll('.level-entry')
-            .forEach(e => e.classList.remove('selected'));
-          entry.classList.add('selected');
-          this.selectedLevelName = level.name;
-        });
-
-        this.levelListDiv.appendChild(entry);
-      });
-    } catch {
-      this.showServerError();
-    }
-  }
-
-  private showServerError() {
-    this.levelListDiv.innerHTML =
-      '<div class="no-levels">Could not reach server. Check your connection.</div>';
   }
 
   private refreshStoredLevels() {
@@ -254,7 +209,7 @@ export class LobbyUI extends AbstractUI {
     localStorage.setItem('nickname', nickname);
     this.player.changeNickname(nickname);
 
-    if (this.selectedLevelName !== gameRoot.level?.name) {
+    if (this.isDev && this.selectedLevelName !== gameRoot.level?.name) {
       localStorage.setItem(LevelsKey, this.selectedLevelName);
       localStorage.removeItem('mp-server-address');
       localStorage.removeItem('mp-room-id');

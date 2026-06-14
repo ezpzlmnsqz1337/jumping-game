@@ -88,3 +88,20 @@ Client UI tests with coverage:
 nvm use
 npm run test:ui:coverage
 ```
+
+## Chrome DevTools MCP (Visual Debugging)
+
+The project exposes a Chrome DevTools MCP server the AI assistant can use to visually inspect the running application. This is the preferred way to debug UI issues, inspect the DOM, check console output, and verify visual state.
+
+**Available URLs (must be running first):**
+
+| Service | URL | How to start |
+|---|---|---|
+| Vite dev server (client) | `http://localhost:5173` | `npm run dev` |
+| Colyseus multiplayer server | `http://localhost:13370` | `cd multiplayer-server && npm run start` |
+
+**Usage:**
+
+- The AI assistant can use `chrome-devtools_*` tools to navigate pages, inspect elements, take screenshots, view console messages, and debug performance.
+- Developers should always run the relevant dev server(s) before asking the AI to use visual debugging.
+- The MCP requires Google Chrome installed on the system. If unavailable, the tools will fail with a `Could not find Google Chrome executable` error.

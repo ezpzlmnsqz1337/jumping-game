@@ -6,9 +6,14 @@
     <div class="lm-views">
       <!-- Play View -->
       <div class="lm-view active" data-view="play">
-        <h2>Select Level</h2>
-        <div class="level-select">
+        <h2 class="dev-only">Select Level</h2>
+        <div class="level-select dev-only">
           <div class="level-list"></div>
+        </div>
+        <div class="prod-only map-info">
+          <div class="map-label">Current map</div>
+          <div class="map-name"></div>
+          <div class="map-meta"></div>
         </div>
         <div class="dev-only">
           <h3>Level Editor</h3>

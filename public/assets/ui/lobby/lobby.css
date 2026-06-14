@@ -27,6 +27,39 @@
   display: block;
 }
 
+/* Production-mode only section */
+.prod-only {
+  display: none;
+}
+
+.lobby-wrapper:not(.is-dev) .prod-only {
+  display: block;
+}
+
+/* Map info (production mode) */
+.map-info {
+  margin-bottom: var(--space-3xl);
+}
+
+.map-info .map-label {
+  font-size: var(--font-size-ui-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.map-info .map-name {
+  font-size: var(--font-size-ui-2xl);
+  font-weight: 600;
+  margin-bottom: var(--space-xxs);
+}
+
+.map-info .map-meta {
+  font-size: var(--font-size-ui-md);
+  color: var(--color-text-secondary);
+}
+
 /* Scrollable views area */
 .lm-views {
   flex: 1;
