@@ -1,6 +1,6 @@
 .timer {
   align-items: center;
-  bottom: 6.5rem;
+  bottom: 0;
   color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
@@ -60,7 +60,7 @@
 
 @media only screen and (max-width: 1000px) {
   .timer {
-    bottom: 6.5rem;
+    bottom: 0;
     font-size: var(--font-size-ui-2xl);
     left: 0;
     padding: var(--space-lg);

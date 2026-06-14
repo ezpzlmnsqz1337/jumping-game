@@ -449,7 +449,7 @@
 
 /* Settings button */
 .ui-buttons {
-  bottom: 6.5rem;
+  bottom: 0.5rem;
   color: var(--color-text-primary);
   font-size: var(--font-size-ui-6xl);
   position: fixed;

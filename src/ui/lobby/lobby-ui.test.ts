@@ -127,7 +127,6 @@ describe('LobbyUI', () => {
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera: vi.fn() },
       editorUI: { show: vi.fn() },
-      performanceUI: { show: vi.fn() },
     } as never;
 
     const ui = new LobbyUI(
@@ -206,7 +205,6 @@ describe('LobbyUI', () => {
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera },
       editorUI: { show: vi.fn() },
-      performanceUI: { show: vi.fn() },
     } as never;
 
     const camera: TestCamera = {

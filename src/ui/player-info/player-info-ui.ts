@@ -4,13 +4,20 @@ import { AbstractUI } from '../abstract-ui';
 
 export class PlayerInfoUI extends AbstractUI {
   playerInfoDiv!: HTMLDivElement;
-  hSpeedDiv!: HTMLDivElement;
-  vSpeedDiv!: HTMLDivElement;
-  movingDiv!: HTMLDivElement;
-  jumpingDiv!: HTMLDivElement;
+  hSpeedDiv!: HTMLSpanElement;
+  vSpeedDiv!: HTMLSpanElement;
+  movingBadge!: HTMLSpanElement;
+  jumpingBadge!: HTMLSpanElement;
+  fpsValueDiv!: HTMLSpanElement;
+
+  private enabled = false;
+  perfMonitor: BABYLON.PerformanceMonitor;
+  fpsUpdateIntervalMs = 1000;
+  lastFpsUpdate = 0;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'player-info', player);
+    this.perfMonitor = new BABYLON.PerformanceMonitor();
   }
 
   protected updateHorizontalSpeed() {
@@ -28,35 +35,35 @@ export class PlayerInfoUI extends AbstractUI {
   }
 
   protected updateMoving() {
-    const newValue = this.player.moving ? 'Yes' : 'No';
-    if (this.movingDiv.innerText === newValue) return;
-    this.movingDiv.innerText = this.player.moving ? 'Yes' : 'No';
-    this.movingDiv.classList.toggle('yes', this.player.moving);
-    this.movingDiv.classList.toggle('no', !this.player.moving);
+    this.movingBadge.classList.toggle('active', this.player.moving);
   }
 
   protected updateJumping() {
-    const newValue = this.player.jumping ? 'Yes' : 'No';
-    if (this.jumpingDiv.innerText === newValue) return;
-    this.jumpingDiv.innerText = this.player.jumping ? 'Yes' : 'No';
-    this.jumpingDiv.classList.toggle('yes', this.player.jumping);
-    this.jumpingDiv.classList.toggle('no', !this.player.jumping);
+    this.jumpingBadge.classList.toggle('active', this.player.jumping);
+  }
+
+  protected updateFps() {
+    this.perfMonitor.sampleFrame();
+    const now = performance.now();
+    if (now - this.lastFpsUpdate >= this.fpsUpdateIntervalMs) {
+      this.fpsValueDiv.innerText = this.perfMonitor.instantaneousFPS.toFixed(0);
+      this.lastFpsUpdate = now;
+    }
   }
 
   async bindUI() {
     await super.bindUI();
     this.playerInfoDiv = document.querySelector('.player-info') as HTMLDivElement;
-    this.hSpeedDiv = document.querySelector(
-      '.player-info > .horizontal-speed > .value'
-    ) as HTMLDivElement;
-    this.vSpeedDiv = document.querySelector(
-      '.player-info > .vertical-speed > .value'
-    ) as HTMLDivElement;
-    this.movingDiv = document.querySelector('.player-info > .moving > .value') as HTMLDivElement;
-    this.jumpingDiv = document.querySelector('.player-info > .jumping > .value') as HTMLDivElement;
+    this.hSpeedDiv = document.querySelector('.horizontal-speed') as HTMLSpanElement;
+    this.vSpeedDiv = document.querySelector('.vertical-speed') as HTMLSpanElement;
+    this.movingBadge = document.querySelector('.moving-badge') as HTMLSpanElement;
+    this.jumpingBadge = document.querySelector('.jumping-badge') as HTMLSpanElement;
+    this.fpsValueDiv = document.querySelector('.fps-value') as HTMLSpanElement;
 
+    this.perfMonitor.enable();
     this.scene.onBeforeRenderObservable.add(() => this.updateUI());
     this.rootElement = this.playerInfoDiv;
+    this.show(false);
   }
 
   show(show: boolean): void {
@@ -64,10 +71,16 @@ export class PlayerInfoUI extends AbstractUI {
     this.rootElement.style.display = show ? 'flex' : 'none';
   }
 
+  toggle(): void {
+    this.enabled = !this.enabled;
+    this.show(this.enabled);
+  }
+
   updateUI(): void {
     this.updateHorizontalSpeed();
     this.updateVerticalSpeed();
     this.updateMoving();
     this.updateJumping();
+    this.updateFps();
   }
 }

@@ -1,48 +1,83 @@
 .player-info {
-  background-color: var(--blue);
-  bottom: 0;
+  background-color: var(--color-surface-overlay);
+  border-radius: var(--radius-sm);
+  bottom: 0.5rem;
+  color: var(--color-text-primary);
   display: flex;
-  height: var(--size-player-bar);
+  flex-direction: column;
+  gap: var(--space-xs);
+  left: 1rem;
+  padding: var(--space-md) var(--space-lg);
   position: fixed;
-  width: 100%;
+  z-index: var(--z-overlay);
 }
 
-.player-info>div {
+.debug-row {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.debug-item {
   align-items: center;
   display: flex;
+  gap: var(--space-xs);
+}
+
+.debug-item-speed {
   flex: 1;
-  flex-direction: column;
-  gap: var(--space-lg);
-  justify-content: center;
 }
 
-.player-info>div .label {
-  font-size: var(--font-size-ui-4xl);
+.debug-label {
+  font-size: var(--font-size-ui-xs);
+  font-weight: 600;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.debug-value {
+  font-size: var(--font-size-ui-sm);
+  font-variant-numeric: tabular-nums;
   font-weight: bold;
+  min-width: 3rem;
+}
+
+.status-badge {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex: 1;
+  font-size: var(--font-size-ui-xs);
+  font-weight: 700;
+  justify-content: center;
+  padding: var(--space-xxs) var(--space-sm);
   text-transform: uppercase;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.player-info>div .value {
-  background-color: var(--color-status-bg-soft);
-  font-size: var(--font-size-ui-2xl);
-  padding: var(--space-xs) var(--space-3xl);
-  text-transform: uppercase;
+.status-badge.active {
+  background: var(--color-text-primary);
+  color: #111;
 }
 
-.player-info>div .value.no {
-  color: var(--color-status-positive);
-}
-
-.player-info>div .value.yes {
-  color: var(--color-status-negative);
+.status-badge:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  opacity: 0.5;
 }
 
 @media only screen and (max-width: 1000px) {
-  .player-info>div .label {
+  .player-info {
+    bottom: 0.5rem;
     font-size: var(--font-size-ui-xs);
+    left: 0.5rem;
+    padding: var(--space-xs) var(--space-sm);
   }
 
-  .player-info>div .value {
-    font-size: var(--font-size-ui-md);
+  .debug-row {
+    gap: var(--space-sm);
+  }
+
+  .debug-value {
+    min-width: 2rem;
   }
 }

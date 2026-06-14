@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PlayerInfoUI } from './player-info-ui';
 
 type Velocity = { x: number; y: number; z: number };
@@ -15,10 +15,12 @@ type PlayerInfoTestPlayer = {
 
 function createUiWith(player: PlayerInfoTestPlayer) {
   const ui = new PlayerInfoUI({} as never, player as never);
-  ui.hSpeedDiv = document.createElement('div');
-  ui.vSpeedDiv = document.createElement('div');
-  ui.movingDiv = document.createElement('div');
-  ui.jumpingDiv = document.createElement('div');
+  ui.hSpeedDiv = document.createElement('span');
+  ui.vSpeedDiv = document.createElement('span');
+  ui.movingBadge = document.createElement('span');
+  ui.jumpingBadge = document.createElement('span');
+  ui.fpsValueDiv = document.createElement('span');
+  ui.perfMonitor = { enable: vi.fn(), sampleFrame: vi.fn(), instantaneousFPS: 60 } as never;
   return ui;
 }
 
@@ -41,7 +43,7 @@ describe('PlayerInfoUI', () => {
     expect(ui.vSpeedDiv.innerText).toBe('4.00');
   });
 
-  it('updateUI renders moving and jumping states with classes', () => {
+  it('updateUI reflects moving and jumping states via active class', () => {
     const player: PlayerInfoTestPlayer = {
       moving: true,
       jumping: false,
@@ -55,12 +57,8 @@ describe('PlayerInfoUI', () => {
     const ui = createUiWith(player);
     ui.updateUI();
 
-    expect(ui.movingDiv.innerText).toBe('Yes');
-    expect(ui.movingDiv.classList.contains('yes')).toBe(true);
-    expect(ui.movingDiv.classList.contains('no')).toBe(false);
-    expect(ui.jumpingDiv.innerText).toBe('No');
-    expect(ui.jumpingDiv.classList.contains('no')).toBe(true);
-    expect(ui.jumpingDiv.classList.contains('yes')).toBe(false);
+    expect(ui.movingBadge.classList.contains('active')).toBe(true);
+    expect(ui.jumpingBadge.classList.contains('active')).toBe(false);
   });
 
   it('updateUI reflects changed moving and jumping states', () => {
@@ -81,13 +79,22 @@ describe('PlayerInfoUI', () => {
     player.jumping = true;
     ui.updateUI();
 
-    expect(ui.movingDiv.innerText).toBe('Yes');
-    expect(ui.movingDiv.classList.contains('yes')).toBe(true);
-    expect(ui.jumpingDiv.innerText).toBe('Yes');
-    expect(ui.jumpingDiv.classList.contains('yes')).toBe(true);
+    expect(ui.movingBadge.classList.contains('active')).toBe(true);
+    expect(ui.jumpingBadge.classList.contains('active')).toBe(true);
   });
 
-  it('show toggles root element display using flex', () => {
+  it('toggle shows and hides the element', () => {
+    const ui = new PlayerInfoUI({} as never, {} as never);
+    ui.rootElement = document.createElement('div');
+
+    ui.toggle();
+    expect(ui.rootElement.style.display).toBe('flex');
+
+    ui.toggle();
+    expect(ui.rootElement.style.display).toBe('none');
+  });
+
+  it('updateUI refreshes fps text when interval elapsed', () => {
     const player: PlayerInfoTestPlayer = {
       moving: false,
       jumping: false,
@@ -98,13 +105,19 @@ describe('PlayerInfoUI', () => {
       },
     };
 
-    const ui = new PlayerInfoUI({} as never, player as never);
-    ui.rootElement = document.createElement('div');
+    const ui = createUiWith(player);
+    ui.fpsValueDiv.innerText = '0';
+    ui.fpsUpdateIntervalMs = 1000;
+    ui.lastFpsUpdate = 0;
 
-    ui.show(true);
-    expect(ui.rootElement.style.display).toBe('flex');
+    const nowSpy = vi.spyOn(performance, 'now');
+    nowSpy.mockReturnValue(500);
+    ui.updateUI();
+    expect(ui.fpsValueDiv.innerText).toBe('0');
 
-    ui.show(false);
-    expect(ui.rootElement.style.display).toBe('none');
+    nowSpy.mockReturnValue(1500);
+    ui.updateUI();
+    expect(ui.fpsValueDiv.innerText).toBe('60');
+    expect(ui.lastFpsUpdate).toBe(1500);
   });
 });

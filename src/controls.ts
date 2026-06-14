@@ -63,12 +63,22 @@ export class GameControls {
       if (e.code === 'KeyL') {
         gameRoot.uiManager?.lobbyUI.openLobby();
       }
+      if (e.code === 'Backquote') {
+        gameRoot.uiManager?.playerInfoUI.toggle();
+      }
       if (player && !['in_lobby', 'in_chat'].includes(player.status)) {
         this.handleRespawn(e.code, player);
         this.handleCheckpoints(e.code, player);
         this.handleCollissions(e.code);
         this.handleFollowCamera(e.code);
         this.handleOpenChat(e.code);
+      }
+    });
+
+    document.addEventListener('keyup', e => {
+      if (e.code === 'F2') {
+        e.preventDefault();
+        gameRoot.uiManager?.playerInfoUI.toggle();
       }
     });
   }

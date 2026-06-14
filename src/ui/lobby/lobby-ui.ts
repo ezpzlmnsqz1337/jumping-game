@@ -318,6 +318,5 @@ export class LobbyUI extends AbstractUI {
     gameRoot.uiManager?.timeTableUI.show(show);
     gameRoot.uiManager?.gameSettingsUI.show(show);
     gameRoot.uiManager?.editorUI.show(show);
-    gameRoot.uiManager?.performanceUI.show(show);
   }
 }

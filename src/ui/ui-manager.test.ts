@@ -12,7 +12,6 @@ describe('UIManager', () => {
       timerUI: mk('timerUI'),
       timeTableUI: mk('timeTableUI'),
       gameSettingsUI: mk('gameSettingsUI'),
-      performanceUI: mk('performanceUI'),
       chatUI: mk('chatUI'),
       editorUI: mk('editorUI'),
       lobbyUI: mk('lobbyUI'),
@@ -26,7 +25,6 @@ describe('UIManager', () => {
       'timerUI',
       'timeTableUI',
       'gameSettingsUI',
-      'performanceUI',
       'chatUI',
       'editorUI',
       'lobbyUI',
@@ -35,7 +33,6 @@ describe('UIManager', () => {
     expect(manager.timerUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.timeTableUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.gameSettingsUI.bindUI).toHaveBeenCalledTimes(1);
-    expect(manager.performanceUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.chatUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.editorUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.lobbyUI.bindUI).toHaveBeenCalledTimes(1);
@@ -65,11 +62,6 @@ describe('UIManager', () => {
         kind = 'gameSettingsUI';
       },
     }));
-    vi.doMock('./performance/performance-ui', () => ({
-      PerformanceUI: class {
-        kind = 'performanceUI';
-      },
-    }));
     vi.doMock('./chat/chat-ui', () => ({
       ChatUI: class {
         kind = 'chatUI';
@@ -94,7 +86,6 @@ describe('UIManager', () => {
     expect((manager.timerUI as unknown as { kind: string }).kind).toBe('timerUI');
     expect((manager.timeTableUI as unknown as { kind: string }).kind).toBe('timeTableUI');
     expect((manager.gameSettingsUI as unknown as { kind: string }).kind).toBe('gameSettingsUI');
-    expect((manager.performanceUI as unknown as { kind: string }).kind).toBe('performanceUI');
     expect((manager.chatUI as unknown as { kind: string }).kind).toBe('chatUI');
     expect((manager.editorUI as unknown as { kind: string }).kind).toBe('editorUI');
     expect((manager.lobbyUI as unknown as { kind: string }).kind).toBe('lobbyUI');
@@ -103,7 +94,6 @@ describe('UIManager', () => {
     vi.doUnmock('./timer/timer-ui');
     vi.doUnmock('./time-table/time-table-ui');
     vi.doUnmock('./game-settings/game-settings-ui');
-    vi.doUnmock('./performance/performance-ui');
     vi.doUnmock('./chat/chat-ui');
     vi.doUnmock('./editor/editor-ui');
     vi.doUnmock('./lobby/lobby-ui');
