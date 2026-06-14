@@ -32,6 +32,12 @@ nvm use
 npm run start:server
 ```
 
+## Feature Development Team
+
+This project has a team workflow using custom OpenCode agents. Switch to the `feature-lead` agent (Tab key) and describe a feature — it orchestrates architect, developer, reviewer, tester, UI/UX designer, and QA subagents.
+
+- Team workflow guide: `docs/agents/team-workflow.md`
+
 ## Documentation Index
 
 - Overview and architecture: `docs/agents/overview.md`
