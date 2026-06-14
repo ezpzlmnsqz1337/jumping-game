@@ -1,9 +1,6 @@
 .lobby-wrapper {
-  bottom: 0;
-  left: 0;
+  inset: 0;
   position: fixed;
-  right: 0;
-  top: 0;
   z-index: var(--z-modal);
 }
 
@@ -296,11 +293,11 @@
 .colors > div {
   border-radius: var(--radius-md);
   cursor: pointer;
-  height: 5rem;
+  height: var(--size-color-swatch);
   opacity: 0.3;
   transform: scale(1);
   transition: transform var(--transition-fast) ease-out;
-  width: 5rem;
+  width: var(--size-color-swatch);
 }
 
 .colors > div:hover,
@@ -312,21 +309,27 @@
 .colors > div.blue {
   background-color: var(--blue);
 }
+
 .colors > div.red {
   background-color: var(--red);
 }
+
 .colors > div.green {
   background-color: var(--green);
 }
+
 .colors > div.yellow {
   background-color: var(--yellow);
 }
+
 .colors > div.purple {
   background-color: var(--purple);
 }
+
 .colors > div.pink {
   background-color: var(--pink);
 }
+
 .colors > div.orange {
   background-color: var(--orange);
 }
@@ -449,11 +452,11 @@
 
 /* Settings button */
 .ui-buttons {
-  bottom: 0.5rem;
+  bottom: var(--space-player-info-bottom);
   color: var(--color-text-primary);
   font-size: var(--font-size-ui-6xl);
   position: fixed;
-  right: 0;
+  right: var(--space-none);
   z-index: var(--z-modal-top);
 }
 
@@ -466,10 +469,10 @@
   cursor: pointer;
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (width <= 1000px) {
   .colors > div {
-    height: 4rem;
-    width: 4rem;
+    height: calc(var(--size-color-swatch) - 1rem);
+    width: calc(var(--size-color-swatch) - 1rem);
   }
 
   .editor-actions {
@@ -503,7 +506,7 @@
   }
 
   .lobby {
-    margin: 0;
+    margin: var(--space-none);
     padding: var(--space-xl);
   }
 

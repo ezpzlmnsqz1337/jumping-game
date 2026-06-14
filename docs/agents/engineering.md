@@ -151,3 +151,5 @@ Before approving a merge request:
 - Multiplayer changes tested with at least two clients locally.
 - UI changes verified on desktop aspect ratios and a narrow/mobile-like viewport.
 - If protocol changed: client/server compatibility confirmed in same branch.
+- For CSS changes: `npm run lint:css` passes with no errors.
+- For CSS changes: new tokens added to `src/style.css` before use.

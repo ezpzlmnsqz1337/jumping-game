@@ -257,14 +257,14 @@ Each UI module's CSS file should follow this structure:
 ## Linting and Formatting
 
 - **Prettier** formats all CSS automatically via `npm run format`.
-- **No CSS-specific linter (stylelint) is installed yet.** This is a known gap. When adding stylelint, configure rules for:
-  - Alphabetical property order
+- **Stylelint** is installed with `stylelint-order` plugin. It enforces:
+  - Alphabetical property order (auto-fixable with `npm run lint:css:fix`)
   - No duplicate selectors
-  - No `!important` (proactive only, allow list)
+  - No `!important`
   - No `id` selectors
-  - No universal selectors as key selectors
-  - Color naming (no named colors)
-  - Unit validation (prefer rem)
+  - No named colors
+  - Relative units (`rem`, `em`, `%`, `vh`, `vw`, `fr`)
+- Run `npm run lint:css` to check — CI runs this on every pull request.
 
 ---
 
@@ -279,6 +279,7 @@ Each UI module's CSS file should follow this structure:
 
 ## Code Review Checklist for CSS
 
+- [ ] `npm run lint:css` passes with no errors
 - [ ] All values use design tokens (no hardcoded rem/px)
 - [ ] No `!important` (or proactively justified)
 - [ ] No IDs in selectors
@@ -286,6 +287,6 @@ Each UI module's CSS file should follow this structure:
 - [ ] No magic numbers
 - [ ] No inline styles (except display toggling)
 - [ ] Selectors follow BEM-like naming
-- [ ] Properties alphabetized
+- [ ] Properties alphabetized (enforced by stylelint)
 - [ ] Responsive breakpoints use existing tokens
 - [ ] New tokens added to `src/style.css` before use
