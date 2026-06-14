@@ -44,6 +44,21 @@
 - Separated local-best and bundled-map-record storage slots to prevent local runs from overwriting bundled map records.
 - Added explicit migration telemetry via warning logs for legacy storage key conversions.
 
+10. Multiplayer lobby polish
+- Removed "Select Level" selector in multiplayer mode — server now dictates the map.
+- Lobby shows read-only current map info with correct wall count from the running level.
+- Fixed server `/api/levels` hardcoded wall count returning 0.
+- Color/nickname change detection loop in player sync identified (reduced player mesh recreate cycles).
+
+11. Dev tooling infrastructure
+- Added Chrome DevTools MCP integration for visual debugging (Chromium installed via apt).
+- Moved opencode.json configuration to `~/.config/opencode/` (out of project root).
+- Fixed all ESLint errors (unused catch bindings, `any` casts).
+- Formatted all source files with Prettier.
+
 ## Next Priorities
 
-None. All roadmap tasks are currently complete.
+1. Investigate and fix the `__playground_message_types` warning from `@colyseus/playground` monkey-patch.
+2. Resolve the remaining player create/remove cycle in `updatePlayers` when color/nickname changes.
+3. Add server-authoritative level sync — broadcast the current map name/state from the room so all clients agree.
+4. Add level count returned from the server to be dynamic rather than hardcoded.

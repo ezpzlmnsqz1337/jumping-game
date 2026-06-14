@@ -11,6 +11,8 @@ This file is an index. Keep it short and place detailed guidance in `docs/agents
 - Prefer incremental changes over rewrites.
 - If multiplayer protocol/state changes, update both client and server in the same task.
 - Preserve gameplay feel unless explicitly asked to redesign mechanics.
+- Before committing, run `npm run format:check`, `npm run lint`, and `npm run test:ui` — all must pass.
+- opencode.json lives at `~/.config/opencode/opencode.json` (not in the project root).
 
 ## Quickstart Commands
 
