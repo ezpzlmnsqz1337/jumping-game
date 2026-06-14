@@ -1,6 +1,10 @@
 import * as BABYLON from '@babylonjs/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MultiplayerSession } from './multiplayer-session';
+import {
+  MAX_EXTRAPOLATION_DISTANCE,
+  MAX_EXTRAPOLATION_MS,
+  MultiplayerSession,
+} from './multiplayer-session';
 import type { PlayerInfo } from './multiplayer-session';
 
 describe('MultiplayerSession interpolation', () => {
@@ -170,5 +174,54 @@ describe('MultiplayerSession interpolation', () => {
 
     // Position should not change
     expect(player.mesh!.position.equals(originalPos)).toBe(true);
+  });
+
+  it('applies bounded extrapolation when packets are briefly missing', () => {
+    const player: PlayerInfo = {
+      status: 'playing',
+      interpolationDuration: 100,
+      mesh: {
+        position: new BABYLON.Vector3(0, 0, 0),
+        rotationQuaternion: BABYLON.Quaternion.Identity(),
+        physicsBody: { disablePreStep: false } as never,
+      } as never,
+      lastServerPosition: new BABYLON.Vector3(0, 0, 0),
+      lastServerRotation: BABYLON.Quaternion.Identity(),
+      extrapolationStartAt: 1000,
+      lastExtrapolationAt: 1000,
+      predictedVelocity: new BABYLON.Vector3(30, 0, 0),
+    };
+
+    session.players.set('remote-1', player);
+    vi.spyOn(performance, 'now').mockReturnValue(1010);
+
+    session.applyInterpolation();
+
+    expect(player.mesh!.position.x).toBeGreaterThan(0);
+    expect(player.mesh!.position.x).toBeLessThanOrEqual(MAX_EXTRAPOLATION_DISTANCE);
+  });
+
+  it('stops extrapolation beyond max time window', () => {
+    const player: PlayerInfo = {
+      status: 'playing',
+      interpolationDuration: 100,
+      mesh: {
+        position: new BABYLON.Vector3(1, 0, 0),
+        rotationQuaternion: BABYLON.Quaternion.Identity(),
+        physicsBody: { disablePreStep: false } as never,
+      } as never,
+      lastServerPosition: new BABYLON.Vector3(0, 0, 0),
+      lastServerRotation: BABYLON.Quaternion.Identity(),
+      extrapolationStartAt: 1000,
+      lastExtrapolationAt: 1000,
+      predictedVelocity: new BABYLON.Vector3(10, 0, 0),
+    };
+
+    session.players.set('remote-1', player);
+    vi.spyOn(performance, 'now').mockReturnValue(1000 + MAX_EXTRAPOLATION_MS + 1);
+
+    session.applyInterpolation();
+
+    expect(player.mesh!.position.x).toBe(1);
   });
 });

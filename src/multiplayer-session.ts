@@ -15,6 +15,8 @@ import { TimeEntry } from './level-timer';
 
 const UPDATE_SPEED_MS = 1000 / 60;
 const PLAYER_INFO_SEND_INTERVAL_MS = 1000 / 30;
+export const MAX_EXTRAPOLATION_MS = 150;
+export const MAX_EXTRAPOLATION_DISTANCE = 1.2;
 
 interface PlayerInfoMessage {
   position: Position;
@@ -63,6 +65,12 @@ interface PlayerInfo {
   interpolationStartTime?: number;
   interpolationDuration: number;
   interpolationActive?: boolean; // Track if disablePreStep is currently enabled
+  lastServerPosition?: BABYLON.Vector3;
+  lastServerRotation?: BABYLON.Quaternion;
+  lastServerUpdateAt?: number;
+  predictedVelocity?: BABYLON.Vector3;
+  extrapolationStartAt?: number;
+  lastExtrapolationAt?: number;
 }
 
 export interface ChatMessage {
@@ -173,19 +181,38 @@ export class MultiplayerSession {
           player.mesh = await this.createMpPlayer(this.scene, nickname, color);
         }
         if (info.position && info.rotation) {
-          // set interpolation targets for next frame lerp
-          player.targetPosition = new BABYLON.Vector3(
+          const now = performance.now();
+          const nextServerPosition = new BABYLON.Vector3(
             info.position.x,
             info.position.y,
             info.position.z
           );
-          player.targetRotation = new BABYLON.Quaternion(
+          const nextServerRotation = new BABYLON.Quaternion(
             info.rotation.x,
             info.rotation.y,
             info.rotation.z,
             info.rotation.w
           );
-          player.interpolationStartTime = performance.now();
+
+          if (player.lastServerPosition && player.lastServerUpdateAt) {
+            const deltaMs = now - player.lastServerUpdateAt;
+            if (deltaMs > 0) {
+              player.predictedVelocity = nextServerPosition
+                .subtract(player.lastServerPosition)
+                .scale(1000 / deltaMs);
+            }
+          }
+
+          player.lastServerPosition = nextServerPosition.clone();
+          player.lastServerRotation = nextServerRotation.clone();
+          player.lastServerUpdateAt = now;
+          player.extrapolationStartAt = now;
+          player.lastExtrapolationAt = now;
+
+          // set interpolation targets for next frame lerp
+          player.targetPosition = nextServerPosition;
+          player.targetRotation = nextServerRotation;
+          player.interpolationStartTime = now;
           // Store current position for interpolation
           player.position = player.position || info.position;
           player.rotation = player.rotation || info.rotation;
@@ -214,9 +241,15 @@ export class MultiplayerSession {
   applyInterpolation() {
     const now = performance.now();
     for (const [, player] of this.players) {
-      if (!player.mesh || !player.targetPosition || !player.targetRotation || !player.interpolationStartTime) {
+      if (!player.mesh) {
+        continue;
+      }
+
+      if (!player.targetPosition || !player.targetRotation || !player.interpolationStartTime) {
+        this.applyExtrapolation(player, now);
+
         // Cleanup: re-enable physics if interpolation was cleared but disablePreStep is still set
-        if (player.mesh && player.interpolationActive && player.mesh.physicsBody) {
+        if (player.interpolationActive && player.mesh.physicsBody) {
           player.mesh.physicsBody.disablePreStep = false;
           player.interpolationActive = false;
         }
@@ -255,6 +288,44 @@ export class MultiplayerSession {
         player.targetPosition = undefined;
         player.targetRotation = undefined;
       }
+    }
+  }
+
+  applyExtrapolation(player: PlayerInfo, now: number) {
+    if (
+      !player.mesh ||
+      !player.lastServerPosition ||
+      !player.extrapolationStartAt ||
+      !player.predictedVelocity
+    ) {
+      return;
+    }
+
+    const elapsedTotal = now - player.extrapolationStartAt;
+    if (elapsedTotal > MAX_EXTRAPOLATION_MS) return;
+
+    const previousStepAt = player.lastExtrapolationAt ?? now;
+    const stepMs = now - previousStepAt;
+    player.lastExtrapolationAt = now;
+    if (stepMs <= 0) return;
+
+    const extrapolated = player.mesh.position
+      .clone()
+      .add(player.predictedVelocity.scale(stepMs / 1000));
+    const offset = extrapolated.subtract(player.lastServerPosition);
+    if (offset.length() > MAX_EXTRAPOLATION_DISTANCE) {
+      offset.normalize().scaleInPlace(MAX_EXTRAPOLATION_DISTANCE);
+      player.mesh.position = player.lastServerPosition.add(offset);
+    } else {
+      player.mesh.position = extrapolated;
+    }
+
+    if (player.lastServerRotation && player.mesh.rotationQuaternion) {
+      player.mesh.rotationQuaternion = BABYLON.Quaternion.Slerp(
+        player.mesh.rotationQuaternion,
+        player.lastServerRotation,
+        0.2
+      );
     }
   }
 

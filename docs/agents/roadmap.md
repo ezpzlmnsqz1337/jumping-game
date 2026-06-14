@@ -19,19 +19,28 @@
 - Kept remote-player physics pre-step suspended for the entire interpolation window.
 - Added collision layer audit helpers and tests to detect contradictory mask setups.
 
+5. Replay and ghost quality
+- Added replay format versioning (`v1`) and payload validation.
+- Added fail-safe handling for missing/corrupt/unsupported replay data.
+- Added replay metadata capture/surface (player, time, date, map, replay version, source).
+- Added legacy replay migration path with warning logs and tests.
+
+6. UX polish (phase 1)
+- Improved onboarding copy in lobby/settings flows.
+- Added explicit start/end/teleport run-status feedback in timer UI.
+- Added multiplayer connection status indicators for connect/disconnect/reconnect states.
+
 ## Next Priorities
 
-1. Replay and ghost quality
-- Version and validate replay format.
-- Add fail-safe when replay data is missing or corrupt.
-- Store and surface metadata (player name, time, date, map, version).
-
-2. UX polish
-- Improve onboarding in lobby and settings flows.
-- Add clearer feedback for start, end, and teleport events.
-- Add clearer multiplayer connection and status indicators.
-
-3. Multiplayer authority hardening (optional, deeper pass)
+1. Multiplayer authority hardening (optional, deeper pass)
 - Move further toward server-authoritative transform resolution.
-- Add bounded extrapolation for packet gaps and lag spikes.
-- Keep local prediction minimal and reversible.
+- Extend bounded extrapolation pass with stronger server correction policies.
+- Keep local prediction minimal, reversible, and capped under prolonged packet loss.
+
+2. UX polish (phase 2)
+- Tune message timing/priority to reduce overlap between timer, connection, and chat surfaces.
+- Add optional toast/sound mapping for key state transitions.
+
+3. Replay and ghost quality (phase 2)
+- Consider separate local-best vs bundled-map-record storage slots.
+- Add explicit migration telemetry/debug counters for replay upgrades.

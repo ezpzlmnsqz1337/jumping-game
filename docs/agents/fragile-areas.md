@@ -3,8 +3,9 @@
 - Multiplayer physics consistency and collision behavior are improved but still sensitive under lag spikes and packet gaps.
 - Camera system has better mode handoff controls, but edge-case clipping can still appear in dense geometry.
 - Player collision toggle in multiplayer is gameplay-useful but technically fragile.
-- Ghost replay/demo should be protected against invalid/incomplete recording data.
+- Ghost replay/demo now validates payload shape/version and migrates legacy data, but metadata/source fields can still regress if future formats diverge without migration updates.
 - Trigger ordering (start/end/reset/teleport) is centralized, but can regress if new trigger paths bypass GameLevel transition methods.
+- Multiplayer now uses bounded extrapolation for short packet gaps; overshoot limits and reconciliation thresholds are sensitive and should be retuned cautiously.
 
 ## Level Editor
 
