@@ -193,7 +193,7 @@ describe('GameSettingsUI', () => {
 
     expect(ui.automaticCameraCheckBox.checked).toBe(true);
     expect(ui.collissionsCheckBox.checked).toBe(true);
-    expect(ui.playerInfoCheckBox.checked).toBe(true);
+    expect(ui.playerInfoCheckBox.checked).toBe(false);
     expect(ui.rootElement).toBe(ui.gameSettingsDiv);
     expect(toggleEditModeSpy).toHaveBeenCalledTimes(1);
 

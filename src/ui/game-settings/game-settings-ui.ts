@@ -104,7 +104,7 @@ export class GameSettingsUI extends AbstractUI {
       this.toggleCollissions();
     });
 
-    this.playerInfoCheckBox.checked = true;
+    this.playerInfoCheckBox.checked = false;
     this.playerInfoCheckBox.addEventListener('click', () => {
       this.togglePlayerInfo();
     });
