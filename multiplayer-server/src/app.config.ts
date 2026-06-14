@@ -43,9 +43,7 @@ export default config({
      * The server dictates which maps can be played in production.
      */
     app.get('/api/levels', (_req: Request, res: Response) => {
-      res.json([
-        { name: 'level1', walls: 153, triggers: 2 },
-      ]);
+      res.json([{ name: 'level1', walls: 153, triggers: 2 }]);
     });
 
     /**
