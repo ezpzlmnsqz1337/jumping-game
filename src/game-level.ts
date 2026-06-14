@@ -1,7 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
+import earcut from 'earcut';
 import { PlayerEntity } from './entities/player-entity';
 import { SpawnPointEntity } from './entities/spawn-point-entity';
-import { WallEntity } from './entities/wall-entity';
+import { WallEntity, WallType } from './entities/wall-entity';
 import { Skybox } from './scenes/level1/skybox';
 import { ShadowGenerator } from './shadows';
 import { LevelTimer } from './level-timer';
@@ -9,13 +10,22 @@ import { Trigger } from './triggers/trigger';
 import { EndTrigger } from './triggers/end-trigger';
 import { StartTrigger } from './triggers/start-trigger';
 import { TeleportTrigger } from './triggers/teleport-trigger';
+import { GameEntity } from './entities/game-entity';
+import { AutomaticCamera } from './cameras/automatic-camera';
 import gameRoot from './game-root';
 import {
+  deserializeColor3,
+  deserializeQuaternion,
+  deserializeVector3,
   serializeColor3,
   serializeQuaternion,
   serializeVector3,
   type LevelDocument,
+  type SerializedTrigger,
+  type TextureVariant,
 } from './level-document';
+import { getDarkTexture, getLightTexture, getRedTexture } from './assets/textures';
+import { FILTER_GROUP_GROUND } from './collission-groups';
 
 export class GameLevel {
   name: string;
@@ -146,9 +156,7 @@ export class GameLevel {
       checkpoints: player.checkpoints.length,
     });
 
-    this.scene
-      ?.sounds?.find(sound => sound.name === 'wicked-sick')
-      ?.play();
+    this.scene?.sounds?.find(sound => sound.name === 'wicked-sick')?.play();
 
     const demo = gameRoot.demoService.stopRecording();
     const replay = gameRoot.demoService.createReplayPayload(demo, {
@@ -275,5 +283,286 @@ export class GameLevel {
       texts: this.serializeTextDecorations(),
       environment: this.serializeEnvironment(),
     };
+  }
+}
+
+export function createTemplateLevelDocument(name: string): LevelDocument {
+  return {
+    version: 1,
+    name,
+    walls: [
+      {
+        wallType: 'ground',
+        opts: { width: 40, height: 1, depth: 40, textureVariant: 'light' as TextureVariant },
+        textureVariant: 'light',
+        position: { x: 0, y: -0.5, z: 0 },
+      },
+    ],
+    spawnPoints: [{ name: 'spawn-1', position: { x: 0, y: 0.5, z: 0 } }],
+    startTriggers: [
+      {
+        triggerType: 'start',
+        debugType: 'trigger',
+        position: { x: -5, y: 0, z: 0 },
+        scaling: { x: 3, y: 0.1, z: 3 },
+        isVisible: true,
+      },
+    ],
+    endTriggers: [
+      {
+        triggerType: 'end',
+        debugType: 'trigger',
+        position: { x: 5, y: 0, z: 0 },
+        scaling: { x: 3, y: 0.1, z: 3 },
+        isVisible: true,
+      },
+    ],
+    teleports: [],
+    triggers: [],
+    environment: {
+      skyboxEnabled: true,
+      ground: {
+        width: 40,
+        height: 40,
+        textureVariant: 'light',
+        uScale: 20,
+        vScale: 20,
+      },
+    },
+  };
+}
+
+export class DocumentLevel extends GameLevel {
+  private doc: LevelDocument;
+
+  constructor(doc: LevelDocument) {
+    super(doc.name);
+    this.doc = doc;
+  }
+
+  protected createSkybox(): void {
+    if (this.doc.environment?.skyboxEnabled === false) {
+      this.skybox = null;
+      return;
+    }
+    this.skybox = new Skybox(this.scene!);
+  }
+
+  protected createGround() {
+    const scene = this.scene!;
+    const serializedGround = this.doc.environment?.ground;
+
+    const groundMaterial = new BABYLON.StandardMaterial('groundMaterial', scene);
+    const uScale = serializedGround?.uScale ?? 20;
+    const vScale = serializedGround?.vScale ?? 20;
+    const textureVariant = serializedGround?.textureVariant ?? 'dark';
+
+    if (textureVariant === 'light') {
+      groundMaterial.diffuseTexture = getLightTexture({ uScale, vScale }, scene);
+    } else if (textureVariant === 'red') {
+      groundMaterial.diffuseTexture = getRedTexture({ uScale, vScale }, scene);
+    } else {
+      groundMaterial.diffuseTexture = getDarkTexture({ uScale, vScale }, scene);
+    }
+    groundMaterial.roughness = serializedGround?.roughness ?? 0.7;
+
+    this.ground = BABYLON.MeshBuilder.CreateGround(
+      'ground',
+      {
+        height: serializedGround?.height ?? 40,
+        width: serializedGround?.width ?? 40,
+      },
+      scene
+    );
+    this.ground.material = groundMaterial;
+    if (serializedGround?.scaling) {
+      this.ground.scaling = deserializeVector3(serializedGround.scaling);
+    }
+
+    const groundAggregate = new BABYLON.PhysicsAggregate(
+      this.ground,
+      BABYLON.PhysicsShapeType.BOX,
+      { mass: 0, friction: 0.4 },
+      scene
+    );
+    groundAggregate.shape.filterMembershipMask = FILTER_GROUP_GROUND;
+  }
+
+  protected createWalls() {
+    const scene = this.scene!;
+    this.walls = this.doc.walls.map(wall => {
+      const opts =
+        wall.textureVariant && typeof wall.textureVariant === 'string'
+          ? { ...wall.opts, textureVariant: wall.textureVariant }
+          : wall.opts;
+
+      const wallEntity = new WallEntity(
+        scene,
+        this,
+        wall.wallType as WallType,
+        opts,
+        deserializeVector3(wall.position),
+        wall.rotation ? deserializeQuaternion(wall.rotation) : undefined
+      );
+
+      if (wall.scaling) {
+        wallEntity.mesh.scaling = deserializeVector3(wall.scaling);
+      }
+      return wallEntity;
+    });
+
+    if (this.doc.texts && this.doc.texts.length > 0) {
+      this.createSerializedTexts(this.doc.texts);
+    }
+  }
+
+  protected createSpawnPoints() {
+    this.spawnPoints = this.doc.spawnPoints.map(
+      spawnPoint =>
+        new SpawnPointEntity(
+          spawnPoint.name,
+          this,
+          this.scene!,
+          deserializeVector3(spawnPoint.position)
+        )
+    );
+  }
+
+  protected createStartTriggers() {
+    this.startTriggers = this.doc.startTriggers.map(
+      trigger =>
+        new StartTrigger(this.scene!, {
+          level: this,
+          position: deserializeVector3(trigger.position),
+          scaling: deserializeVector3(trigger.scaling),
+          rotationQuaternion: trigger.rotation
+            ? deserializeQuaternion(trigger.rotation)
+            : undefined,
+          isVisible: trigger.isVisible,
+          debugType: trigger.debugType,
+        })
+    );
+  }
+
+  protected createEndTriggers() {
+    this.endTriggers = this.doc.endTriggers.map(
+      trigger =>
+        new EndTrigger(this.scene!, {
+          level: this,
+          position: deserializeVector3(trigger.position),
+          scaling: deserializeVector3(trigger.scaling),
+          rotationQuaternion: trigger.rotation
+            ? deserializeQuaternion(trigger.rotation)
+            : undefined,
+          isVisible: trigger.isVisible,
+          debugType: trigger.debugType,
+        })
+    );
+  }
+
+  protected createTeleports() {
+    const scene = this.scene!;
+    this.teleports = this.doc.teleports.map((teleport, index) => {
+      const teleportTrigger = new TeleportTrigger(
+        `teleport-${index + 1}`,
+        scene,
+        {
+          level: this,
+          position: deserializeVector3(teleport.position),
+          scaling: deserializeVector3(teleport.scaling),
+          rotationQuaternion: teleport.rotation
+            ? deserializeQuaternion(teleport.rotation)
+            : undefined,
+          isVisible: teleport.isVisible,
+          debugType: teleport.debugType,
+        },
+        deserializeVector3(teleport.destination)
+      );
+      GameEntity.createLabelTag(scene, teleportTrigger.mesh, teleportTrigger.name);
+      return teleportTrigger;
+    });
+
+    this.doc.triggers.forEach(triggerData => {
+      const trigger = new Trigger(scene, {
+        level: this,
+        position: deserializeVector3(triggerData.position),
+        scaling: deserializeVector3(triggerData.scaling),
+        width: triggerData.boxSize?.x,
+        height: triggerData.boxSize?.y,
+        depth: triggerData.boxSize?.z,
+        rotationQuaternion: triggerData.rotation
+          ? deserializeQuaternion(triggerData.rotation)
+          : undefined,
+        isVisible: triggerData.isVisible,
+        debugType: triggerData.debugType,
+        triggerType: triggerData.triggerType,
+        cameraTarget: triggerData.cameraTarget,
+      });
+      this.bindSerializedTriggerBehavior(trigger, triggerData);
+    });
+  }
+
+  protected createLights() {
+    const scene = this.scene!;
+    const hemiLight = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
+    this.lights = [hemiLight];
+  }
+
+  private createSerializedTexts(texts: NonNullable<LevelDocument['texts']>) {
+    const scene = this.scene!;
+    const font = scene.metadata?.fonts?.fontMontserratRegular;
+    if (!font) return;
+
+    texts.forEach(textData => {
+      const textMesh = BABYLON.MeshBuilder.CreateText(
+        '',
+        textData.text,
+        font,
+        { size: 1, depth: 0.3 },
+        scene,
+        earcut
+      ) as BABYLON.Mesh;
+
+      textMesh.position = deserializeVector3(textData.position);
+      if (textData.rotation) {
+        textMesh.rotationQuaternion = deserializeQuaternion(textData.rotation);
+      }
+
+      const material = new BABYLON.StandardMaterial('serializedTextMaterial', scene);
+      material.diffuseColor = textData.color
+        ? deserializeColor3(textData.color)
+        : new BABYLON.Color3(1, 1, 1);
+      textMesh.material = material;
+      textMesh.metadata = {
+        levelTextDecoration: {
+          text: textData.text,
+          color: material.diffuseColor,
+        },
+      };
+    });
+  }
+
+  private bindSerializedTriggerBehavior(trigger: Trigger, triggerData: SerializedTrigger) {
+    if (triggerData.triggerType === 'camera' && triggerData.cameraTarget) {
+      trigger.onEnter = (_mesh: BABYLON.Mesh, player: PlayerEntity) => {
+        const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
+        if (!camera) return;
+        const { alpha, beta, radius, speed } = triggerData.cameraTarget!;
+        camera.setMoveToTarget(alpha, beta, radius, speed ?? 50);
+      };
+      return;
+    }
+
+    if (triggerData.triggerType === 'jump') {
+      trigger.onEnter = (_mesh: BABYLON.Mesh, player: PlayerEntity) => {
+        setTimeout(() => {
+          const velocity = player.physics.body.getLinearVelocity();
+          player.physics.body.setLinearVelocity(
+            velocity.multiply(new BABYLON.Vector3(0.5, 0, 0.5))
+          );
+          player.jump();
+        });
+      };
+    }
   }
 }

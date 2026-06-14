@@ -4,6 +4,20 @@ import { GameLevel } from './game-level';
 import gameRoot from './game-root';
 import { LevelTimer } from './level-timer';
 
+interface MockPlayer {
+  nickname?: string;
+  checkpoints: unknown[];
+  lastCheckpointIndex: number;
+  mesh?: { position: BABYLON.Vector3 };
+  physics?: {
+    body: {
+      disablePreStep: boolean;
+      setLinearVelocity: ReturnType<typeof vi.fn>;
+      setAngularVelocity: ReturnType<typeof vi.fn>;
+    };
+  };
+}
+
 describe('GameLevel run transitions', () => {
   const originalDemoService = gameRoot.demoService;
   const originalMultiplayer = gameRoot.multiplayer;
@@ -48,21 +62,21 @@ describe('GameLevel run transitions', () => {
     const player = {
       checkpoints: [{}],
       lastCheckpointIndex: 4,
-    } as never;
+    } as MockPlayer;
 
-    expect(level.armRunFromStart(player)).toBe(true);
+    expect(level.armRunFromStart(player as any)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(level.timer.state).toBe('armed');
     expect(player.checkpoints).toEqual([]);
     expect(player.lastCheckpointIndex).toBe(0);
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('ready');
 
-    expect(level.startRunFromStart(player)).toBe(true);
+    expect(level.startRunFromStart(player as any)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(level.timer.state).toBe('running');
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledWith(player);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('running');
 
-    expect(level.startRunFromStart(player)).toBe(false);
+    expect(level.startRunFromStart(player as any)).toBe(false); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(gameRoot.demoService.startRecording).toHaveBeenCalledTimes(1);
   });
 
@@ -71,11 +85,11 @@ describe('GameLevel run transitions', () => {
     level.timer = new LevelTimer();
     level.timer.armRun();
     level.timer.startRun();
-    
+
     // Simulate realistic run time: advance timer to 30 seconds later
     const mockStartTime = level.timer.startedAt;
     vi.spyOn(Date, 'now').mockReturnValue(mockStartTime + 30000); // 30 seconds
-    
+
     const sound = { name: 'wicked-sick', play: vi.fn() };
     level.scene = { sounds: [sound] } as never;
     const player = {
@@ -100,10 +114,7 @@ describe('GameLevel run transitions', () => {
         mapName: 'test',
       })
     );
-    expect(gameRoot.demoService.saveReplay).toHaveBeenCalledWith(
-      expect.anything(),
-      'local-best'
-    );
+    expect(gameRoot.demoService.saveReplay).toHaveBeenCalledWith(expect.anything(), 'local-best');
     expect(gameRoot.uiManager?.timeTableUI.updateReplayMetadata).toHaveBeenCalledTimes(1);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith(
       'finished',
@@ -120,7 +131,7 @@ describe('GameLevel run transitions', () => {
     level.timer = new LevelTimer();
     level.timer.armRun();
     level.timer.startRun();
-    
+
     const mockStartTime = level.timer.startedAt;
     // Mock Date.now to return immediately after start (triggers anti-cheat)
     vi.spyOn(Date, 'now').mockReturnValue(mockStartTime + 50);
@@ -159,14 +170,14 @@ describe('GameLevel run transitions', () => {
           setAngularVelocity,
         },
       },
-    } as never;
+    } as MockPlayer;
     const destination = new BABYLON.Vector3(4, 5, 6);
 
-    expect(level.resetRunForTeleport(player, destination)).toBe(true);
+    expect(level.resetRunForTeleport(player as any, destination)).toBe(true); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(level.timer.state).toBe('idle');
     expect(player.checkpoints).toEqual([]);
     expect(player.lastCheckpointIndex).toBe(0);
-    expect(player.mesh.position.equals(destination)).toBe(true);
+    expect(player.mesh!.position.equals(destination)).toBe(true);
     expect(setLinearVelocity).toHaveBeenCalledWith(BABYLON.Vector3.Zero());
     expect(setAngularVelocity).toHaveBeenCalledWith(BABYLON.Vector3.Zero());
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);

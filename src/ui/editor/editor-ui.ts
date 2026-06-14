@@ -36,8 +36,16 @@ export class EditorUI extends AbstractUI {
 
   oldMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
 
+  private autoSaveTimer: ReturnType<typeof setInterval> | null = null;
+
   private setEditModeEnabled(enabled: boolean) {
     this.editorDiv.style.display = enabled ? 'flex' : 'none';
+
+    if (enabled) {
+      this.startAutoSave();
+    } else {
+      this.stopAutoSave();
+    }
 
     if (!this.gizmoManager) return;
 
@@ -509,5 +517,25 @@ export class EditorUI extends AbstractUI {
     });
 
     this.rootElement = this.editorDiv;
+  }
+
+  private startAutoSave() {
+    if (this.autoSaveTimer) return;
+    this.autoSaveTimer = setInterval(() => {
+      if (!gameRoot.level || !gameRoot.level.scene) return;
+      try {
+        const doc = gameRoot.level.serialize();
+        GameStorage.saveLevelDocument(doc);
+      } catch {
+        // Silently fail auto-save
+      }
+    }, 30000);
+  }
+
+  private stopAutoSave() {
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
   }
 }

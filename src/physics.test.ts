@@ -1,29 +1,17 @@
-import * as BABYLON from '@babylonjs/core';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Physics Stability Tests
- * 
+ *
  * These tests document the physics cadence normalization strategy:
  * 1. Local player uses standard physics (responsive to gravity/controls)
  * 2. Remote players have disablePreStep = true during interpolation (no ghost forces)
  * 3. Interpolation spans full 33ms network interval (synchronizes with updates)
  * 4. Physics is re-enabled after interpolation completes
- * 
+ *
  * This prevents desync between client physics simulation and networked transforms.
  */
 describe('Physics stability and cadence', () => {
-  let mockScene: BABYLON.Scene;
-
-  beforeEach(() => {
-    mockScene = {
-      enablePhysics: vi.fn(),
-      onBeforePhysicsObservable: {
-        add: vi.fn(),
-      },
-    } as never;
-  });
-
   it('documents physics cadence mismatch: 60 Hz physics vs 30 Hz network updates', () => {
     // Physics engine runs at ~60 FPS = 16.67ms per tick
     // Network updates arrive at 30 Hz = 33ms interval
@@ -49,7 +37,6 @@ describe('Physics stability and cadence', () => {
     // - Frame N+1: disablePreStep = false, physics resumes normally
     // Result: Smooth movement, no jitter
 
-    const INTERPOLATION_START_MS = 1000;
     const INTERPOLATION_DURATION_MS = 33;
     const PHYSICS_TICK_MS = 16.67;
 

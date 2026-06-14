@@ -48,7 +48,7 @@ describe('LobbyUI', () => {
     ui.nicknameErrorText = document.createElement('span');
     ui.nicknameErrorText.style.display = 'none';
 
-    (ui as any).confirmPlay();
+    ui.confirmPlay();
 
     expect(ui.nicknameInput.classList.contains('invalid')).toBe(true);
     expect(ui.nicknameErrorText.style.display).toBe('block');
@@ -89,7 +89,7 @@ describe('LobbyUI', () => {
 
     const closeSpy = vi.spyOn(ui, 'closeLobby').mockImplementation(() => {});
 
-    (ui as any).confirmPlay();
+    ui.confirmPlay();
 
     expect(localStorage.getItem('color')).toBe('red');
     expect(localStorage.getItem('nickname')).toBe('very-long-playe');
@@ -189,7 +189,7 @@ describe('LobbyUI', () => {
 
     const closeSpy = vi.spyOn(ui, 'closeLobby').mockImplementation(() => {});
 
-    (ui as any).confirmPlay();
+    ui.confirmPlay();
 
     expect(player.changeNickname).not.toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();

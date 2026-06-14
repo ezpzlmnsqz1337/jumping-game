@@ -53,7 +53,7 @@ interface ObjectInfo {
   mesh?: BABYLON.Mesh;
 }
 
-interface PlayerInfo {
+export interface PlayerInfo {
   position?: Position;
   rotation?: Rotation;
   nickname?: string;
@@ -100,9 +100,14 @@ export class MultiplayerSession {
   constructor(scene: BABYLON.Scene, player: PlayerEntity, _objects: BABYLON.Mesh[]) {
     this.scene = scene;
     this.player = player;
-    this.ws = new Colyseus.Client(`ws://${window.location.host}`);
-    this.ws
-      .joinOrCreate<MultiplayerGameInfo>('my_room')
+    this.ws = new Colyseus.Client(
+      `ws://${localStorage.getItem('mp-server-address') || window.location.host}`
+    );
+    const roomId = localStorage.getItem('mp-room-id');
+    const joinPromise = roomId
+      ? this.ws.joinById<MultiplayerGameInfo>(roomId)
+      : this.ws.joinOrCreate<MultiplayerGameInfo>('my_room');
+    joinPromise
       .then(room => {
         this.room = room;
         console.warn(room.sessionId, 'joined', room.name);
@@ -275,7 +280,11 @@ export class MultiplayerSession {
         // Interpolate towards target (keep disablePreStep = true throughout)
         const currentPos = player.mesh.position.clone();
         const newPos = BABYLON.Vector3.Lerp(currentPos, player.targetPosition, t);
-        const newRot = BABYLON.Quaternion.Slerp(player.mesh.rotationQuaternion || BABYLON.Quaternion.Identity(), player.targetRotation, t);
+        const newRot = BABYLON.Quaternion.Slerp(
+          player.mesh.rotationQuaternion || BABYLON.Quaternion.Identity(),
+          player.targetRotation,
+          t
+        );
 
         player.mesh.position = newPos;
         player.mesh.rotationQuaternion = newRot;
@@ -451,13 +460,13 @@ export class MultiplayerSession {
       color,
       status,
       collisionEnabled ? '1' : '0',
-      teleported ? '1' : '0'
+      teleported ? '1' : '0',
     ].join('|');
   }
 
   handleServerCorrection(message: { position: Position; rotation: Rotation }) {
     if (!this.player.mesh || !this.player.physics) return;
-    
+
     // Snap local player back to server-approved transform
     this.player.mesh.position = new BABYLON.Vector3(
       message.position.x,
@@ -470,7 +479,7 @@ export class MultiplayerSession {
       message.rotation.z,
       message.rotation.w
     );
-    
+
     // Kill any invalid momentum
     this.player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
     this.player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());

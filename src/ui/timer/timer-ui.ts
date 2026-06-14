@@ -51,7 +51,7 @@ export class TimerUI extends AbstractUI {
         : status === 'running'
           ? 'Run started'
           : status === 'finished'
-          ? `Run finished${detail ? `: ${detail}` : ''}`
+            ? `Run finished${detail ? `: ${detail}` : ''}`
             : `Run reset${detail ? ` (${detail})` : ''}`;
 
     this.runStatusDiv.innerText = text;
@@ -80,11 +80,11 @@ export class TimerUI extends AbstractUI {
 
   showConnectionStatus(status: 'online' | 'offline', detail = '') {
     if (!this.connectionStatusDiv) return;
-    
+
     // Only play sound if status actually changes to prevent spam
     const currentClass = this.connectionStatusDiv.className;
     const isNewStatus = !currentClass.includes(`state-${status}`);
-    
+
     if (isNewStatus) {
       if (status === 'online') {
         this.scene.sounds?.find(x => x.name === 'open-lobby')?.play();
@@ -103,8 +103,8 @@ export class TimerUI extends AbstractUI {
     this.connectionStatusDiv.style.display = 'block';
 
     if (this.connectionStatusTimeout) clearTimeout(this.connectionStatusTimeout);
-    
-    // Hide 'online' status after 4 seconds to reduce UI clutter. 
+
+    // Hide 'online' status after 4 seconds to reduce UI clutter.
     // Keep 'offline' visible so player knows they are disconnected.
     if (status === 'online') {
       this.connectionStatusTimeout = setTimeout(() => {

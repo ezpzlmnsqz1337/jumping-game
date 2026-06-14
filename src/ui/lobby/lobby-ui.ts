@@ -235,7 +235,9 @@ export class LobbyUI extends AbstractUI {
     // Player setup
     this.nicknameInput = document.querySelector('.nickname-input') as HTMLInputElement;
     this.nicknameErrorText = document.querySelector('.lobby .error') as HTMLSpanElement;
-    this.playerColorsDivs = document.querySelectorAll('.colors > div') as NodeListOf<HTMLDivElement>;
+    this.playerColorsDivs = document.querySelectorAll(
+      '.colors > div'
+    ) as NodeListOf<HTMLDivElement>;
     this.playButton = document.querySelector('.play-btn') as HTMLButtonElement;
 
     // Play view

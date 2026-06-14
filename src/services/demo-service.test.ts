@@ -58,7 +58,10 @@ describe('DemoService replay format', () => {
 
   it('rejects corrupted replay payload and clears storage', () => {
     const service = new DemoService();
-    localStorage.setItem('replay_local_best_level1', JSON.stringify({ version: REPLAY_FORMAT_VERSION, frames: 'bad' }));
+    localStorage.setItem(
+      'replay_local_best_level1',
+      JSON.stringify({ version: REPLAY_FORMAT_VERSION, frames: 'bad' })
+    );
 
     const { replay, type } = service.loadStoredReplay('level1');
 

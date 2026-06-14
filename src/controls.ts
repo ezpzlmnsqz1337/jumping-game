@@ -57,7 +57,7 @@ export class GameControls {
 
     window.addEventListener('keypress', e => {
       if (e.code === 'Enter') {
-        gameRoot.uiManager?.lobbyUI.confirmLobby();
+        gameRoot.uiManager?.lobbyUI.confirmPlay();
         gameRoot.uiManager?.chatUI.sendChatMessage();
       }
       if (e.code === 'KeyL') {

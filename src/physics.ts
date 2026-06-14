@@ -7,13 +7,13 @@ import HavokPhysics from '@babylonjs/havok';
  * Babylon physics engine (Havok) runs at fixed timestep determined by the engine's _deltaTime.
  * Default: ~16.67ms per frame (60 FPS physics)
  * Network updates: 33ms (30 Hz player position sync)
- * 
+ *
  * This mismatch means remote players experience 2 physics ticks between network updates.
  * To prevent desync:
  * 1. Remote player bodies have disablePreStep = true during interpolation (no gravity/forces)
  * 2. Interpolation spans the full 33ms network interval using Lerp for position and Slerp for rotation
  * 3. Physics bodies are re-enabled after interpolation completes
- * 
+ *
  * Local player physics is unaffected and computes normally for responsive gameplay.
  */
 export const createPhysics = async (scene: BABYLON.Scene) => {

@@ -10,7 +10,7 @@ import type { PlayerInfo } from './multiplayer-session';
 describe('MultiplayerSession interpolation', () => {
   let session: MultiplayerSession;
   let mockScene: BABYLON.Scene;
-  let mockPlayer: any;
+  let mockPlayer: { mesh: null; collisionEnabled: boolean };
 
   beforeEach(() => {
     mockScene = {
@@ -33,23 +33,7 @@ describe('MultiplayerSession interpolation', () => {
   });
 
   it('initializes player with interpolation duration', () => {
-    const playerInfo: Map<string, PlayerInfo> = new Map([
-      [
-        'remote-1',
-        {
-          position: { x: 0, y: 0, z: 0 },
-          rotation: { x: 0, y: 0, z: 0, w: 1 },
-          status: 'playing',
-          nickname: 'alice',
-          color: 'blue',
-          collisionEnabled: true,
-          interpolationDuration: 33,
-        },
-      ],
-    ]);
-
     expect(session.players.size).toBe(0);
-    // Note: updatePlayers is async, so in real scenarios this would be awaited
   });
 
   it('lerps position over interpolation duration', () => {

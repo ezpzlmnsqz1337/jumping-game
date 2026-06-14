@@ -12,7 +12,7 @@
     "build:server": "bash -c ./build-server.sh",
     "build:watch": "vite build --watch",
     "build:all": "bash -c ./build-all.sh",
-    "start:server": "node multiplayer-server/build/index.js",
+    "start:server": "nvm use && cd multiplayer-server && npm run start",
     "deploy:homelab": "bash -c ./deploy.sh",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts",

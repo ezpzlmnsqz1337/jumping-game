@@ -132,7 +132,15 @@ export class DemoService {
     const rz = readNumber(rotation, 'z', '_z');
     const rw = readNumber(rotation, 'w', '_w');
 
-    if (x === null || y === null || z === null || rx === null || ry === null || rz === null || rw === null) {
+    if (
+      x === null ||
+      y === null ||
+      z === null ||
+      rx === null ||
+      ry === null ||
+      rz === null ||
+      rw === null
+    ) {
       return null;
     }
 
@@ -239,18 +247,22 @@ export class DemoService {
   }
 
   saveReplay(replay: ReplayPayload, type: 'local-best' | 'bundled-record' = 'local-best'): void {
-    const key = type === 'local-best' 
-      ? `${LOCAL_BEST_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`
-      : `${BUNDLED_RECORD_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`;
-      
+    const key =
+      type === 'local-best'
+        ? `${LOCAL_BEST_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`
+        : `${BUNDLED_RECORD_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`;
+
     localStorage.setItem(key, JSON.stringify(replay));
   }
 
-  loadStoredReplay(mapName: string): { replay: ReplayPayload | null, type: 'local-best' | 'bundled-record' | null } {
+  loadStoredReplay(mapName: string): {
+    replay: ReplayPayload | null;
+    type: 'local-best' | 'bundled-record' | null;
+  } {
     // 1. Try to load local best first
     const localBestKey = `${LOCAL_BEST_STORAGE_KEY_PREFIX}${mapName}`;
     const localBestJson = localStorage.getItem(localBestKey);
-    
+
     if (localBestJson) {
       try {
         const { replay, migrated } = this.normalizeReplayPayload(
@@ -267,7 +279,7 @@ export class DemoService {
         } else {
           localStorage.removeItem(localBestKey);
         }
-      } catch (_error) {
+      } catch {
         localStorage.removeItem(localBestKey);
       }
     }
@@ -275,7 +287,7 @@ export class DemoService {
     // 2. Try to load bundled record
     const bundledRecordKey = `${BUNDLED_RECORD_STORAGE_KEY_PREFIX}${mapName}`;
     const bundledRecordJson = localStorage.getItem(bundledRecordKey);
-    
+
     if (bundledRecordJson) {
       try {
         const { replay, migrated } = this.normalizeReplayPayload(
@@ -292,7 +304,7 @@ export class DemoService {
         } else {
           localStorage.removeItem(bundledRecordKey);
         }
-      } catch (_error) {
+      } catch {
         localStorage.removeItem(bundledRecordKey);
       }
     }
@@ -301,18 +313,14 @@ export class DemoService {
     const legacyJson = localStorage.getItem(LEGACY_STORAGE_KEY);
     if (legacyJson) {
       try {
-        const { replay } = this.normalizeReplayPayload(
-          JSON.parse(legacyJson),
-          mapName,
-          'local'
-        );
+        const { replay } = this.normalizeReplayPayload(JSON.parse(legacyJson), mapName, 'local');
         if (replay) {
           console.warn('[Replay] Migrated legacy generic replay data to local-best v1 format.');
           this.saveReplay(replay, 'local-best');
           localStorage.removeItem(LEGACY_STORAGE_KEY);
           return { replay, type: 'local-best' };
         }
-      } catch (_error) {
+      } catch {
         // Just ignore legacy parse errors
       }
       localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -321,9 +329,12 @@ export class DemoService {
     return { replay: null, type: null };
   }
 
-  async loadOrCreateStoredReplay(fallbackUrl: string, mapName: string): Promise<ReplayPayload | null> {
+  async loadOrCreateStoredReplay(
+    fallbackUrl: string,
+    mapName: string
+  ): Promise<ReplayPayload | null> {
     const { replay: storedReplay, type } = this.loadStoredReplay(mapName);
-    
+
     // If we have a local best, or we already downloaded the bundled record, use it.
     if (storedReplay && (type === 'local-best' || type === 'bundled-record')) {
       return storedReplay;
@@ -332,7 +343,11 @@ export class DemoService {
     try {
       const response = await fetch(fallbackUrl);
       if (!response.ok) return null;
-      const { replay, migrated } = this.normalizeReplayPayload(await response.json(), mapName, 'bundled');
+      const { replay, migrated } = this.normalizeReplayPayload(
+        await response.json(),
+        mapName,
+        'bundled'
+      );
       if (!replay) return null;
 
       if (migrated) {
@@ -341,7 +356,7 @@ export class DemoService {
 
       this.saveReplay(replay, 'bundled-record');
       return replay;
-    } catch (_error) {
+    } catch {
       return null;
     }
   }

@@ -52,7 +52,9 @@ describe('Collision layer configuration', () => {
   });
 
   it('allows local player to collide with remote players', () => {
-    expect(FILTER_MASK_PLAYER_WITH_COLLISSIONS & FILTER_GROUP_PLAYER_MP).toBe(FILTER_GROUP_PLAYER_MP);
+    expect(FILTER_MASK_PLAYER_WITH_COLLISSIONS & FILTER_GROUP_PLAYER_MP).toBe(
+      FILTER_GROUP_PLAYER_MP
+    );
   });
 
   it('allows remote players to collide with ground and walls', () => {

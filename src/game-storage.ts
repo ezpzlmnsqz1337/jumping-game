@@ -8,6 +8,8 @@ export interface GameSettings {
   newlyCreated?: boolean;
 }
 
+const LEVEL_INDEX_KEY = 'level-index';
+
 export class GameStorage {
   static getGameSettings(): GameSettings {
     const nickname = localStorage.getItem('nickname') || 'player';
@@ -33,13 +35,30 @@ export class GameStorage {
   }
 
   static saveLevelDocument(level: LevelDocument): void {
-    localStorage.setItem('level-editor-draft', JSON.stringify(level));
+    const name = level.name;
+    const index = this.getLevelIndex();
+    if (!index.includes(name)) {
+      index.push(name);
+      this.setLevelIndex(index);
+    }
+    localStorage.setItem(`level-data-${name}`, JSON.stringify(level));
   }
 
-  static getLevel(): LevelDocument | null {
+  static getLevel(name?: string): LevelDocument | null {
+    if (name) {
+      const stored = localStorage.getItem(`level-data-${name}`);
+      if (!stored) return null;
+      try {
+        const parsed = JSON.parse(stored) as unknown;
+        if (!isLevelDocument(parsed)) return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+    // Fallback to legacy single-level key
     const storedLevel = localStorage.getItem('level-editor-draft');
     if (!storedLevel) return null;
-
     try {
       const parsed = JSON.parse(storedLevel) as unknown;
       if (!isLevelDocument(parsed)) return null;
@@ -47,6 +66,43 @@ export class GameStorage {
     } catch {
       return null;
     }
+  }
+
+  static deleteLevel(name: string): void {
+    localStorage.removeItem(`level-data-${name}`);
+    const index = this.getLevelIndex().filter(n => n !== name);
+    this.setLevelIndex(index);
+  }
+
+  static listLevels(): LevelDocument[] {
+    const index = this.getLevelIndex();
+    const levels: LevelDocument[] = [];
+    for (const name of index) {
+      const level = this.getLevel(name);
+      if (level) levels.push(level);
+    }
+    // Also include the default level1 if not in index
+    if (!index.includes('level1')) {
+      const legacy = this.getLevel();
+      if (legacy) levels.push(legacy);
+    }
+    return levels;
+  }
+
+  private static getLevelIndex(): string[] {
+    try {
+      const raw = localStorage.getItem(LEVEL_INDEX_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed as string[];
+    } catch {
+      return [];
+    }
+  }
+
+  private static setLevelIndex(index: string[]): void {
+    localStorage.setItem(LEVEL_INDEX_KEY, JSON.stringify(index));
   }
 
   static clearLevel(): void {

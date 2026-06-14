@@ -55,7 +55,12 @@ export function auditCollisionLayers(): {
   }
 
   // Verify group uniqueness (no overlap)
-  const groups = [FILTER_GROUP_PLAYER, FILTER_GROUP_GROUND, FILTER_GROUP_WALL, FILTER_GROUP_PLAYER_MP];
+  const groups = [
+    FILTER_GROUP_PLAYER,
+    FILTER_GROUP_GROUND,
+    FILTER_GROUP_WALL,
+    FILTER_GROUP_PLAYER_MP,
+  ];
   for (let i = 0; i < groups.length; i++) {
     for (let j = i + 1; j < groups.length; j++) {
       if ((groups[i] & groups[j]) !== 0) {

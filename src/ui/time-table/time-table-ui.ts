@@ -18,9 +18,9 @@ export class TimeTableUI extends AbstractUI {
     await super.bindUI();
     this.timesListDiv = document.querySelector('.time-table') as HTMLDivElement;
 
-    const existingMetadata = this.timesListDiv.querySelector('.replay-metadata') as
-      | HTMLDivElement
-      | null;
+    const existingMetadata = this.timesListDiv.querySelector(
+      '.replay-metadata'
+    ) as HTMLDivElement | null;
 
     if (existingMetadata) {
       this.replayMetadataDiv = existingMetadata;
