@@ -75,7 +75,9 @@
 }
 
 .editor .level-source,
-.editor .level-summary {
+.editor .level-name-value,
+.editor .walls-value,
+.editor .triggers-value {
   color: var(--color-brand-primary-muted);
   max-width: 15rem;
   text-align: right;

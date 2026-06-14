@@ -25,6 +25,10 @@ type ObservableMock<T> = {
 function createUi() {
   const ui = new EditorUI({} as never, {} as never, undefined);
   ui.editorDiv = document.createElement('div');
+  ui.levelSourceSpan = document.createElement('span');
+  ui.levelNameValueSpan = document.createElement('span');
+  ui.wallsValueSpan = document.createElement('span');
+  ui.triggersValueSpan = document.createElement('span');
   ui.transformCheckBox = document.createElement('input');
   ui.rotationCheckBox = document.createElement('input');
   ui.scalingCheckBox = document.createElement('input');
@@ -66,7 +70,9 @@ function renderBindDom() {
     <canvas id="render-canvas"></canvas>
     <div class="editor">
       <span class="level-source"></span>
-      <span class="level-summary"></span>
+      <span class="level-name-value"></span>
+      <span class="walls-value"></span>
+      <span class="triggers-value"></span>
       <button class="export-level"></button>
       <button class="import-level"></button>
       <input class="import-level-input" type="file" />
@@ -600,14 +606,15 @@ describe('EditorUI', () => {
   it('updateLevelInfo renders hardcoded and imported summaries', () => {
     const ui = createUi();
     ui.levelSourceSpan = document.createElement('span');
-    ui.levelSummarySpan = document.createElement('span');
 
     const getLevelSpy = vi.spyOn(GameStorage, 'getLevel');
 
     getLevelSpy.mockReturnValueOnce(null);
     (ui as unknown as { updateLevelInfo: () => void }).updateLevelInfo();
     expect(ui.levelSourceSpan.innerText).toBe('hardcoded');
-    expect(ui.levelSummarySpan.innerText).toBe('default Level1 script');
+    expect(ui.levelNameValueSpan.innerText).toBe('Level1');
+    expect(ui.wallsValueSpan.innerText).toBe('-');
+    expect(ui.triggersValueSpan.innerText).toBe('-');
 
     getLevelSpy.mockReturnValueOnce({
       version: 1,
@@ -624,7 +631,9 @@ describe('EditorUI', () => {
 
     (ui as unknown as { updateLevelInfo: () => void }).updateLevelInfo();
     expect(ui.levelSourceSpan.innerText).toBe('imported JSON');
-    expect(ui.levelSummarySpan.innerText).toBe('CustomLevel | walls: 2 | triggers: 4');
+    expect(ui.levelNameValueSpan.innerText).toBe('CustomLevel');
+    expect(ui.wallsValueSpan.innerText).toBe('2');
+    expect(ui.triggersValueSpan.innerText).toBe('4');
   });
 
   it('toggleCameraTriggers updates only trigger mesh visibility', () => {

@@ -12,7 +12,9 @@ export type GizmoType = 'position' | 'rotation' | 'scaling';
 export class EditorUI extends AbstractUI {
   editorDiv!: HTMLDivElement;
   levelSourceSpan!: HTMLSpanElement;
-  levelSummarySpan!: HTMLSpanElement;
+  levelNameValueSpan!: HTMLSpanElement;
+  wallsValueSpan!: HTMLSpanElement;
+  triggersValueSpan!: HTMLSpanElement;
   exportLevelButton!: HTMLButtonElement;
   importLevelButton!: HTMLButtonElement;
   importLevelInput!: HTMLInputElement;
@@ -73,17 +75,21 @@ export class EditorUI extends AbstractUI {
 
     if (!level) {
       this.levelSourceSpan.innerText = 'hardcoded';
-      this.levelSummarySpan.innerText = 'default Level1 script';
+      this.levelNameValueSpan.innerText = 'Level1';
+      this.wallsValueSpan.innerText = '-';
+      this.triggersValueSpan.innerText = '-';
       return;
     }
 
     this.levelSourceSpan.innerText = 'imported JSON';
-    this.levelSummarySpan.innerText = `${level.name} | walls: ${level.walls.length} | triggers: ${
+    this.levelNameValueSpan.innerText = level.name;
+    this.wallsValueSpan.innerText = String(level.walls.length);
+    this.triggersValueSpan.innerText = String(
       level.startTriggers.length +
-      level.endTriggers.length +
-      level.teleports.length +
-      level.triggers.length
-    }`;
+        level.endTriggers.length +
+        level.teleports.length +
+        level.triggers.length
+    );
   }
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
@@ -426,7 +432,9 @@ export class EditorUI extends AbstractUI {
     await super.bindUI();
     this.editorDiv = document.querySelector('.editor') as HTMLDivElement;
     this.levelSourceSpan = document.querySelector('.level-source') as HTMLSpanElement;
-    this.levelSummarySpan = document.querySelector('.level-summary') as HTMLSpanElement;
+    this.levelNameValueSpan = document.querySelector('.level-name-value') as HTMLSpanElement;
+    this.wallsValueSpan = document.querySelector('.walls-value') as HTMLSpanElement;
+    this.triggersValueSpan = document.querySelector('.triggers-value') as HTMLSpanElement;
     this.exportLevelButton = document.querySelector('.export-level') as HTMLButtonElement;
     this.importLevelButton = document.querySelector('.import-level') as HTMLButtonElement;
     this.importLevelInput = document.querySelector('.import-level-input') as HTMLInputElement;
