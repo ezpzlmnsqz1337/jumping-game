@@ -68,12 +68,14 @@ export class PlayerInfoUI extends AbstractUI {
 
   show(show: boolean): void {
     if (!this.rootElement) return;
+    this.enabled = show;
     this.rootElement.style.display = show ? 'flex' : 'none';
   }
 
   toggle(): void {
-    this.enabled = !this.enabled;
-    this.show(this.enabled);
+    this.show(!this.enabled);
+    const checkbox = document.querySelector('.player-info-enabled') as HTMLInputElement | null;
+    if (checkbox) checkbox.checked = this.enabled;
   }
 
   updateUI(): void {
