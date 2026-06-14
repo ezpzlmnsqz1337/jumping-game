@@ -83,6 +83,9 @@ export class GameControls {
     });
   }
 
+  private readonly strafeOrJumpSpeedMultiplier = 0.5;
+  private readonly maxHorizontalSpeed = 20;
+
   handleWSADMovement(player: PlayerEntity, deltaTime: number) {
     if (!player.mesh) return;
     const keyStatus = this.keyStatus;
@@ -90,14 +93,13 @@ export class GameControls {
       player.moving = true;
       const forward = player.mesh.getDirection(BABYLON.Axis.Z);
       const right = player.mesh.getDirection(BABYLON.Axis.X);
-      const speed =
-        ((keyStatus.KeyS || keyStatus.KeyW) && (keyStatus.KeyA || keyStatus.KeyD)) || player.jumping
-          ? player.speed * 0.5 * deltaTime
-          : player.speed * deltaTime;
+      const isDiagonal = (keyStatus.KeyS || keyStatus.KeyW) && (keyStatus.KeyA || keyStatus.KeyD);
+      const speedMultiplier = isDiagonal || player.jumping ? this.strafeOrJumpSpeedMultiplier : 1;
+      const speed = player.speed * speedMultiplier * deltaTime;
 
       const { x, z } = player.physics.body.getLinearVelocity();
       const hSpeed = new BABYLON.Vector3(x, 0, z).length();
-      if (hSpeed < 20) {
+      if (hSpeed < this.maxHorizontalSpeed) {
         if (keyStatus.KeyW && !keyStatus.KeyS) {
           player.physics.body.applyImpulse(
             forward.scale(-speed),
@@ -199,12 +201,13 @@ export class GameControls {
 
     if ('KeyR' === key) {
       const previousPlayerPosition = player.mesh.position.clone();
-      const spawnPoint = level.getRandomSpawnPoint().mesh as BABYLON.Mesh;
+      const spawnPointMesh = level.getRandomSpawnPoint()?.mesh as BABYLON.Mesh | undefined;
+      if (!spawnPointMesh) return;
       player.physics.body.disablePreStep = true;
-      player.mesh.position = spawnPoint.position.clone();
+      player.mesh.position = spawnPointMesh.position.clone();
       player.mesh.position.y += 1;
       player.mesh.rotationQuaternion = (
-        spawnPoint.rotationQuaternion || BABYLON.Quaternion.Identity()
+        spawnPointMesh.rotationQuaternion || BABYLON.Quaternion.Identity()
       ).clone();
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());

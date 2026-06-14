@@ -71,10 +71,10 @@ export class GameLevel {
       }
     });
 
-    const spawnPoint = this.getRandomSpawnPoint().mesh;
-    if (spawnPoint) {
+    const spawnPoint = this.getRandomSpawnPoint();
+    if (spawnPoint?.mesh) {
       player.physics.body.disablePreStep = true;
-      player.mesh!.position = spawnPoint.position.clone();
+      player.mesh!.position = spawnPoint.mesh.position.clone();
       player.physics.body.setLinearVelocity(BABYLON.Vector3.Zero());
       player.physics.body.setAngularVelocity(BABYLON.Vector3.Zero());
       player.physics.body.disablePreStep = false;
@@ -119,7 +119,10 @@ export class GameLevel {
   }
 
   armRunFromStart(player: PlayerEntity) {
-    if (!this.timer) return false;
+    if (!this.timer) {
+      console.warn('[GameLevel] armRunFromStart failed: timer is null');
+      return false;
+    }
 
     this.timer.resetRun();
     this.timer.armRun();
@@ -130,7 +133,10 @@ export class GameLevel {
   }
 
   startRunFromStart(player: PlayerEntity) {
-    if (!this.timer?.startRun()) return false;
+    if (!this.timer?.startRun()) {
+      console.warn('[GameLevel] startRunFromStart failed: timer not in "armed" state');
+      return false;
+    }
 
     gameRoot.demoService.startRecording(player);
     gameRoot.uiManager?.timerUI.showRunStatus('running');
@@ -138,12 +144,15 @@ export class GameLevel {
   }
 
   finishRun(player: PlayerEntity) {
-    if (!this.timer?.finishRun()) return false;
+    if (!this.timer?.finishRun()) {
+      console.warn('[GameLevel] finishRun failed: timer not in "running" state');
+      return false;
+    }
 
     // Anti-cheat: validate run is legitimate
     const validation = this.timer.isValidRun(player.checkpoints.length);
     if (!validation.valid) {
-      console.warn('Run rejected:', validation.reason);
+      console.warn('[GameLevel] Run rejected:', validation.reason);
       this.timer.resetRun();
       gameRoot.uiManager?.timerUI.showRunStatus('reset', validation.reason);
       return false;
@@ -200,7 +209,8 @@ export class GameLevel {
   }
 
   getRandomSpawnPoint() {
-    const index = Math.round(Math.random() * (this.spawnPoints.length - 1));
+    if (this.spawnPoints.length === 0) return undefined;
+    const index = Math.floor(Math.random() * this.spawnPoints.length);
     return this.spawnPoints[index];
   }
 

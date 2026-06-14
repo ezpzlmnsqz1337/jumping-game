@@ -81,6 +81,69 @@ Following [Writing Great Unit Tests](https://gist.github.com/vadymhimself/763e96
 - No network calls, no real timers, no file I/O.
 - Tests must pass in any order, independently.
 
+## Code Review Guidelines
+
+Based on [GitLab Code Review Guidelines](https://docs.gitlab.com/development/code_review/) and [Conventional Comments](https://conventionalcomments.org/).
+
+### 1. Review Focus Areas
+
+When reviewing a merge request, evaluate:
+
+| Area | What to Check |
+|------|---------------|
+| **Architecture** | Module boundaries respected? New dependencies justified? No circular imports? |
+| **Design** | Is the solution the right one? Are there simpler alternatives? |
+| **Correctness** | Does the code do what it claims? Edge cases handled? |
+| **Consistency** | Follows existing patterns in the codebase? |
+| **Readability** | Clear naming? Comments explain *why*, not *what*? |
+| **Test coverage** | Tests exist for the new behavior? Edge cases covered? |
+| **Security** | No unsafe deserialization, no XSS via innerHTML, no leaked credentials |
+| **Performance** | Unnecessary allocations? Expensive operations in render loops? |
+
+### 2. Conventional Comment Format
+
+Use labels to convey intent clearly:
+- **`suggestion (non-blocking):`** — Optional improvement, author may ignore.
+- **`issue (blocking):`** — Must be resolved before merge.
+- **`thought:`** — Open question or discussion.
+- **`praise:`** — Highlight good code.
+- **`nitpick:`** — Minor style preference.
+
+### 3. Specific Patterns for This Codebase
+
+**Game Root (gameRoot):**
+- The singleton is imported directly by most modules. Adding new `gameRoot` dependencies couples that module to the global state.
+- Prefer constructor injection for new services or entities (e.g., passing `level` to triggers, `scene` to entities).
+
+**Multiplayer:**
+- Changes to physics or speed mechanics must use `pendingTeleportFlag` to avoid false server corrections.
+- Any modification to remote player movement must update both client interpolation and server validation.
+
+**UI:**
+- All UI classes extend `AbstractUI` and follow the `loadCss()` → `loadHtml()` → `bindUI()` lifecycle.
+- UI communicates via optional chaining through `gameRoot.uiManager?.targetUI.method()` — never hard-reference a UI from another module.
+- CSS must use design tokens from `src/style.css`. Never hardcode values.
+
+**Triggers:**
+- `Trigger` subclasses call `this.level.*()` methods (e.g., `armRunFromStart`). New trigger types must go through `GameLevel` transition methods, not bypass them.
+- The trigger key in `serialize()` uses `this.triggerType` — ensure it matches the expected key in `DocumentLevel`.
+
+**Level Editor:**
+- GizmoManager `attachableMeshes: null` means "all meshes pickable" — this is unintuitive. Document any changes to edit mode toggling.
+
+### 4. Acceptance Checklist
+
+Before approving a merge request:
+- [ ] Code follows existing patterns (singleton pattern, AbstractUI lifecycle, trigger → level callbacks)
+- [ ] All edge cases are handled or documented
+- [ ] Automated tests exist and pass
+- [ ] No unnecessary type assertions (`as never`, `as any`) where proper types are feasible
+- [ ] No `eslint-disable` comments without a clear reason
+- [ ] For multiplayer changes: both client and server updated in the same task
+- [ ] For UI changes: verified with design tokens, not hardcoded values
+- [ ] For physics changes: tested both single-player and multiplayer
+- [ ] For camera changes: movement remains playable on keyboard
+
 ## Definition Of Done For Typical Changes
 
 - TypeScript builds cleanly for touched package(s).

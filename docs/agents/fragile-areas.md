@@ -6,6 +6,10 @@
 - Ghost replay/demo now validates payload shape/version and migrates legacy data, but metadata/source fields can still regress if future formats diverge without migration updates.
 - Trigger ordering (start/end/reset/teleport) is centralized, but can regress if new trigger paths bypass GameLevel transition methods.
 - Multiplayer now uses server-authoritative speed validation and bounded extrapolation. Extrapolation limits, speed reconciliation thresholds (250 u/s), and the 1000ms teleport-rate limits are heavily tuned. Modifying player speed mechanics or introducing new instant-movement capabilities must properly use the `pendingTeleportFlag` to avoid triggering anti-cheat rubber-banding.
+- **gameRoot singleton pattern**: Modules import `gameRoot` directly, creating implicit coupling. Adding a new dependency on `gameRoot` in a module should be reviewed carefully — prefer constructor injection where feasible.
+- **player.physics.body type safety**: `player.physics.body` is typed as `BABYLON.PhysicsBody` but many methods (like `setLinearVelocity`, `setAngularVelocity`, `disablePreStep`) are accessed with `as never` casts in tests and some source files, indicating a type misalignment.
+
+## Level Editor
 
 ## Level Editor
 
