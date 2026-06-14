@@ -25,7 +25,7 @@ describe('MultiplayerSession interpolation', () => {
     };
 
     // Disable actual network connection
-    session = new MultiplayerSession(mockScene, mockPlayer, []);
+    session = new MultiplayerSession(mockScene, mockPlayer as never, []);
     session.localPlayerId = 'local-id';
   });
   afterEach(() => {

@@ -35,6 +35,17 @@ npm run format
 npm run format:check
 ```
 
+Type-check client:
+```bash
+npm run typecheck
+```
+
+Type-check server:
+```bash
+cd multiplayer-server
+npm run typecheck
+```
+
 Run UI tests (client):
 ```bash
 npm run test:ui
@@ -75,6 +86,7 @@ Workflow jobs are separated for clarity and faster feedback:
 
 - `lint` (root + server)
 - `format` (root + server)
+- `typecheck` (root + server)
 - `build` (depends on `lint` and `format`)
 - `test` (depends on `lint` and `format`)
 
