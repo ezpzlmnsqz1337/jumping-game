@@ -8,8 +8,10 @@ import { createPhysics } from '../physics.ts';
 import { UIManager } from '../ui/ui-manager.ts';
 import { createBall } from './level1/football.ts';
 import { Level1 } from './level1/level1.ts';
+import { DocumentLevel } from '../game-level.ts';
 import { MultiplayerSession } from '../multiplayer-session.ts';
 import { GameLevel } from '../game-level.ts';
+import { GameStorage } from '../game-storage.ts';
 import { ArcRotateCameraOptions, MyArcRotateCamera } from '../cameras/arc-rotate-camera.ts';
 import { FollowCameraOptions, MyFollowCamera } from '../cameras/follow-camera.ts';
 
@@ -28,7 +30,21 @@ const followCameraOptions: FollowCameraOptions = {
   radius: 4.5,
 };
 
-const levels: GameLevel[] = [new Level1('level1')];
+function resolveLevel(): GameLevel {
+  const storedLevelName = localStorage.getItem('level-manager-selected-level');
+  if (storedLevelName) {
+    const doc = GameStorage.getLevel(storedLevelName);
+    if (doc) {
+      return new DocumentLevel(doc);
+    }
+  }
+  // Check for legacy imported level document
+  const legacyDoc = GameStorage.getLevel();
+  if (legacyDoc) {
+    return new DocumentLevel(legacyDoc);
+  }
+  return new Level1('level1');
+}
 
 export const createScene1 = async (engine: BABYLON.Engine) => {
   const scene = new BABYLON.Scene(engine);
@@ -43,7 +59,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   const arcRotateCamera = new MyArcRotateCamera('arcRotateCamera', arcRotateCameraOptions, scene);
   const followCamera = new MyFollowCamera('followCamera', followCameraOptions, scene);
 
-  gameRoot.level = levels[0];
+  gameRoot.level = resolveLevel();
   gameRoot.player = new PlayerEntity(
     gameRoot.gameSettings.nickname,
     gameRoot.level,
@@ -86,6 +102,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   if (ENABLE_EDITOR) {
     gizmoManager = new BABYLON.GizmoManager(scene);
+    gameRoot.gizmoManager = gizmoManager;
   }
 
   // UI

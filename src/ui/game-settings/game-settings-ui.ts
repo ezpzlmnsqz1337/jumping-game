@@ -94,6 +94,13 @@ export class GameSettingsUI extends AbstractUI {
     ) as HTMLInputElement;
     this.editModeCheckBox = document.querySelector('.edit-mode-enabled-global') as HTMLInputElement;
 
+    if (gameRoot.multiplayer || !gameRoot.gizmoManager) {
+      const editModeDiv = this.editModeCheckBox.closest('.edit-mode-visibility') as HTMLElement;
+      if (editModeDiv) {
+        editModeDiv.style.display = 'none';
+      }
+    }
+
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
 
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;

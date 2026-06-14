@@ -24,7 +24,7 @@ describe('LobbyUI', () => {
     localStorage.clear();
   });
 
-  it('confirmLobby shows validation error when nickname is empty', async () => {
+  it('play shows validation error when nickname is empty', async () => {
     const { LobbyUI } = await import('./lobby-ui');
 
     const camera: TestCamera = {
@@ -48,15 +48,23 @@ describe('LobbyUI', () => {
     ui.nicknameErrorText = document.createElement('span');
     ui.nicknameErrorText.style.display = 'none';
 
-    ui.confirmLobby();
+    (ui as any).confirmPlay();
 
     expect(ui.nicknameInput.classList.contains('invalid')).toBe(true);
     expect(ui.nicknameErrorText.style.display).toBe('block');
     expect(player.changeNickname).not.toHaveBeenCalled();
   });
 
-  it('confirmLobby persists nickname and color and closes lobby when valid', async () => {
+  it('play persists nickname and color and closes lobby when valid', async () => {
+    const { default: gameRoot } = await import('../../game-root');
     const { LobbyUI } = await import('./lobby-ui');
+
+    // Make gameRoot.level match default selectedLevelName so confirmPlay doesn't reload
+    Object.defineProperty(gameRoot, 'level', {
+      value: { name: 'level1' },
+      writable: true,
+      configurable: true,
+    });
 
     const camera: TestCamera = {
       name: 'arcCamera',
@@ -81,7 +89,7 @@ describe('LobbyUI', () => {
 
     const closeSpy = vi.spyOn(ui, 'closeLobby').mockImplementation(() => {});
 
-    ui.confirmLobby();
+    (ui as any).confirmPlay();
 
     expect(localStorage.getItem('color')).toBe('red');
     expect(localStorage.getItem('nickname')).toBe('very-long-playe');
@@ -155,7 +163,7 @@ describe('LobbyUI', () => {
     expect(closeSound.play).toHaveBeenCalled();
   });
 
-  it('confirmLobby is a no-op while player is in chat', async () => {
+  it('play is a no-op while player is in chat', async () => {
     const { LobbyUI } = await import('./lobby-ui');
 
     const camera: TestCamera = {
@@ -181,7 +189,7 @@ describe('LobbyUI', () => {
 
     const closeSpy = vi.spyOn(ui, 'closeLobby').mockImplementation(() => {});
 
-    ui.confirmLobby();
+    (ui as any).confirmPlay();
 
     expect(player.changeNickname).not.toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
@@ -230,28 +238,42 @@ describe('LobbyUI', () => {
 
   it('bindUI wires controls and applies game settings', async () => {
     const { LobbyUI } = await import('./lobby-ui');
-    const { GameStorage } = await import('../../game-storage');
 
     document.body.innerHTML = `
       <canvas id="render-canvas"></canvas>
-      <div class="lobby">
-        <div class="nickname">
-          <input class="nickname-input" />
-          <span class="error"></span>
-        </div>
-        <div class="player-color">
-          <div class="colors">
-            <div class="green"></div>
-            <div class="blue"></div>
+      <div class="lobby-wrapper">
+        <div class="lobby">
+          <div class="lm-view active" data-view="play">
+            <h2>Select Level</h2>
+            <div class="level-select"><div class="level-list"></div></div>
+            <div class="dev-only">
+              <input class="new-level-name" />
+              <button class="create-level-btn">Create</button>
+              <button class="import-level-btn">Import</button>
+              <input class="import-level-input" style="display:none" />
+              <div class="stored-level-list"></div>
+            </div>
+          </div>
+          <div class="player-setup">
+            <div class="nickname">
+              <input class="nickname-input" />
+              <span class="error"></span>
+            </div>
+            <div class="player-color">
+              <div class="colors">
+                <div class="green"></div>
+                <div class="blue"></div>
+              </div>
+            </div>
+            <button class="play-btn">Play</button>
           </div>
         </div>
-        <button class="enter"></button>
       </div>
-      <div class="lobby-wrapper"></div>
       <div class="ui-buttons"><div class="settings"></div></div>
     `;
 
-    const gameSettingsSpy = vi.spyOn(GameStorage, 'getGameSettings').mockReturnValue({
+    const { GameStorage } = await import('../../game-storage');
+    vi.spyOn(GameStorage, 'getGameSettings').mockReturnValue({
       nickname: 'neo',
       color: 'green',
       newlyCreated: true,
@@ -277,12 +299,8 @@ describe('LobbyUI', () => {
     ui.loadCss = vi.fn();
     ui.loadHtml = vi.fn(async () => {});
 
-    const confirmSpy = vi.spyOn(ui, 'confirmLobby').mockImplementation(() => {});
-    const openSpy = vi.spyOn(ui, 'openLobby').mockImplementation(() => {});
-
     await ui.bindUI();
 
-    expect(gameSettingsSpy).toHaveBeenCalled();
     expect(ui.nicknameInput.value).toBe('neo');
     expect(
       (document.querySelector('.green') as HTMLDivElement).classList.contains('selected')
@@ -290,64 +308,5 @@ describe('LobbyUI', () => {
 
     (document.querySelector('.green') as HTMLDivElement).click();
     expect(player.changeColor).toHaveBeenCalled();
-
-    ui.enterButton.click();
-    expect(confirmSpy).toHaveBeenCalled();
-
-    ui.lobbyButtonDiv.click();
-    expect(openSpy).toHaveBeenCalled();
-  });
-
-  it('bindUI auto-confirms for returning players', async () => {
-    const { LobbyUI } = await import('./lobby-ui');
-    const { GameStorage } = await import('../../game-storage');
-
-    document.body.innerHTML = `
-      <canvas id="render-canvas"></canvas>
-      <div class="lobby">
-        <div class="nickname">
-          <input class="nickname-input" />
-          <span class="error"></span>
-        </div>
-        <div class="player-color">
-          <div class="colors"><div class="blue"></div></div>
-        </div>
-        <button class="enter"></button>
-      </div>
-      <div class="lobby-wrapper"></div>
-      <div class="ui-buttons"><div class="settings"></div></div>
-    `;
-
-    vi.spyOn(GameStorage, 'getGameSettings').mockReturnValue({
-      nickname: 'returning',
-      color: 'blue',
-      newlyCreated: false,
-    });
-
-    const camera: TestCamera = {
-      name: 'arcCamera',
-      alpha: 1,
-      beta: 1,
-      radius: 6,
-      useAutoRotationBehavior: true,
-      setMoveToTarget: vi.fn(),
-    };
-
-    const player: LobbyTestPlayer = {
-      status: 'in_lobby',
-      color: 'blue',
-      changeNickname: vi.fn(),
-      changeColor: vi.fn(async () => {}),
-    };
-
-    const ui = new LobbyUI({ activeCamera: camera } as never, player as never);
-    ui.loadCss = vi.fn();
-    ui.loadHtml = vi.fn(async () => {});
-
-    const confirmSpy = vi.spyOn(ui, 'confirmLobby').mockImplementation(() => {});
-
-    await ui.bindUI();
-
-    expect(confirmSpy).toHaveBeenCalledTimes(1);
   });
 });

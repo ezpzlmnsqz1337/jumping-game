@@ -207,7 +207,9 @@ describe('GameSettingsUI', () => {
       <input class="collissions-enabled" type="checkbox" />
       <input class="player-info-enabled" type="checkbox" />
       <input class="camera-triggers-enabled" type="checkbox" />
-      <input class="edit-mode-enabled-global" type="checkbox" />
+      <div class="edit-mode-visibility">
+        <input class="edit-mode-enabled-global" type="checkbox" />
+      </div>
     `;
 
     const arcRotateCamera = {
@@ -267,5 +269,37 @@ describe('GameSettingsUI', () => {
     expect(togglePlayerInfoSpy).toHaveBeenCalled();
     expect(toggleCameraTriggersSpy).toHaveBeenCalledTimes(2);
     expect(toggleEditModeSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('hides edit mode checkbox when gizmoManager is not available', async () => {
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    document.body.innerHTML = `
+      <div class="game-settings"></div>
+      <input class="automatic-camera-enabled" type="checkbox" />
+      <input class="follow-camera-enabled" type="checkbox" />
+      <input class="collissions-enabled" type="checkbox" />
+      <input class="player-info-enabled" type="checkbox" />
+      <input class="camera-triggers-enabled" type="checkbox" />
+      <div class="edit-mode-visibility">
+        <input class="edit-mode-enabled-global" type="checkbox" />
+      </div>
+    `;
+
+    const scene = {
+      activeCamera: { automaticCameraEnabled: true },
+      getCameraByName: vi.fn(),
+      meshes: [],
+    };
+
+    const player = { collisionEnabled: true };
+    const ui = new GameSettingsUI(scene as never, player as never);
+    ui.loadCss = vi.fn();
+    ui.loadHtml = vi.fn(async () => {});
+
+    await ui.bindUI();
+
+    const editModeDiv = document.querySelector('.edit-mode-visibility') as HTMLElement;
+    expect(editModeDiv.style.display).toBe('none');
   });
 });

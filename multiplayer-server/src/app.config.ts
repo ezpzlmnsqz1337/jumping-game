@@ -39,6 +39,16 @@ export default config({
     });
 
     /**
+     * Serve the list of available levels/maps.
+     * The server dictates which maps can be played in production.
+     */
+    app.get('/api/levels', (_req: Request, res: Response) => {
+      res.json([
+        { name: 'level1', walls: 0, triggers: 0 },
+      ]);
+    });
+
+    /**
      * Use @colyseus/playground
      * (It is not recommended to expose this route in a production environment)
      */

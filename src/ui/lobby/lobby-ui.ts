@@ -6,18 +6,41 @@ import { renderingCanvas } from './../ui-manager';
 import gameRoot from '../../game-root';
 import { MyArcRotateCamera } from '../../cameras/arc-rotate-camera';
 import { GameStorage } from '../../game-storage';
+import { createTemplateLevelDocument } from '../../game-level';
+import { isLevelDocument } from '../../level-document';
+
+const LevelsKey = 'level-manager-selected-level';
+
+interface ServerLevelSummary {
+  name: string;
+  walls: number;
+  triggers: number;
+}
 
 export class LobbyUI extends AbstractUI {
+  // Play view
   nicknameInput!: HTMLInputElement;
   nicknameErrorText!: HTMLSpanElement;
   playerColorsDivs!: NodeListOf<HTMLDivElement>;
-  enterButton!: HTMLButtonElement;
+  playButton!: HTMLButtonElement;
+  levelListDiv!: HTMLDivElement;
+  selectedLevelName = 'level1';
+
+  // Editor tools (play view, dev-only)
+  newLevelNameInput!: HTMLInputElement;
+  createLevelButton!: HTMLButtonElement;
+  importLevelButton!: HTMLButtonElement;
+  importLevelInput!: HTMLInputElement;
+  storedLevelListDiv!: HTMLDivElement;
+
   lobbyDiv!: HTMLDivElement;
   lobbyButtonDiv!: HTMLDivElement;
 
   open = true;
   lastCameraRadius: number;
   switchCameraOnClose = false;
+
+  private isDev = import.meta.env.DEV;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'lobby', player);
@@ -73,8 +96,147 @@ export class LobbyUI extends AbstractUI {
     return this.open;
   }
 
-  confirmLobby() {
-    if (!this.isLobbyOpen()) return;
+  private async refreshLevelList() {
+    if (!this.levelListDiv) return;
+
+    this.levelListDiv.innerHTML = '';
+
+    if (this.isDev) {
+      this.refreshClientLevelList();
+    } else {
+      await this.refreshServerLevelList();
+    }
+  }
+
+  private refreshClientLevelList() {
+    const levels = GameStorage.listLevels();
+    if (levels.length === 0) {
+      this.levelListDiv.innerHTML = '<div class="no-levels">No levels found.</div>';
+      return;
+    }
+
+    levels.forEach(level => {
+      const entry = document.createElement('div');
+      entry.className = `level-entry${level.name === this.selectedLevelName ? ' selected' : ''}`;
+      entry.dataset.levelName = level.name;
+
+      const source =
+        level.triggers.length === 0 && level.walls.length <= 1 ? 'template' : 'imported';
+
+      entry.innerHTML = `
+        <div class="level-info">
+          <div class="level-name">${level.name}</div>
+          <div class="level-meta">${level.walls.length} walls &middot; ${level.startTriggers.length + level.endTriggers.length} triggers</div>
+        </div>
+        <div class="level-source-badge">${source}</div>
+      `;
+
+      entry.addEventListener('click', () => {
+        this.levelListDiv
+          .querySelectorAll('.level-entry')
+          .forEach(e => e.classList.remove('selected'));
+        entry.classList.add('selected');
+        this.selectedLevelName = level.name;
+      });
+
+      this.levelListDiv.appendChild(entry);
+    });
+  }
+
+  private async refreshServerLevelList() {
+    try {
+      const response = await fetch('/api/levels');
+      if (!response.ok) {
+        this.showServerError();
+        return;
+      }
+      const levels: ServerLevelSummary[] = await response.json();
+
+      if (levels.length === 0) {
+        this.levelListDiv.innerHTML = '<div class="no-levels">No levels available on server.</div>';
+        return;
+      }
+
+      levels.forEach(level => {
+        const entry = document.createElement('div');
+        entry.className = `level-entry${level.name === this.selectedLevelName ? ' selected' : ''}`;
+        entry.dataset.levelName = level.name;
+
+        entry.innerHTML = `
+          <div class="level-info">
+            <div class="level-name">${level.name}</div>
+            <div class="level-meta">${level.walls} walls &middot; ${level.triggers} triggers</div>
+          </div>
+        `;
+
+        entry.addEventListener('click', () => {
+          this.levelListDiv
+            .querySelectorAll('.level-entry')
+            .forEach(e => e.classList.remove('selected'));
+          entry.classList.add('selected');
+          this.selectedLevelName = level.name;
+        });
+
+        this.levelListDiv.appendChild(entry);
+      });
+    } catch {
+      this.showServerError();
+    }
+  }
+
+  private showServerError() {
+    this.levelListDiv.innerHTML =
+      '<div class="no-levels">Could not reach server. Check your connection.</div>';
+  }
+
+  private refreshStoredLevels() {
+    if (!this.storedLevelListDiv) return;
+
+    const levels = GameStorage.listLevels();
+    this.storedLevelListDiv.innerHTML = '';
+
+    if (levels.length === 0) {
+      this.storedLevelListDiv.innerHTML = '<div class="no-levels">No saved levels yet.</div>';
+      return;
+    }
+
+    levels.forEach(level => {
+      const entry = document.createElement('div');
+      entry.className = 'stored-level-entry';
+      entry.innerHTML = `
+        <span class="sl-name">${level.name}</span>
+        <span class="sl-meta">${level.walls.length} walls</span>
+        <button class="export-level-btn" title="Export as JSON">Export</button>
+        <button class="delete-level-btn" title="Delete level">Delete</button>
+      `;
+
+      entry.querySelector('.export-level-btn')?.addEventListener('click', () => {
+        this.exportLevel(level.name);
+      });
+      entry.querySelector('.delete-level-btn')?.addEventListener('click', () => {
+        GameStorage.deleteLevel(level.name);
+        this.refreshStoredLevels();
+        this.refreshLevelList();
+      });
+
+      this.storedLevelListDiv.appendChild(entry);
+    });
+  }
+
+  private exportLevel(name: string) {
+    const doc = GameStorage.getLevel(name);
+    if (!doc) return;
+    const payload = JSON.stringify(doc, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${name}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  confirmPlay() {
     if (this.player.status === 'in_chat') return;
 
     const nickname = this.nicknameInput.value.substring(0, 15);
@@ -90,30 +252,54 @@ export class LobbyUI extends AbstractUI {
 
     localStorage.setItem('color', this.player.color as PlayerColor);
     localStorage.setItem('nickname', nickname);
+    this.player.changeNickname(nickname);
+
+    if (this.selectedLevelName !== gameRoot.level?.name) {
+      localStorage.setItem(LevelsKey, this.selectedLevelName);
+      localStorage.removeItem('mp-server-address');
+      localStorage.removeItem('mp-room-id');
+      window.location.reload();
+      return;
+    }
 
     (this.scene.activeCamera as MyArcRotateCamera).useAutoRotationBehavior = false;
-    this.player.changeNickname(nickname);
     this.closeLobby();
   }
 
   async bindUI() {
     await super.bindUI();
 
-    this.nicknameInput = document.querySelector('.lobby .nickname-input') as HTMLInputElement;
-    this.nicknameErrorText = document.querySelector('.lobby .nickname .error') as HTMLSpanElement;
-    this.playerColorsDivs = document.querySelectorAll(
-      '.lobby .player-color > .colors > div'
-    ) as NodeListOf<HTMLDivElement>;
-    this.enterButton = document.querySelector('.lobby .enter') as HTMLButtonElement;
     this.lobbyDiv = document.querySelector('.lobby-wrapper') as HTMLDivElement;
     this.lobbyButtonDiv = document.querySelector('.ui-buttons .settings') as HTMLDivElement;
 
+    this.lobbyDiv.classList.toggle('is-dev', this.isDev);
     this.lobbyDiv.style.display = this.open ? 'block' : 'none';
 
     const gameSettings = GameStorage.getGameSettings();
 
+    // Player setup
+    this.nicknameInput = document.querySelector('.nickname-input') as HTMLInputElement;
+    this.nicknameErrorText = document.querySelector('.lobby .error') as HTMLSpanElement;
+    this.playerColorsDivs = document.querySelectorAll('.colors > div') as NodeListOf<HTMLDivElement>;
+    this.playButton = document.querySelector('.play-btn') as HTMLButtonElement;
+
+    // Play view
+    this.levelListDiv = document.querySelector('.level-list') as HTMLDivElement;
+
+    // Editor tools (dev-only)
+    this.newLevelNameInput = document.querySelector('.new-level-name') as HTMLInputElement;
+    this.createLevelButton = document.querySelector('.create-level-btn') as HTMLButtonElement;
+    this.importLevelButton = document.querySelector('.import-level-btn') as HTMLButtonElement;
+    this.importLevelInput = document.querySelector('.import-level-input') as HTMLInputElement;
+    this.storedLevelListDiv = document.querySelector('.stored-level-list') as HTMLDivElement;
+
+    // Load selected level preference
+    this.selectedLevelName = localStorage.getItem(LevelsKey) || gameRoot.level?.name || 'level1';
+
+    // Nickname
     this.nicknameInput.value = gameSettings.nickname;
 
+    // Color
     this.playerColorsDivs.forEach(div => {
       div.classList.toggle('selected', div.classList.contains(gameSettings.color));
       div.addEventListener('click', async () => {
@@ -123,17 +309,50 @@ export class LobbyUI extends AbstractUI {
       });
     });
 
-    this.enterButton.addEventListener('click', () => {
-      this.confirmLobby();
+    // Play button
+    this.playButton.addEventListener('click', () => {
+      this.confirmPlay();
     });
 
+    // Level list
+    await this.refreshLevelList();
+
+    // Editor - create level
+    this.createLevelButton.addEventListener('click', () => {
+      const name = this.newLevelNameInput.value.trim() || 'My Custom Level';
+      const doc = createTemplateLevelDocument(name);
+      GameStorage.saveLevelDocument(doc);
+      localStorage.setItem(LevelsKey, name);
+      localStorage.removeItem('mp-server-address');
+      localStorage.removeItem('mp-room-id');
+      window.location.reload();
+    });
+
+    // Editor - import JSON
+    this.importLevelButton.addEventListener('click', () => {
+      this.importLevelInput.click();
+    });
+    this.importLevelInput.addEventListener('change', async () => {
+      const file = this.importLevelInput.files?.[0];
+      if (!file) return;
+      try {
+        const fileContent = await file.text();
+        const parsed = JSON.parse(fileContent) as unknown;
+        if (!isLevelDocument(parsed)) return;
+        GameStorage.saveLevelDocument(parsed);
+        this.refreshStoredLevels();
+        this.refreshLevelList();
+      } catch {
+        return;
+      }
+    });
+
+    // Editor - stored levels
+    this.refreshStoredLevels();
+
+    // Settings button
     this.lobbyButtonDiv.addEventListener('click', () => this.openLobby());
     this.lobbyButtonDiv.style.display = this.open ? 'none' : 'block';
-
-    // close lobby if player not a new player
-    if (!gameSettings.newlyCreated) {
-      this.confirmLobby();
-    }
   }
 
   showOtherUIs(show: boolean) {
