@@ -95,11 +95,30 @@ describe('TimeTableUI', () => {
       source: 'local',
     });
 
-    expect(ui.replayMetadataDiv.innerText).toContain('Ghost: runner');
-    expect(ui.replayMetadataDiv.innerText).toContain('Time: 00:45.234');
-    expect(ui.replayMetadataDiv.innerText).toContain('Map: level1');
-    expect(ui.replayMetadataDiv.innerText).toContain('Source: Local record');
-    expect(ui.replayMetadataDiv.innerText).toContain('Replay v1');
     expect(ui.replayMetadataDiv.style.display).toBe('block');
+    const primary = ui.replayMetadataDiv.querySelector('.replay-metadata__primary');
+    const secondary = ui.replayMetadataDiv.querySelector('.replay-metadata__secondary');
+    expect(primary?.textContent).toBe('Map: level1');
+    expect(secondary?.textContent).toBe('Ghost: 00:45.234 - runner');
+  });
+
+  it('renders bundled replay metadata without source label or date', () => {
+    const ui = new TimeTableUI({} as never, {} as never);
+    ui.replayMetadataDiv = document.createElement('div');
+
+    ui.updateReplayMetadata({
+      playerName: 'Map record',
+      timeMs: 176717,
+      timeStr: '02:56.717',
+      completedAt: '2026-06-14T00:00:00.000Z',
+      mapName: 'level1',
+      replayVersion: 1,
+      source: 'bundled',
+    });
+
+    const primary = ui.replayMetadataDiv.querySelector('.replay-metadata__primary');
+    const secondary = ui.replayMetadataDiv.querySelector('.replay-metadata__secondary');
+    expect(primary?.textContent).toBe('Map: level1');
+    expect(secondary?.textContent).toBe('Ghost: 02:56.717 - Map record');
   });
 });
