@@ -19,7 +19,7 @@
 - Kept remote-player physics pre-step suspended for the entire interpolation window.
 - Added collision layer audit helpers and tests to detect contradictory mask setups.
 
-5. Replay and ghost quality
+5. Replay and ghost quality (phase 1)
 - Added replay format versioning (`v1`) and payload validation.
 - Added fail-safe handling for missing/corrupt/unsupported replay data.
 - Added replay metadata capture/surface (player, time, date, map, replay version, source).
@@ -40,8 +40,10 @@
 - Tuned multiplayer connection messages to hide on success, minimizing screen clutter.
 - Mapped distinct sound effects to critical state transitions (start, reset, teleport, connect, disconnect).
 
+9. Replay and ghost quality (phase 2)
+- Separated local-best and bundled-map-record storage slots to prevent local runs from overwriting bundled map records.
+- Added explicit migration telemetry via warning logs for legacy storage key conversions.
+
 ## Next Priorities
 
-1. Replay and ghost quality (phase 2)
-- Consider separate local-best vs bundled-map-record storage slots.
-- Add explicit migration telemetry/debug counters for replay upgrades.
+None. All roadmap tasks are currently complete.

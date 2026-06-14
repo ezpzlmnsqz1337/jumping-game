@@ -162,7 +162,7 @@ export class GameLevel {
 
     if (!replay) return true;
 
-    gameRoot.demoService.saveReplay(replay);
+    gameRoot.demoService.saveReplay(replay, 'local-best');
     gameRoot.uiManager?.timeTableUI.updateReplayMetadata(replay.metadata);
     gameRoot.uiManager?.timerUI.showRunStatus('finished', replay.metadata.timeStr);
     if (this.scene) {

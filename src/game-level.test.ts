@@ -100,7 +100,10 @@ describe('GameLevel run transitions', () => {
         mapName: 'test',
       })
     );
-    expect(gameRoot.demoService.saveReplay).toHaveBeenCalledTimes(1);
+    expect(gameRoot.demoService.saveReplay).toHaveBeenCalledWith(
+      expect.anything(),
+      'local-best'
+    );
     expect(gameRoot.uiManager?.timeTableUI.updateReplayMetadata).toHaveBeenCalledTimes(1);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith(
       'finished',

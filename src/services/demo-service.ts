@@ -42,7 +42,9 @@ export type ReplayPayload = ReplayPayloadV1;
 
 const SAMPLE_RATE_MS = 1000 / 60;
 export const REPLAY_FORMAT_VERSION = 1;
-const REPLAY_STORAGE_KEY = 'demo';
+const LOCAL_BEST_STORAGE_KEY_PREFIX = 'replay_local_best_';
+const BUNDLED_RECORD_STORAGE_KEY_PREFIX = 'replay_bundled_record_';
+const LEGACY_STORAGE_KEY = 'demo'; // Maintained for migration
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
@@ -236,40 +238,96 @@ export class DemoService {
     };
   }
 
-  saveReplay(replay: ReplayPayload): void {
-    localStorage.setItem(REPLAY_STORAGE_KEY, JSON.stringify(replay));
+  saveReplay(replay: ReplayPayload, type: 'local-best' | 'bundled-record' = 'local-best'): void {
+    const key = type === 'local-best' 
+      ? `${LOCAL_BEST_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`
+      : `${BUNDLED_RECORD_STORAGE_KEY_PREFIX}${replay.metadata.mapName}`;
+      
+    localStorage.setItem(key, JSON.stringify(replay));
   }
 
-  loadStoredReplay(mapName: string): ReplayPayload | null {
-    const replayJson = localStorage.getItem(REPLAY_STORAGE_KEY);
-    if (!replayJson) return null;
-
-    try {
-      const { replay, migrated } = this.normalizeReplayPayload(
-        JSON.parse(replayJson),
-        mapName,
-        'local'
-      );
-      if (!replay) {
-        localStorage.removeItem(REPLAY_STORAGE_KEY);
-        return null;
+  loadStoredReplay(mapName: string): { replay: ReplayPayload | null, type: 'local-best' | 'bundled-record' | null } {
+    // 1. Try to load local best first
+    const localBestKey = `${LOCAL_BEST_STORAGE_KEY_PREFIX}${mapName}`;
+    const localBestJson = localStorage.getItem(localBestKey);
+    
+    if (localBestJson) {
+      try {
+        const { replay, migrated } = this.normalizeReplayPayload(
+          JSON.parse(localBestJson),
+          mapName,
+          'local'
+        );
+        if (replay) {
+          if (migrated) {
+            console.warn('[Replay] Migrated local-best replay data to v1 format.');
+            this.saveReplay(replay, 'local-best');
+          }
+          return { replay, type: 'local-best' };
+        } else {
+          localStorage.removeItem(localBestKey);
+        }
+      } catch (_error) {
+        localStorage.removeItem(localBestKey);
       }
-
-      if (migrated) {
-        console.warn('[Replay] Migrated legacy replay data in local storage to v1 format.');
-      }
-
-      localStorage.setItem(REPLAY_STORAGE_KEY, JSON.stringify(replay));
-      return replay;
-    } catch (_error) {
-      localStorage.removeItem(REPLAY_STORAGE_KEY);
-      return null;
     }
+
+    // 2. Try to load bundled record
+    const bundledRecordKey = `${BUNDLED_RECORD_STORAGE_KEY_PREFIX}${mapName}`;
+    const bundledRecordJson = localStorage.getItem(bundledRecordKey);
+    
+    if (bundledRecordJson) {
+      try {
+        const { replay, migrated } = this.normalizeReplayPayload(
+          JSON.parse(bundledRecordJson),
+          mapName,
+          'bundled'
+        );
+        if (replay) {
+          if (migrated) {
+            console.warn('[Replay] Migrated bundled-record replay data to v1 format.');
+            this.saveReplay(replay, 'bundled-record');
+          }
+          return { replay, type: 'bundled-record' };
+        } else {
+          localStorage.removeItem(bundledRecordKey);
+        }
+      } catch (_error) {
+        localStorage.removeItem(bundledRecordKey);
+      }
+    }
+
+    // 3. Fallback to legacy demo key migration
+    const legacyJson = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacyJson) {
+      try {
+        const { replay } = this.normalizeReplayPayload(
+          JSON.parse(legacyJson),
+          mapName,
+          'local'
+        );
+        if (replay) {
+          console.warn('[Replay] Migrated legacy generic replay data to local-best v1 format.');
+          this.saveReplay(replay, 'local-best');
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
+          return { replay, type: 'local-best' };
+        }
+      } catch (_error) {
+        // Just ignore legacy parse errors
+      }
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
+
+    return { replay: null, type: null };
   }
 
   async loadOrCreateStoredReplay(fallbackUrl: string, mapName: string): Promise<ReplayPayload | null> {
-    const storedReplay = this.loadStoredReplay(mapName);
-    if (storedReplay) return storedReplay;
+    const { replay: storedReplay, type } = this.loadStoredReplay(mapName);
+    
+    // If we have a local best, or we already downloaded the bundled record, use it.
+    if (storedReplay && (type === 'local-best' || type === 'bundled-record')) {
+      return storedReplay;
+    }
 
     try {
       const response = await fetch(fallbackUrl);
@@ -278,10 +336,10 @@ export class DemoService {
       if (!replay) return null;
 
       if (migrated) {
-        console.warn('[Replay] Migrated legacy bundled replay data to v1 format.');
+        console.warn('[Replay] Migrated downloaded bundled replay data to v1 format.');
       }
 
-      this.saveReplay(replay);
+      this.saveReplay(replay, 'bundled-record');
       return replay;
     } catch (_error) {
       return null;

@@ -46,33 +46,36 @@ describe('DemoService replay format', () => {
       ])
     );
 
-    const replay = service.loadStoredReplay('level1');
+    const { replay, type } = service.loadStoredReplay('level1');
 
     expect(replay).toBeTruthy();
     expect(replay?.version).toBe(REPLAY_FORMAT_VERSION);
     expect(replay?.frames[0].position).toEqual({ x: 10, y: 11, z: 12 });
     expect(replay?.metadata.mapName).toBe('level1');
     expect(replay?.metadata.source).toBe('migrated-legacy');
+    expect(type).toBe('local-best');
   });
 
   it('rejects corrupted replay payload and clears storage', () => {
     const service = new DemoService();
-    localStorage.setItem('demo', JSON.stringify({ version: REPLAY_FORMAT_VERSION, frames: 'bad' }));
+    localStorage.setItem('replay_local_best_level1', JSON.stringify({ version: REPLAY_FORMAT_VERSION, frames: 'bad' }));
 
-    const replay = service.loadStoredReplay('level1');
+    const { replay, type } = service.loadStoredReplay('level1');
 
     expect(replay).toBeNull();
-    expect(localStorage.getItem('demo')).toBeNull();
+    expect(type).toBeNull();
+    expect(localStorage.getItem('replay_local_best_level1')).toBeNull();
   });
 
   it('rejects unsupported replay versions and clears storage', () => {
     const service = new DemoService();
-    localStorage.setItem('demo', JSON.stringify({ version: 999, frames: [] }));
+    localStorage.setItem('replay_local_best_level1', JSON.stringify({ version: 999, frames: [] }));
 
-    const replay = service.loadStoredReplay('level1');
+    const { replay, type } = service.loadStoredReplay('level1');
 
     expect(replay).toBeNull();
-    expect(localStorage.getItem('demo')).toBeNull();
+    expect(type).toBeNull();
+    expect(localStorage.getItem('replay_local_best_level1')).toBeNull();
   });
 
   it('loads fallback replay when storage is missing', async () => {
@@ -96,7 +99,7 @@ describe('DemoService replay format', () => {
     expect(replay?.version).toBe(REPLAY_FORMAT_VERSION);
     expect(replay?.metadata.source).toBe('bundled');
     expect(fetch).toHaveBeenCalledWith('assets/demo/map-record.json');
-    expect(localStorage.getItem('demo')).toContain('"version":1');
+    expect(localStorage.getItem('replay_bundled_record_level1')).toContain('"version":1');
   });
 
   it('warns when migrating legacy stored replay', () => {
@@ -112,11 +115,11 @@ describe('DemoService replay format', () => {
       ])
     );
 
-    const replay = service.loadStoredReplay('level1');
+    const { replay } = service.loadStoredReplay('level1');
 
     expect(replay).toBeTruthy();
     expect(warnSpy).toHaveBeenCalledWith(
-      '[Replay] Migrated legacy replay data in local storage to v1 format.'
+      '[Replay] Migrated legacy generic replay data to local-best v1 format.'
     );
   });
 });
