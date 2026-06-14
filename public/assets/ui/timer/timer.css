@@ -4,21 +4,22 @@
   color: var(--color-text-primary);
   font-weight: bold;
   font-size: var(--font-size-ui-5xl);
-  bottom: 6.5rem;
-  left: 0;
-  right: 0;
+  top: 1rem;
+  right: 1rem;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   z-index: 10;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
+  pointer-events: none;
 }
 
 .timer>div {
   background-color: var(--color-surface-overlay);
   padding: var(--space-lg) var(--space-3xl);
-  text-align: center;
+  text-align: right;
   border-radius: 0.2rem;
+  pointer-events: auto;
 }
 
 .timer>div>.checkpoints {
@@ -60,11 +61,13 @@
   .timer {
     padding: var(--space-lg);
     font-size: var(--font-size-ui-2xl);
+    top: 0;
+    right: 0;
   }
   
   .timer>div {
     padding: var(--space-lg);
-    text-align: center;
+    text-align: right;
     border-radius: 0.2rem;
   }
   

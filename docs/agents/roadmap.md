@@ -35,12 +35,13 @@
 - Kept local prediction minimal and capped. Added client correction via rubber-banding when cheating or severe desync occurs.
 - Implemented rate-limited teleport flags to allow legitimate instant movement.
 
+8. UX polish (phase 2)
+- Relocated timer and connection surfaces to eliminate layout overlap with chat and leaderboards.
+- Tuned multiplayer connection messages to hide on success, minimizing screen clutter.
+- Mapped distinct sound effects to critical state transitions (start, reset, teleport, connect, disconnect).
+
 ## Next Priorities
 
-1. UX polish (phase 2)
-- Tune message timing/priority to reduce overlap between timer, connection, and chat surfaces.
-- Add optional toast/sound mapping for key state transitions.
-
-2. Replay and ghost quality (phase 2)
+1. Replay and ghost quality (phase 2)
 - Consider separate local-best vs bundled-map-record storage slots.
 - Add explicit migration telemetry/debug counters for replay upgrades.

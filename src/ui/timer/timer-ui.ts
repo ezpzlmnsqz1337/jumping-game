@@ -12,6 +12,8 @@ export class TimerUI extends AbstractUI {
 
   runStatusTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  connectionStatusTimeout: ReturnType<typeof setTimeout> | null = null;
+
   constructor(scene: BABYLON.Scene, player: PlayerEntity) {
     super(scene, 'timer', player);
   }
@@ -56,6 +58,19 @@ export class TimerUI extends AbstractUI {
     this.runStatusDiv.className = `run-status state-${status}`;
     this.runStatusDiv.style.display = 'block';
 
+    // Sound mapping
+    if (status === 'ready') {
+      this.scene.sounds?.find(x => x.name === 'key-press')?.play();
+    } else if (status === 'running') {
+      this.scene.sounds?.find(x => x.name === 'key-press')?.play();
+    } else if (status === 'reset') {
+      if (detail === 'teleport') {
+        this.scene.sounds?.find(x => x.name === 'water-splash1')?.play();
+      } else {
+        this.scene.sounds?.find(x => x.name === 'water-splash2')?.play();
+      }
+    }
+
     if (this.runStatusTimeout) clearTimeout(this.runStatusTimeout);
     this.runStatusTimeout = setTimeout(() => {
       if (!this.runStatusDiv) return;
@@ -65,6 +80,19 @@ export class TimerUI extends AbstractUI {
 
   showConnectionStatus(status: 'online' | 'offline', detail = '') {
     if (!this.connectionStatusDiv) return;
+    
+    // Only play sound if status actually changes to prevent spam
+    const currentClass = this.connectionStatusDiv.className;
+    const isNewStatus = !currentClass.includes(`state-${status}`);
+    
+    if (isNewStatus) {
+      if (status === 'online') {
+        this.scene.sounds?.find(x => x.name === 'open-lobby')?.play();
+      } else {
+        this.scene.sounds?.find(x => x.name === 'close-lobby')?.play();
+      }
+    }
+
     const text =
       status === 'online'
         ? `Multiplayer connected${detail ? ` (${detail})` : ''}`
@@ -73,6 +101,17 @@ export class TimerUI extends AbstractUI {
     this.connectionStatusDiv.innerText = text;
     this.connectionStatusDiv.className = `connection-status state-${status}`;
     this.connectionStatusDiv.style.display = 'block';
+
+    if (this.connectionStatusTimeout) clearTimeout(this.connectionStatusTimeout);
+    
+    // Hide 'online' status after 4 seconds to reduce UI clutter. 
+    // Keep 'offline' visible so player knows they are disconnected.
+    if (status === 'online') {
+      this.connectionStatusTimeout = setTimeout(() => {
+        if (!this.connectionStatusDiv) return;
+        this.connectionStatusDiv.style.display = 'none';
+      }, 4000);
+    }
   }
 
   updateUI(): void {
