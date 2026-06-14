@@ -86,7 +86,7 @@ describe("MyRoom unit behavior", () => {
     incoming.color = "red";
     incoming.status = "in_game";
 
-    room.updatePlayerInfo({ sessionId: "p1", send: () => {} } as never, incoming);
+    room.updatePlayerInfo({ sessionId: "p1", send: () => {} } as never, incoming as never);
 
     const updated = room.state.players.get("p1");
     assert.strictEqual(updated.position.x, 10);
@@ -123,13 +123,13 @@ describe("MyRoom unit behavior", () => {
     let sentCorrection = false;
     room.updatePlayerInfo({ 
       sessionId: "p1", 
-      send: (type: string, data: any) => {
+      send: (type: string, data: never) => {
         if (type === 'player:correction') {
           sentCorrection = true;
-          assert.strictEqual(data.position.x, 0);
+          assert.strictEqual((data as { position: { x: number } }).position.x, 0);
         }
       } 
-    } as never, incoming as any);
+    } as never, incoming as never);
 
     const updated = room.state.players.get("p1");
     // Position should NOT have been updated to 50
@@ -151,14 +151,14 @@ describe("MyRoom unit behavior", () => {
     let sentCorrection = false;
     
     // We only send it ONCE WITH the flag, no need to send it without the flag first (which triggers the correction that isn't cleared)
-    (incoming as any).teleported = true;
+    (incoming as never as { teleported: boolean }).teleported = true;
     
     room.updatePlayerInfo({ 
       sessionId: "p1", 
       send: (type: string) => {
         if (type === 'player:correction') sentCorrection = true;
       } 
-    } as never, incoming as any);
+    } as never, incoming as never);
 
     const updated = room.state.players.get("p1");
     assert.strictEqual(updated.position.x, 50); // Allowed because of teleport flag
