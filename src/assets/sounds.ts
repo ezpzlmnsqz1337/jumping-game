@@ -14,6 +14,8 @@ export const createSounds = (scene: BABYLON.Scene) => {
     waterSplash2(scene),
     keyPress(scene),
     openLobby(scene),
+    jumpSound(scene),
+    landSound(scene),
   ] as BABYLON.Sound[];
 };
 
@@ -74,5 +76,17 @@ const waterSplash2 = (scene: BABYLON.Scene, opts?: BABYLON.ISoundOptions) =>
 const keyPress = (scene: BABYLON.Scene, opts?: BABYLON.ISoundOptions) =>
   new BABYLON.Sound('key-press', './assets/sounds/key-press.mp3', scene, null, {
     volume: 0.1,
+    ...opts,
+  });
+
+const jumpSound = (scene: BABYLON.Scene, opts?: BABYLON.ISoundOptions) =>
+  new BABYLON.Sound('jump', './assets/sounds/jump.wav', scene, null, {
+    volume: 0.5,
+    ...opts,
+  });
+
+const landSound = (scene: BABYLON.Scene, opts?: BABYLON.ISoundOptions) =>
+  new BABYLON.Sound('land', './assets/sounds/land.wav', scene, null, {
+    volume: 0.2,
     ...opts,
   });

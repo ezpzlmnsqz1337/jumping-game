@@ -6,6 +6,7 @@ import {
   FILTER_MASK_PLAYER_NO_COLLISSIONS,
   FILTER_MASK_PLAYER_WITH_COLLISSIONS,
 } from '../collission-groups';
+import { triggerLandingEffect } from '../effects/landing-effect';
 import { GameEntity } from './game-entity';
 import { GameLevel } from '../game-level';
 
@@ -29,6 +30,7 @@ export class PlayerEntity extends GameEntity {
   color = 'blue';
   status: PlayerStatus = 'in_lobby';
   collisionEnabled = true;
+  private lastLandTime = 0;
 
   constructor(
     nickname: string = 'player',
@@ -126,6 +128,14 @@ export class PlayerEntity extends GameEntity {
       // console.log('upCollission', upCollission);
       if (upCollission < -0.9 && upCollission > -1.1) {
         this.jumping = false;
+
+        // Landing: play sound + particle burst (with cooldown to avoid multi-fire)
+        const now = performance.now();
+        if (now - this.lastLandTime > 300) {
+          this.lastLandTime = now;
+          triggerLandingEffect(this.scene, this.mesh.position, 5);
+          this.scene.sounds?.find(s => s.name === 'land')?.play();
+        }
       } else {
         const power = ['ground', 'wall'].includes(collidedAgainstNode.name) ? 1 : 5;
         // push player away
@@ -147,5 +157,8 @@ export class PlayerEntity extends GameEntity {
       this.mesh.getAbsolutePosition()
     );
     this.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+
+    // Jump sound
+    this.scene.sounds?.find(s => s.name === 'jump')?.play();
   }
 }
