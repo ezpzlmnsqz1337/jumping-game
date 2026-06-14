@@ -44,7 +44,11 @@ export class GameSettingsUI extends AbstractUI {
   }
 
   toggleCollissions() {
-    gameRoot.multiplayer?.toggleCollissions();
+    if (gameRoot.multiplayer) {
+      gameRoot.multiplayer.toggleCollissions();
+    } else {
+      this.player.collisionEnabled = !this.player.collisionEnabled;
+    }
     this.collissionsCheckBox.checked = this.player.collisionEnabled;
     renderingCanvas.focus();
   }
