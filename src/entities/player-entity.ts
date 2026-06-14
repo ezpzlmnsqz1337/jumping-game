@@ -6,6 +6,7 @@ import {
   FILTER_MASK_PLAYER_NO_COLLISSIONS,
   FILTER_MASK_PLAYER_WITH_COLLISSIONS,
 } from '../collission-groups';
+import { triggerLandingEffect } from '../effects/landing-effect';
 import { GameEntity } from './game-entity';
 import { GameLevel } from '../game-level';
 
@@ -126,6 +127,14 @@ export class PlayerEntity extends GameEntity {
       // console.log('upCollission', upCollission);
       if (upCollission < -0.9 && upCollission > -1.1) {
         this.jumping = false;
+
+        // Landing effect: trigger particles and sound when falling with speed
+        const velocity = this.physics.body.getLinearVelocity();
+        const verticalSpeed = Math.abs(velocity.y);
+        if (verticalSpeed > 2) {
+          triggerLandingEffect(this.scene, this.mesh.position, verticalSpeed);
+          this.scene.sounds?.find(s => s.name === 'water-splash1')?.play();
+        }
       } else {
         const power = ['ground', 'wall'].includes(collidedAgainstNode.name) ? 1 : 5;
         // push player away
@@ -147,5 +156,8 @@ export class PlayerEntity extends GameEntity {
       this.mesh.getAbsolutePosition()
     );
     this.physics.body.setAngularVelocity(new BABYLON.Vector3(0, 0, 0));
+
+    // Jump sound
+    this.scene.sounds?.find(s => s.name === 'key-press')?.play();
   }
 }
