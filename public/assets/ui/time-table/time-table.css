@@ -12,9 +12,19 @@
 }
 
 .time-table > .replay-metadata {
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   font-size: var(--font-size-ui-sm);
   margin-top: var(--space-sm);
+}
+
+.replay-metadata__primary {
+  display: block;
+}
+
+.replay-metadata__secondary {
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: var(--font-size-ui-xs);
 }
 
 @media only screen and (max-width: 1000px) {

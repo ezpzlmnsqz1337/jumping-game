@@ -37,23 +37,11 @@ export class TimeTableUI extends AbstractUI {
   updateReplayMetadata(metadata: ReplayMetadata): void {
     if (!this.replayMetadataDiv) return;
 
-    const sourceLabel =
-      metadata.source === 'local'
-        ? 'Local record'
-        : metadata.source === 'bundled'
-          ? 'Bundled map record'
-          : 'Migrated legacy record';
+    this.replayMetadataDiv.innerHTML = [
+      `<span class="replay-metadata__primary">Map: ${metadata.mapName}</span>`,
+      `<span class="replay-metadata__secondary">Ghost: ${metadata.timeStr} - ${metadata.playerName}</span>`,
+    ].join('');
 
-    const details = [
-      `Ghost: ${metadata.playerName}`,
-      `Time: ${metadata.timeStr}`,
-      `Map: ${metadata.mapName}`,
-      `Date: ${new Date(metadata.completedAt).toLocaleDateString()}`,
-      `Source: ${sourceLabel}`,
-      `Replay v${metadata.replayVersion}`,
-    ].join(' | ');
-
-    this.replayMetadataDiv.innerText = details;
     this.replayMetadataDiv.style.display = 'block';
   }
 
