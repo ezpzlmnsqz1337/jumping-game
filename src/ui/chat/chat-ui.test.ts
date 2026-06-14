@@ -187,4 +187,29 @@ describe('ChatUI', () => {
     chatUi.chatInput.dispatchEvent(new Event('blur'));
     expect(player.status).toBe('playing');
   });
+
+  it('stopChat hides input and restarts timeout', async () => {
+    const { ChatUI } = await import('./chat-ui');
+
+    const player: ChatTestPlayer = {
+      status: 'in_chat',
+      nickname: 'tester',
+      color: 'green',
+    };
+
+    const chatUi = new ChatUI({} as never, player as never);
+    chatUi.chatDiv = document.querySelector('.chat') as HTMLDivElement;
+    chatUi.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
+    chatUi.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+
+    chatUi.restartChatTimeout();
+    expect(chatUi.chatDiv.style.display).toBe('block');
+
+    chatUi.stopChat();
+
+    expect(chatUi.chatInput.style.display).toBe('none');
+    expect(player.status).toBe('playing');
+    // Timeout should have been restarted — chat stays visible
+    expect(chatUi.chatDiv.style.display).toBe('block');
+  });
 });

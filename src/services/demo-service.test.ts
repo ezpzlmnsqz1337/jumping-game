@@ -211,4 +211,18 @@ describe('DemoService replay format', () => {
     expect(replay?.metadata.timeStr).toBe('00:05.000');
     expect(type).toBe('local-best');
   });
+
+  it('returns null when creating replay payload with empty recording', () => {
+    const service = new DemoService();
+    const replay = service.createReplayPayload([], {
+      playerName: 'alice',
+      timeMs: 1234,
+      timeStr: '00:01.234',
+      completedAt: '2026-01-01T00:00:00.000Z',
+      mapName: 'level1',
+      source: 'local',
+    });
+
+    expect(replay).toBeNull();
+  });
 });
