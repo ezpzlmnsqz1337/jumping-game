@@ -33,6 +33,8 @@ export class LobbyUI extends AbstractUI {
   open = true;
   lastCameraRadius: number;
   switchCameraOnClose = false;
+  private chatWasVisible = false;
+  private playerInfoWasVisible = false;
 
   private isDev = import.meta.env.DEV;
 
@@ -60,6 +62,9 @@ export class LobbyUI extends AbstractUI {
 
     this.scene.sounds?.find(x => x.name === 'open-lobby')?.play();
     this.player.status = 'in_lobby';
+    this.chatWasVisible = gameRoot.uiManager?.chatUI.rootElement?.style.display !== 'none';
+    this.playerInfoWasVisible =
+      gameRoot.uiManager?.playerInfoUI.rootElement?.style.display !== 'none';
     this.showOtherUIs(false);
   }
 
@@ -318,7 +323,7 @@ export class LobbyUI extends AbstractUI {
     gameRoot.uiManager?.timeTableUI.show(show);
     gameRoot.uiManager?.gameSettingsUI.show(show);
     gameRoot.uiManager?.editorUI.show(show);
-    gameRoot.uiManager?.chatUI.show(show);
-    gameRoot.uiManager?.playerInfoUI.show(show);
+    gameRoot.uiManager?.chatUI.show(show ? this.chatWasVisible : false);
+    gameRoot.uiManager?.playerInfoUI.show(show ? this.playerInfoWasVisible : false);
   }
 }
