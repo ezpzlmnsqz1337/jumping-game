@@ -122,11 +122,20 @@ describe('LobbyUI', () => {
       changeNickname: vi.fn(),
     };
 
+    const chatRootElement = document.createElement('div');
+    chatRootElement.style.display = 'block';
+    const playerInfoRootElement = document.createElement('div');
+    playerInfoRootElement.style.display = 'flex';
+
+    const chatShow = vi.fn();
+    const playerInfoShow = vi.fn();
     gameRoot.uiManager = {
       timerUI: { show: vi.fn() },
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera: vi.fn() },
       editorUI: { show: vi.fn() },
+      chatUI: { show: chatShow, rootElement: chatRootElement },
+      playerInfoUI: { show: playerInfoShow, rootElement: playerInfoRootElement },
     } as never;
 
     const ui = new LobbyUI(
@@ -151,6 +160,8 @@ describe('LobbyUI', () => {
     expect(player.status).toBe('in_lobby');
     expect(camera.useAutoRotationBehavior).toBe(true);
     expect(openSound.play).toHaveBeenCalled();
+    expect(chatShow).toHaveBeenCalledWith(false);
+    expect(playerInfoShow).toHaveBeenCalledWith(false);
 
     ui.closeLobby();
 
@@ -160,6 +171,8 @@ describe('LobbyUI', () => {
     expect(player.status).toBe('playing');
     expect(camera.useAutoRotationBehavior).toBe(false);
     expect(closeSound.play).toHaveBeenCalled();
+    expect(chatShow).toHaveBeenCalledWith(true);
+    expect(playerInfoShow).toHaveBeenCalledWith(true);
   });
 
   it('play is a no-op while player is in chat', async () => {
@@ -200,11 +213,19 @@ describe('LobbyUI', () => {
     const { LobbyUI } = await import('./lobby-ui');
 
     const toggleFollowCamera = vi.fn();
+
+    const chatRootElement = document.createElement('div');
+    chatRootElement.style.display = 'block';
+    const playerInfoRootElement = document.createElement('div');
+    playerInfoRootElement.style.display = 'flex';
+
     gameRoot.uiManager = {
       timerUI: { show: vi.fn() },
       timeTableUI: { show: vi.fn() },
       gameSettingsUI: { show: vi.fn(), toggleFollowCamera },
       editorUI: { show: vi.fn() },
+      chatUI: { show: vi.fn(), rootElement: chatRootElement },
+      playerInfoUI: { show: vi.fn(), rootElement: playerInfoRootElement },
     } as never;
 
     const camera: TestCamera = {
@@ -232,6 +253,112 @@ describe('LobbyUI', () => {
 
     expect(toggleFollowCamera).toHaveBeenCalledTimes(1);
     expect(ui.switchCameraOnClose).toBe(false);
+  });
+
+  it('restores chat and player info to previous visibility when lobby closes', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { LobbyUI } = await import('./lobby-ui');
+
+    const chatRootElement = document.createElement('div');
+    chatRootElement.style.display = 'none';
+    const playerInfoRootElement = document.createElement('div');
+    playerInfoRootElement.style.display = 'none';
+
+    const chatShow = vi.fn();
+    const playerInfoShow = vi.fn();
+    gameRoot.uiManager = {
+      timerUI: { show: vi.fn() },
+      timeTableUI: { show: vi.fn() },
+      gameSettingsUI: { show: vi.fn(), toggleFollowCamera: vi.fn() },
+      editorUI: { show: vi.fn() },
+      chatUI: { show: chatShow, rootElement: chatRootElement },
+      playerInfoUI: { show: playerInfoShow, rootElement: playerInfoRootElement },
+    } as never;
+
+    const camera: TestCamera = {
+      name: 'arcCamera',
+      alpha: 1,
+      beta: 1,
+      radius: 6,
+      useAutoRotationBehavior: true,
+      setMoveToTarget: vi.fn(),
+    };
+
+    const player: LobbyTestPlayer = {
+      status: 'playing',
+      color: 'blue',
+      changeNickname: vi.fn(),
+    };
+
+    const ui = new LobbyUI({ activeCamera: camera, sounds: [] } as never, player as never);
+    ui.open = false;
+    ui.lobbyDiv = document.createElement('div');
+    ui.lobbyButtonDiv = document.createElement('div');
+    ui.lobbyDiv.style.display = 'none';
+    ui.lobbyButtonDiv.style.display = 'block';
+
+    ui.openLobby();
+
+    expect(chatShow).toHaveBeenCalledWith(false);
+    expect(playerInfoShow).toHaveBeenCalledWith(false);
+
+    ui.closeLobby();
+
+    expect(chatShow).toHaveBeenCalledWith(false);
+    expect(playerInfoShow).toHaveBeenCalledWith(false);
+  });
+
+  it('restores chat and player info to visible when they were visible before lobby opened', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { LobbyUI } = await import('./lobby-ui');
+
+    const chatRootElement = document.createElement('div');
+    chatRootElement.style.display = 'block';
+    const playerInfoRootElement = document.createElement('div');
+    playerInfoRootElement.style.display = 'flex';
+
+    const chatShow = vi.fn();
+    const playerInfoShow = vi.fn();
+    gameRoot.uiManager = {
+      timerUI: { show: vi.fn() },
+      timeTableUI: { show: vi.fn() },
+      gameSettingsUI: { show: vi.fn(), toggleFollowCamera: vi.fn() },
+      editorUI: { show: vi.fn() },
+      chatUI: { show: chatShow, rootElement: chatRootElement },
+      playerInfoUI: { show: playerInfoShow, rootElement: playerInfoRootElement },
+    } as never;
+
+    const camera: TestCamera = {
+      name: 'arcCamera',
+      alpha: 1,
+      beta: 1,
+      radius: 6,
+      useAutoRotationBehavior: true,
+      setMoveToTarget: vi.fn(),
+    };
+
+    const player: LobbyTestPlayer = {
+      status: 'playing',
+      color: 'blue',
+      changeNickname: vi.fn(),
+    };
+
+    const ui = new LobbyUI({ activeCamera: camera, sounds: [] } as never, player as never);
+    ui.open = false;
+    ui.lobbyDiv = document.createElement('div');
+    ui.lobbyButtonDiv = document.createElement('div');
+    ui.lobbyDiv.style.display = 'none';
+    ui.lobbyButtonDiv.style.display = 'block';
+
+    ui.openLobby();
+
+    expect(chatShow).toHaveBeenCalledWith(false);
+    expect(playerInfoShow).toHaveBeenCalledWith(false);
+
+    ui.closeLobby();
+
+    expect(chatShow).toHaveBeenCalledWith(true);
+    expect(playerInfoShow).toHaveBeenCalledWith(true);
   });
 
   it('bindUI wires controls and applies game settings', async () => {

@@ -141,10 +141,17 @@ export class MyRoom extends Room<MyRoomState> {
 
     // Server authoritative speed validation
     if (!isTeleport && distance > 0.1 && speed > MAX_ALLOWED_SPEED) {
-      console.warn(`[Correction] Player ${playerId} moved too fast (${speed.toFixed(2)} u/s). Rubber-banding to last valid position.`);
+      console.warn(
+        `[Correction] Player ${playerId} moved too fast (${speed.toFixed(2)} u/s). Rubber-banding to last valid position.`
+      );
       client.send(EventType.PLAYER_CORRECTION, {
         position: { x: player.position.x, y: player.position.y, z: player.position.z },
-        rotation: { x: player.rotation.x, y: player.rotation.y, z: player.rotation.z, w: player.rotation.w }
+        rotation: {
+          x: player.rotation.x,
+          y: player.rotation.y,
+          z: player.rotation.z,
+          w: player.rotation.w,
+        },
       });
       return; // Reject the update
     }
