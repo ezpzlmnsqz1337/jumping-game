@@ -36,7 +36,7 @@
 - Implemented rate-limited teleport flags to allow legitimate instant movement.
 
 8. UX polish (phase 2)
-- Relocated timer and connection surfaces to eliminate layout overlap with chat and leaderboards.
+- Reverted timer position back to bottom-center to avoid overlapping with game settings in top-right. Kept `pointer-events: none` safety.
 - Tuned multiplayer connection messages to hide on success, minimizing screen clutter.
 - Mapped distinct sound effects to critical state transitions (start, reset, teleport, connect, disconnect).
 

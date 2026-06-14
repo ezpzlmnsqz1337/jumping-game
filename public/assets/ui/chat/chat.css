@@ -1,6 +1,6 @@
 .chat {
   position: fixed;
-  bottom: 1rem;
+  bottom: 7rem;
   left: 1rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface-overlay);
@@ -68,7 +68,7 @@
 
 @media only screen and (max-width: 1000px) {
   .chat {
-    bottom: 1rem;
+    bottom: 11rem;
     left: 0;
     padding: var(--space-lg);
     font-size: var(--font-size-ui-xs);

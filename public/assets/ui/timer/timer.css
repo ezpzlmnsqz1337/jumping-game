@@ -4,20 +4,21 @@
   color: var(--color-text-primary);
   font-weight: bold;
   font-size: var(--font-size-ui-5xl);
-  top: 1rem;
-  right: 1rem;
+  bottom: 6.5rem;
+  left: 0;
+  right: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   z-index: 10;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   pointer-events: none;
 }
 
 .timer>div {
   background-color: var(--color-surface-overlay);
   padding: var(--space-lg) var(--space-3xl);
-  text-align: right;
+  text-align: center;
   border-radius: 0.2rem;
   pointer-events: auto;
 }
@@ -61,13 +62,14 @@
   .timer {
     padding: var(--space-lg);
     font-size: var(--font-size-ui-2xl);
-    top: 0;
+    bottom: 6.5rem;
+    left: 0;
     right: 0;
   }
   
   .timer>div {
     padding: var(--space-lg);
-    text-align: right;
+    text-align: center;
     border-radius: 0.2rem;
   }
   
