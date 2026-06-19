@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { ShadowGenerator } from '../../shadows';
 
 /** A patrol light that moves back and forth along a path */
 interface PatrolLightDef {
@@ -49,17 +50,44 @@ const PATROL_LIGHTS: PatrolLightDef[] = [
   },
 ];
 
-export function createDynamicLights(scene: BABYLON.Scene): BABYLON.PointLight[] {
+export interface DynamicLightsResult {
+  lights: BABYLON.PointLight[];
+  shadowGenerators: ShadowGenerator[];
+}
+
+export function createDynamicLights(scene: BABYLON.Scene): DynamicLightsResult {
   const lights: BABYLON.PointLight[] = [];
+  const shadowGenerators: ShadowGenerator[] = [];
 
   for (let i = 0; i < PATROL_LIGHTS.length; i++) {
     const def = PATROL_LIGHTS[i];
     const startPos = def.waypoints[0].clone();
     startPos.y += def.heightOffset;
 
+    // Create the point light
     const light = new BABYLON.PointLight(`patrolLight-${i}`, startPos, scene);
     light.diffuse = new BABYLON.Color3(1, 0.9, 0.1); // yellow
     light.intensity = 0.6;
+    light.range = 25;
+
+    // Enable shadows on this light (with small shadow map for performance)
+    light.shadowEnabled = true;
+    const sg = new ShadowGenerator(light, [], [], { blurKernel: 4, mapSize: 128 });
+    shadowGenerators.push(sg);
+
+    // Create visible glowing sphere model
+    const glowSphere = BABYLON.MeshBuilder.CreateSphere(
+      `patrolLightGlow-${i}`,
+      { diameter: 0.5 },
+      scene
+    );
+    const glowMat = new BABYLON.StandardMaterial(`patrolLightMat-${i}`, scene);
+    glowMat.emissiveColor = new BABYLON.Color3(1, 0.9, 0.1);
+    glowMat.diffuseColor = new BABYLON.Color3(1, 0.9, 0.1);
+    glowMat.alpha = 0.9;
+    glowSphere.material = glowMat;
+    glowSphere.position = startPos.clone();
+    glowSphere.isPickable = false;
 
     // Attach animation data for use in render loop
     light.metadata = {
@@ -69,13 +97,14 @@ export function createDynamicLights(scene: BABYLON.Scene): BABYLON.PointLight[] 
         speed: def.speed,
         elapsed: Math.random() * 100, // random start offset
         heightOffset: def.heightOffset,
+        glowMesh: glowSphere,
       },
     };
 
     lights.push(light);
   }
 
-  return lights;
+  return { lights, shadowGenerators };
 }
 
 function calculatePathLength(waypoints: BABYLON.Vector3[]): number {
@@ -95,6 +124,7 @@ export function updateDynamicLights(lights: BABYLON.PointLight[], deltaTime: num
           speed: number;
           elapsed: number;
           heightOffset: number;
+          glowMesh: BABYLON.Mesh;
         }
       | undefined;
     if (!patrol) continue;
@@ -108,6 +138,11 @@ export function updateDynamicLights(lights: BABYLON.PointLight[], deltaTime: num
     const pos = lerpPath(patrol.waypoints, t);
     pos.y += patrol.heightOffset;
     light.position = pos;
+
+    // Move the glowing sphere model with the light
+    if (patrol.glowMesh) {
+      patrol.glowMesh.position = pos.clone();
+    }
   }
 }
 

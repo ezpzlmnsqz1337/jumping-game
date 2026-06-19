@@ -88,7 +88,18 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   });
 
   // Dynamic patrol lights
-  const patrolLights = createDynamicLights(scene);
+  const { lights: patrolLights, shadowGenerators: patrolShadowGens } = createDynamicLights(scene);
+
+  // Register walls and trees as shadow casters for the patrol lights
+  const allWallMeshes = gameRoot.level.walls.map(w => w.mesh);
+  const allShadowCasters = [...allWallMeshes, ...treesResult.treeMeshes];
+  patrolShadowGens.forEach(sg => {
+    allShadowCasters.forEach(mesh => {
+      if (mesh instanceof BABYLON.Mesh) {
+        sg.addShadowCaster(mesh);
+      }
+    });
+  });
 
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
