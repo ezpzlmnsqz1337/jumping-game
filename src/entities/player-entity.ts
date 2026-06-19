@@ -99,6 +99,11 @@ export class PlayerEntity extends GameEntity {
         mesh.rotationQuaternion = flipX.multiply(mesh.rotationQuaternion);
         mesh.rotationQuaternion = flipY.multiply(mesh.rotationQuaternion);
       }
+      // Enable shadow receiving and casting on the visible player model
+      mesh.receiveShadows = true;
+      if (mesh instanceof BABYLON.Mesh) {
+        this.level.shadowGenerators.forEach(sg => sg.addShadowCaster(mesh));
+      }
     });
 
     // save settings
