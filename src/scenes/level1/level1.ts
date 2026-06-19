@@ -471,26 +471,41 @@ export class Level1 extends GameLevel {
     const scene = this.scene!;
     const player = this.player!;
 
-    const hemiLight = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
+    // Ambient sky fill (no shadows)
+    const hemiLight = new BABYLON.HemisphericLight(
+      'hemiLight',
+      new BABYLON.Vector3(0, 1, 0),
+      scene
+    );
+    hemiLight.intensity = 0.3;
+    hemiLight.diffuse = new BABYLON.Color3(0.8, 0.85, 1.0);
+    hemiLight.groundColor = new BABYLON.Color3(0.3, 0.3, 0.35);
 
-    const light1 = new BABYLON.PointLight('pointLight', new BABYLON.Vector3(-6, 6, 0), scene);
-    light1.intensity = 0.4;
-    light1.shadowEnabled = true;
-    light1.shadowMinZ = 0.1;
-    light1.shadowMaxZ = 100;
+    // Sun (directional light) — casts crisp shadows across the entire map
+    const sunLight = new BABYLON.DirectionalLight(
+      'sunLight',
+      new BABYLON.Vector3(-0.6, -1.0, -0.3),
+      scene
+    );
+    sunLight.intensity = 1.5;
+    sunLight.shadowEnabled = true;
+    sunLight.autoCalcShadowZBounds = true;
+
+    // Shadow generator with reduced blur for visible tree shadows
+    const shadowGenerator = new ShadowGenerator(
+      sunLight,
+      [...this.walls.map(x => x.mesh)],
+      [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)],
+      { blurKernel: 8, mapSize: 2048 }
+    );
+
     if (import.meta.env.DEV) {
       const utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-      const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
-      lightGizmo1.light = light1;
+      const sunGizmo = new BABYLON.LightGizmo(utilLayer);
+      sunGizmo.light = sunLight;
     }
 
-    this.lights = [hemiLight, light1];
-    this.shadowGenerators = [
-      new ShadowGenerator(
-        light1,
-        [...this.walls.map(x => x.mesh)],
-        [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
-      ),
-    ];
+    this.lights = [hemiLight, sunLight];
+    this.shadowGenerators = [shadowGenerator];
   }
 }
