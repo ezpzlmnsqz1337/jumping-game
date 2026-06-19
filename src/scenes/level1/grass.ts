@@ -52,32 +52,57 @@ function isInExclusionZone(x: number, z: number): boolean {
   return false;
 }
 
-/** Create a simple grass blade shape mesh (thin tapered quad) */
+/**
+ * Create a cross-quad grass blade shape — two perpendicular quads forming an X.
+ * This ensures blades are visible from every camera angle.
+ */
 function createBladeShape(scene: BABYLON.Scene): BABYLON.Mesh {
   const blade = new BABYLON.Mesh('grassBladeShape', scene);
 
-  // A tapered blade: wider at base, narrow at top
+  // Two perpendicular quads sharing the tip vertex
+  // Quad 1: on XY plane (z=0), Quad 2: on YZ plane (x=0)
   const positions = [
+    // Quad 1 (XY plane)
     -0.01,
     0,
-    0, // bottom-left
+    0, // 0
     0.01,
     0,
-    0, // bottom-right
+    0, // 1
     -0.005,
     0.2,
-    0, // mid-left
+    0, // 2
     0.005,
     0.2,
-    0, // mid-right
+    0, // 3
     0,
     0.3,
-    0, // tip
+    0, // 4 (shared tip)
+
+    // Quad 2 (YZ plane)
+    0,
+    0,
+    -0.01, // 5
+    0,
+    0,
+    0.01, // 6
+    0,
+    0.2,
+    -0.005, // 7
+    0,
+    0.2,
+    0.005, // 8
   ];
-  // Two quads forming a tapered blade: [0,1,2, 2,1,3] + [2,3,4]
-  const indices = [0, 1, 2, 2, 1, 3, 2, 3, 4];
+
+  const indices = [
+    // Quad 1
+    0, 1, 2, 2, 1, 3, 2, 3, 4,
+    // Quad 2
+    5, 6, 7, 7, 6, 8, 7, 8, 4,
+  ];
+
   const normals: number[] = [];
-  const uvs = [0, 1, 1, 1, 0, 0.4, 1, 0.4, 0.5, 0];
+  const uvs = [0, 1, 1, 1, 0, 0.4, 1, 0.4, 0.5, 0, 0, 1, 1, 1, 0, 0.4, 1, 0.4];
 
   BABYLON.VertexData.ComputeNormals(positions, indices, normals);
   const vertexData = new BABYLON.VertexData();
@@ -93,15 +118,16 @@ function createBladeShape(scene: BABYLON.Scene): BABYLON.Mesh {
 }
 
 export async function createGrass(scene: BABYLON.Scene): Promise<void> {
-  const grassCount = 80000;
+  const grassCount = 20000;
 
   // Grass color variations (Color4 with alpha=1)
   const colors = [
+    new BABYLON.Color4(0.3, 0.6, 0.18, 1),
     new BABYLON.Color4(0.35, 0.65, 0.2, 1),
     new BABYLON.Color4(0.4, 0.7, 0.25, 1),
-    new BABYLON.Color4(0.3, 0.55, 0.15, 1),
     new BABYLON.Color4(0.45, 0.75, 0.3, 1),
     new BABYLON.Color4(0.5, 0.8, 0.35, 1),
+    new BABYLON.Color4(0.28, 0.55, 0.15, 1),
   ];
 
   const bladeShape = createBladeShape(scene);
@@ -112,6 +138,9 @@ export async function createGrass(scene: BABYLON.Scene): Promise<void> {
   const grassMesh = sps.buildMesh();
   grassMesh.receiveShadows = true;
   grassMesh.isPickable = false;
+
+  // Each blade starts with a random Y-rotation so they don't all face the same way
+  const preRotations = new Float32Array(grassCount);
 
   // Distribute blades on the ground, avoiding exclusion zones
   const halfMap = 48;
@@ -128,35 +157,48 @@ export async function createGrass(scene: BABYLON.Scene): Promise<void> {
       attempts++;
     } while (isInExclusionZone(x, z) && attempts < 30);
 
-    // Lift blades just above the ground to avoid z-fighting
     particle.position = new BABYLON.Vector3(x, 0.005, z);
-    // Random Y-rotation so blades face different directions
-    particle.rotation = new BABYLON.Vector3(0, Math.random() * Math.PI * 2, 0);
 
-    // Random scale variation
+    const rotY = Math.random() * Math.PI * 2;
+    preRotations[i] = rotY;
+    particle.rotation = new BABYLON.Vector3(0, rotY, 0);
+
+    // Random scale
     const s = 0.6 + Math.random() * 0.8;
     particle.scale = new BABYLON.Vector3(s, s, s);
 
-    // Random color tint
+    // Random color
     const c = colors[Math.floor(Math.random() * colors.length)];
     particle.color = c.clone();
 
-    // Store wind phase for per-frame animation
+    // Store wind phase
     particle.props = { windPhase: Math.random() * Math.PI * 2 };
   }
 
   sps.setParticles();
 
-  // Wind animation: gentle swaying of blades
+  // Frustum culling: don't render grass that's off-screen
+  grassMesh.alwaysSelectAsActiveMesh = false;
+
+  // Efficient wind animation: use a simple time-based sine wave applied
+  // uniformly via the SPS updateParticle callback (called by setParticles).
+  // We only call setParticles every other frame to reduce CPU load.
+  let frameSkip = 0;
+
   scene.onBeforeRenderObservable.add(() => {
+    frameSkip++;
+    if (frameSkip % 2 !== 0) return; // update every 2nd frame
+
     const time = Date.now() / 1000;
-    const windStrength = 0.04;
+    const windStrength = 0.06;
 
     for (let i = 0; i < sps.particles.length; i++) {
       const p = sps.particles[i];
       const phase = (p.props as { windPhase: number }).windPhase;
-      // Sway around local X axis (after Y rotation this translates to wind direction)
-      p.rotation.x = Math.sin(time * 2 + phase) * windStrength;
+      // Sway around local Z axis — after Y rotation this makes blades bend naturally
+      p.rotation.z = Math.sin(time * 2 + phase) * windStrength;
+      // Keep Y rotation stable
+      p.rotation.y = preRotations[i];
     }
 
     sps.setParticles();
