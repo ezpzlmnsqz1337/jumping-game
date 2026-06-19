@@ -77,7 +77,7 @@ function makeBladeMesh(scene: BABYLON.Scene): BABYLON.Mesh {
 }
 
 export async function createGrass(scene: BABYLON.Scene): Promise<void> {
-  const COUNT = 30000;
+  const COUNT = 300000;
 
   // Ground texture as grass material for the whole field
   const grassTex = getGreenTexture({ uScale: 10, vScale: 10 }, scene);
