@@ -8,6 +8,7 @@ import { createPhysics } from '../physics.ts';
 import { UIManager } from '../ui/ui-manager.ts';
 import { createBall } from './level1/football.ts';
 import { createTrees } from './level1/trees.ts';
+import { createDynamicLights, updateDynamicLights } from './level1/dynamic-lights.ts';
 import { Level1 } from './level1/level1.ts';
 import { DocumentLevel } from '../game-level.ts';
 import { MultiplayerSession } from '../multiplayer-session.ts';
@@ -86,6 +87,9 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
     });
   });
 
+  // Dynamic patrol lights
+  const patrolLights = createDynamicLights(scene);
+
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
 
@@ -96,6 +100,12 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;
     arcRotateCamera.moveToTarget();
+  });
+
+  // Animate patrol lights every frame
+  scene.onBeforeRenderObservable.add(() => {
+    const dt = scene.getEngine().getDeltaTime() / 1000;
+    updateDynamicLights(patrolLights, dt);
   });
 
   // football
