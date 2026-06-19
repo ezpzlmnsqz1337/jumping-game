@@ -7,6 +7,7 @@ import { createOptimizations } from '../optimizations.ts';
 import { createPhysics } from '../physics.ts';
 import { UIManager } from '../ui/ui-manager.ts';
 import { createBall } from './level1/football.ts';
+import { createGrass } from './level1/grass.ts';
 import { Level1 } from './level1/level1.ts';
 import { DocumentLevel } from '../game-level.ts';
 import { MultiplayerSession } from '../multiplayer-session.ts';
@@ -73,6 +74,9 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
+
+  // Grass field
+  await createGrass(scene);
 
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
