@@ -75,7 +75,16 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
 
-  await createTrees(scene, gameRoot.level);
+  const treesResult = await createTrees(scene, gameRoot.level);
+
+  // Add tree meshes as shadow casters
+  gameRoot.level.shadowGenerators.forEach(sg => {
+    treesResult.treeMeshes.forEach(mesh => {
+      if (mesh instanceof BABYLON.Mesh) {
+        sg.addShadowCaster(mesh);
+      }
+    });
+  });
 
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
