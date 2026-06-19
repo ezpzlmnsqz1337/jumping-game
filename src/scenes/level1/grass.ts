@@ -93,7 +93,7 @@ function createBladeShape(scene: BABYLON.Scene): BABYLON.Mesh {
 }
 
 export async function createGrass(scene: BABYLON.Scene): Promise<void> {
-  const grassCount = 4000;
+  const grassCount = 80000;
 
   // Grass color variations (Color4 with alpha=1)
   const colors = [
