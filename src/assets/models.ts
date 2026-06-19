@@ -8,8 +8,6 @@ export const ModelId = {
   playerYellow: 'player-yellow.glb',
   playerPink: 'player-pink.glb',
   playerPurple: 'player-purple.glb',
-  tree01: 'tree-01.glb',
-  tree02: 'tree-02.glb',
 };
 
 export const getModel = (

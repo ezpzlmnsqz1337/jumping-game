@@ -7,8 +7,6 @@ import { createOptimizations } from '../optimizations.ts';
 import { createPhysics } from '../physics.ts';
 import { UIManager } from '../ui/ui-manager.ts';
 import { createBall } from './level1/football.ts';
-import { createTrees } from './level1/trees.ts';
-import { createDynamicLights, updateDynamicLights } from './level1/dynamic-lights.ts';
 import { Level1 } from './level1/level1.ts';
 import { DocumentLevel } from '../game-level.ts';
 import { MultiplayerSession } from '../multiplayer-session.ts';
@@ -76,31 +74,6 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
 
-  const treesResult = await createTrees(scene, gameRoot.level);
-
-  // Add tree meshes as shadow casters
-  gameRoot.level.shadowGenerators.forEach(sg => {
-    treesResult.treeMeshes.forEach(mesh => {
-      if (mesh instanceof BABYLON.Mesh) {
-        sg.addShadowCaster(mesh);
-      }
-    });
-  });
-
-  // Dynamic patrol lights
-  const { lights: patrolLights, shadowGenerators: patrolShadowGens } = createDynamicLights(scene);
-
-  // Register walls and trees as shadow casters for the patrol lights
-  const allWallMeshes = gameRoot.level.walls.map(w => w.mesh);
-  const allShadowCasters = [...allWallMeshes, ...treesResult.treeMeshes];
-  patrolShadowGens.forEach(sg => {
-    allShadowCasters.forEach(mesh => {
-      if (mesh instanceof BABYLON.Mesh) {
-        sg.addShadowCaster(mesh);
-      }
-    });
-  });
-
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
 
@@ -111,12 +84,6 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;
     arcRotateCamera.moveToTarget();
-  });
-
-  // Animate patrol lights every frame
-  scene.onBeforeRenderObservable.add(() => {
-    const dt = scene.getEngine().getDeltaTime() / 1000;
-    updateDynamicLights(patrolLights, dt);
   });
 
   // football

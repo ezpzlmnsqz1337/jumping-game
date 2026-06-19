@@ -1,6 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
 import earcut from 'earcut';
-import { getDarkTexture, getLightTexture, getRedTexture } from '../../assets/textures';
+import {
+  getDarkTexture,
+  getGreenTexture,
+  getLightTexture,
+  getRedTexture,
+} from '../../assets/textures';
 import { FILTER_GROUP_GROUND } from '../../collission-groups';
 import { SpawnPointEntity } from '../../entities/spawn-point-entity';
 import { WallEntity, WallType } from '../../entities/wall-entity';
@@ -188,12 +193,14 @@ export class Level1 extends GameLevel {
 
     const uScale = serializedGround?.uScale ?? 20;
     const vScale = serializedGround?.vScale ?? 20;
-    const textureVariant = serializedGround?.textureVariant ?? 'dark';
+    const textureVariant = serializedGround?.textureVariant ?? 'green';
 
     if (textureVariant === 'light') {
       groundMaterial.diffuseTexture = getLightTexture({ uScale, vScale }, this.scene!);
     } else if (textureVariant === 'red') {
       groundMaterial.diffuseTexture = getRedTexture({ uScale, vScale }, this.scene!);
+    } else if (textureVariant === 'green') {
+      groundMaterial.diffuseTexture = getGreenTexture({ uScale, vScale }, this.scene!);
     } else {
       groundMaterial.diffuseTexture = getDarkTexture({ uScale, vScale }, this.scene!);
     }
