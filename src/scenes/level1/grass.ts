@@ -1,8 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 
-/** Exclusions zones — areas where grass should NOT be placed (platforms, walls) */
 const EXCLUSION_ZONES: { x: number; z: number; w: number; d: number }[] = [
-  // Stage 1 pillars
   { x: -3, z: 1, w: 2, d: 2 },
   { x: -3, z: -2, w: 2, d: 2 },
   { x: -3, z: -5, w: 2, d: 2 },
@@ -12,195 +10,179 @@ const EXCLUSION_ZONES: { x: number; z: number; w: number; d: number }[] = [
   { x: 3, z: 1, w: 2, d: 2 },
   { x: 3, z: -2, w: 2, d: 2 },
   { x: 3, z: -5, w: 2, d: 2 },
-  // Stage 2 platform
   { x: 10, z: -2, w: 10, d: 10 },
-  // Stage 3 platform
   { x: 10, z: -12, w: 10, d: 10 },
-  // Stage 4 platform
   { x: 0, z: -12, w: 10, d: 10 },
-  // Stage 5 platform
   { x: -10, z: -12, w: 10, d: 10 },
-  // Stage 6 tower
   { x: -10, z: 8, w: 10, d: 10 },
-  // Long jump platforms
   { x: 46, z: 0, w: 8, d: 92 },
-  // Bunny hop start/end
   { x: -47.5, z: -40, w: 5, d: 20 },
   { x: 13.5, z: -40, w: 5, d: 20 },
-  // Start trigger
   { x: -8, z: -2, w: 5, d: 7 },
-  // Teleports
   { x: -15.9, z: -8, w: 1, d: 1 },
   { x: -15.9, z: -10, w: 1, d: 1 },
   { x: -15.9, z: -12, w: 1, d: 1 },
   { x: -15.9, z: -14, w: 1, d: 1 },
   { x: -15.9, z: -16, w: 1, d: 1 },
-  // Big slide area
   { x: -14.5, z: 18.88, w: 9, d: 14 },
-  // Bunker
   { x: -43, z: 11.8, w: 14, d: 25 },
 ];
 
 function isInExclusionZone(x: number, z: number): boolean {
   for (const zone of EXCLUSION_ZONES) {
-    const hw = zone.w / 2;
-    const hd = zone.d / 2;
-    if (x >= zone.x - hw && x <= zone.x + hw && z >= zone.z - hd && z <= zone.z + hd) {
+    if (
+      x >= zone.x - zone.w / 2 &&
+      x <= zone.x + zone.w / 2 &&
+      z >= zone.z - zone.d / 2 &&
+      z <= zone.z + zone.d / 2
+    )
       return true;
-    }
   }
   return false;
 }
 
-/**
- * Create a cross-quad grass blade shape — two perpendicular quads forming an X.
- * This ensures blades are visible from every camera angle.
- */
-function createBladeShape(scene: BABYLON.Scene): BABYLON.Mesh {
-  const blade = new BABYLON.Mesh('grassBladeShape', scene);
-
-  // Two perpendicular quads sharing the tip vertex
-  // Quad 1: on XY plane (z=0), Quad 2: on YZ plane (x=0)
-  const positions = [
-    // Quad 1 (XY plane)
-    -0.01,
-    0,
-    0, // 0
-    0.01,
-    0,
-    0, // 1
-    -0.005,
-    0.2,
-    0, // 2
-    0.005,
-    0.2,
-    0, // 3
-    0,
-    0.3,
-    0, // 4 (shared tip)
-
-    // Quad 2 (YZ plane)
-    0,
-    0,
-    -0.01, // 5
-    0,
-    0,
-    0.01, // 6
-    0,
-    0.2,
-    -0.005, // 7
-    0,
-    0.2,
-    0.005, // 8
-  ];
-
-  const indices = [
-    // Quad 1
-    0, 1, 2, 2, 1, 3, 2, 3, 4,
-    // Quad 2
-    5, 6, 7, 7, 6, 8, 7, 8, 4,
-  ];
-
-  const normals: number[] = [];
-  const uvs = [0, 1, 1, 1, 0, 0.4, 1, 0.4, 0.5, 0, 0, 1, 1, 1, 0, 0.4, 1, 0.4];
-
-  BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-  const vertexData = new BABYLON.VertexData();
-  vertexData.positions = positions;
-  vertexData.indices = indices;
-  vertexData.normals = normals;
-  vertexData.uvs = uvs;
-  vertexData.applyToMesh(blade);
-
-  blade.isPickable = false;
-  blade.setEnabled(false); // invisible — used only as shape source for SPS
-  return blade;
+function randomExcluded(halfMap: number): [number, number] {
+  let x: number,
+    z: number,
+    a = 0;
+  do {
+    x = (Math.random() - 0.5) * 2 * halfMap;
+    z = (Math.random() - 0.5) * 2 * halfMap;
+    a++;
+  } while (isInExclusionZone(x, z) && a < 30);
+  return [x, z];
 }
 
+// ── Vertex shader: wind animation runs entirely on GPU ──
+const VERTEX_SHADER = `
+  attribute vec3 position;
+  attribute vec2 uv;
+
+  // Per-instance attributes (stored in instance buffers)
+  attribute vec4 instancePos;    // xy = world pos x/z, z = windPhase, w = colorMix
+  attribute vec4 instanceData;   // x = rotY, y = scale, z = _unused, w = _unused
+
+  uniform float uTime;
+  uniform mat4 viewProjection;
+
+  varying vec2 vUv;
+  varying float vColorMix;
+
+  void main() {
+    vec3 pos = position;
+
+    // Wind sway — stronger at the tip, zero at the base
+    float windStrength = 0.07;
+    float heightFactor = pos.y / 0.3;
+    float wind = sin(uTime * 2.0 + instancePos.z) * windStrength * heightFactor;
+    pos.x += wind;
+
+    // Y-rotation of the blade
+    float cosY = cos(instanceData.x);
+    float sinY = sin(instanceData.x);
+    vec3 rPos = vec3(
+      pos.x * cosY - pos.z * sinY,
+      pos.y,
+      pos.x * sinY + pos.z * cosY
+    );
+
+    // Scale
+    rPos *= instanceData.y;
+
+    // World position
+    rPos.x += instancePos.x;
+    rPos.z += instancePos.y;
+    rPos.y += 0.005;
+
+    gl_Position = viewProjection * vec4(rPos, 1.0);
+    vUv = uv;
+    vColorMix = instancePos.w;
+  }
+`;
+
+const FRAGMENT_SHADER = `
+  precision highp float;
+  varying vec2 vUv;
+  varying float vColorMix;
+
+  void main() {
+    // Two grass color variants blended by vColorMix (0..1)
+    vec3 darkGreen = vec3(0.28, 0.50, 0.12);
+    vec3 lightGreen = vec3(0.42, 0.72, 0.22);
+    vec3 color = mix(darkGreen, lightGreen, vColorMix);
+
+    // Slightly darker base, lighter tip
+    float tip = vUv.y;
+    color *= 0.7 + 0.5 * tip;
+
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
 export async function createGrass(scene: BABYLON.Scene): Promise<void> {
-  const grassCount = 20000;
+  const COUNT = 30000;
 
-  // Grass color variations (Color4 with alpha=1)
-  const colors = [
-    new BABYLON.Color4(0.3, 0.6, 0.18, 1),
-    new BABYLON.Color4(0.35, 0.65, 0.2, 1),
-    new BABYLON.Color4(0.4, 0.7, 0.25, 1),
-    new BABYLON.Color4(0.45, 0.75, 0.3, 1),
-    new BABYLON.Color4(0.5, 0.8, 0.35, 1),
-    new BABYLON.Color4(0.28, 0.55, 0.15, 1),
+  // ── 1. Create a single blade mesh (cross-quad, 9 vertices) ──
+  const blade = new BABYLON.Mesh('grassBlade', scene);
+  const positions = [
+    -0.01, 0, 0, 0.01, 0, 0, -0.005, 0.2, 0, 0.005, 0.2, 0, 0, 0.3, 0, 0, 0, -0.01, 0, 0, 0.01, 0,
+    0.2, -0.005, 0, 0.2, 0.005,
   ];
+  const indices = [0, 1, 2, 2, 1, 3, 2, 3, 4, 5, 6, 7, 7, 6, 8, 7, 8, 4];
+  const normals: number[] = [];
+  const uvs = [0, 1, 1, 1, 0, 0.4, 1, 0.4, 0.5, 0, 0, 1, 1, 1, 0, 0.4, 1, 0.4];
+  BABYLON.VertexData.ComputeNormals(positions, indices, normals);
+  const vd = new BABYLON.VertexData();
+  vd.positions = positions;
+  vd.indices = indices;
+  vd.normals = normals;
+  vd.uvs = uvs;
+  vd.applyToMesh(blade);
+  blade.isPickable = false;
 
-  const bladeShape = createBladeShape(scene);
+  // ── 2. Custom ShaderMaterial ──
+  const shaderMat = new BABYLON.ShaderMaterial(
+    'grassMat',
+    scene,
+    {
+      vertexSource: VERTEX_SHADER,
+      fragmentSource: FRAGMENT_SHADER,
+    },
+    {
+      attributes: ['position', 'uv', 'instancePos', 'instanceData'],
+      uniforms: ['worldViewProjection', 'uTime'],
+    }
+  );
+  // Babylon 7.x passes viewProjection as a built-in uniform for ShaderMaterial
+  blade.material = shaderMat;
 
-  const sps = new BABYLON.SolidParticleSystem('grassSps', scene);
-  sps.addShape(bladeShape, grassCount);
-
-  const grassMesh = sps.buildMesh();
-  grassMesh.receiveShadows = true;
-  grassMesh.isPickable = false;
-
-  // Each blade starts with a random Y-rotation so they don't all face the same way
-  const preRotations = new Float32Array(grassCount);
-
-  // Distribute blades on the ground, avoiding exclusion zones
+  // ── 3. Build per-instance buffers ──
   const halfMap = 48;
+  const instancePosData = new Float32Array(COUNT * 4); // x, z, windPhase, colorMix
+  const instanceDataData = new Float32Array(COUNT * 4); // rotY, scale, _, _
 
-  for (let i = 0; i < grassCount; i++) {
-    const particle = sps.particles[i];
+  for (let i = 0; i < COUNT; i++) {
+    const [x, z] = randomExcluded(halfMap);
+    instancePosData[i * 4 + 0] = x;
+    instancePosData[i * 4 + 1] = z;
+    instancePosData[i * 4 + 2] = Math.random() * Math.PI * 2; // windPhase
+    instancePosData[i * 4 + 3] = Math.random(); // colorMix
 
-    let x: number;
-    let z: number;
-    let attempts = 0;
-    do {
-      x = (Math.random() - 0.5) * 2 * halfMap;
-      z = (Math.random() - 0.5) * 2 * halfMap;
-      attempts++;
-    } while (isInExclusionZone(x, z) && attempts < 30);
-
-    particle.position = new BABYLON.Vector3(x, 0.005, z);
-
-    const rotY = Math.random() * Math.PI * 2;
-    preRotations[i] = rotY;
-    particle.rotation = new BABYLON.Vector3(0, rotY, 0);
-
-    // Random scale
-    const s = 0.6 + Math.random() * 0.8;
-    particle.scale = new BABYLON.Vector3(s, s, s);
-
-    // Random color
-    const c = colors[Math.floor(Math.random() * colors.length)];
-    particle.color = c.clone();
-
-    // Store wind phase
-    particle.props = { windPhase: Math.random() * Math.PI * 2 };
+    instanceDataData[i * 4 + 0] = Math.random() * Math.PI * 2; // rotY
+    instanceDataData[i * 4 + 1] = 0.6 + Math.random() * 0.8; // scale
+    instanceDataData[i * 4 + 2] = 0;
+    instanceDataData[i * 4 + 3] = 0;
   }
 
-  sps.setParticles();
+  blade.thinInstanceSetBuffer('instancePos', instancePosData, 4);
+  blade.thinInstanceSetBuffer('instanceData', instanceDataData, 4);
 
-  // Frustum culling: don't render grass that's off-screen
-  grassMesh.alwaysSelectAsActiveMesh = false;
+  // ⚡ Enable frustum culling on all instances
+  blade.alwaysSelectAsActiveMesh = false;
+  blade.receiveShadows = true;
 
-  // Efficient wind animation: use a simple time-based sine wave applied
-  // uniformly via the SPS updateParticle callback (called by setParticles).
-  // We only call setParticles every other frame to reduce CPU load.
-  let frameSkip = 0;
-
+  // ── 4. Wind animation: just update one float uniform each frame ──
   scene.onBeforeRenderObservable.add(() => {
-    frameSkip++;
-    if (frameSkip % 2 !== 0) return; // update every 2nd frame
-
-    const time = Date.now() / 1000;
-    const windStrength = 0.06;
-
-    for (let i = 0; i < sps.particles.length; i++) {
-      const p = sps.particles[i];
-      const phase = (p.props as { windPhase: number }).windPhase;
-      // Sway around local Z axis — after Y rotation this makes blades bend naturally
-      p.rotation.z = Math.sin(time * 2 + phase) * windStrength;
-      // Keep Y rotation stable
-      p.rotation.y = preRotations[i];
-    }
-
-    sps.setParticles();
+    shaderMat.setFloat('uTime', Date.now() / 1000);
   });
 }
