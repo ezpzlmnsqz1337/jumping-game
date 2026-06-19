@@ -129,4 +129,8 @@ export async function createGrass(scene: BABYLON.Scene): Promise<void> {
     p.rotation.z = (Math.random() - 0.5) * 0.04; // slight permanent bend
   }
   sps.setParticles();
+
+  // Refresh bounding info and never cull — the mesh spans the whole map
+  mesh.refreshBoundingInfo();
+  mesh.alwaysSelectAsActiveMesh = true;
 }
