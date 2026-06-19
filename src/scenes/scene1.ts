@@ -75,8 +75,8 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   // Create level
   gameRoot.level.create(scene, gameRoot.player);
 
-  // Grass field
-  await createGrass(scene);
+  // Grass field with player interaction
+  const grassSystem = await createGrass(scene);
 
   arcRotateCamera.lockedTarget = gameRoot.player.mesh;
   followCamera.lockedTarget = gameRoot.player.mesh;
@@ -88,6 +88,13 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;
     arcRotateCamera.moveToTarget();
+  });
+
+  // Grass reacts to player movement
+  scene.onBeforeRenderObservable.add(() => {
+    if (gameRoot.player?.mesh) {
+      grassSystem.update(gameRoot.player.mesh.position);
+    }
   });
 
   // football
