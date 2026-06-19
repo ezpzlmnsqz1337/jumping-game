@@ -490,6 +490,11 @@ export class Level1 extends GameLevel {
     sunLight.intensity = 1.5;
     sunLight.shadowEnabled = true;
     sunLight.autoCalcShadowZBounds = true;
+    // Widen the orthographic frustum to cover the 100x100 map
+    sunLight.orthoLeft = -60;
+    sunLight.orthoRight = 60;
+    sunLight.orthoTop = 60;
+    sunLight.orthoBottom = -60;
 
     // Shadow generator with reduced blur for visible tree shadows
     const shadowGenerator = new ShadowGenerator(
