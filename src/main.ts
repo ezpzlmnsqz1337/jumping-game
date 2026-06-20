@@ -15,6 +15,10 @@ gameRoot.qualityTier = effectiveTier;
 
 const antialias = shouldEnableAntialias(effectiveTier);
 
+// adaptToDeviceRatio: false (the default) is required for low/medium tiers
+// to prevent Babylon from overriding our setHardwareScalingLevel with
+// 1/devicePixelRatio on resize. On retina with scaling 1, the engine
+// renders at canvas internal resolution (CSS_size × DPR) which is sharp.
 const engine = new BABYLON.Engine(canvas, antialias, { adaptToDeviceRatio: false });
 applyEngineQuality(engine, effectiveTier);
 gameRoot.engine = engine;
