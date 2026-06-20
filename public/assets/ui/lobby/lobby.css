@@ -469,6 +469,14 @@
   cursor: pointer;
 }
 
+/* On touch devices, move the lobby button to top-left so it doesn't overlap with mobile controls */
+@media (pointer: coarse) {
+  .ui-buttons {
+    font-size: var(--font-size-ui-2xl);
+    inset: var(--space-sm) auto auto var(--space-sm);
+  }
+}
+
 @media only screen and (width <= 1000px) {
   .colors > div {
     height: calc(var(--size-color-swatch) - 1rem);

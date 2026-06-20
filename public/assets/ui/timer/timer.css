@@ -60,7 +60,7 @@
 
 @media only screen and (width <= 1000px) {
   .timer {
-    bottom: 0;
+    bottom: calc(var(--mobile-controls-height, 0rem));
     font-size: var(--font-size-ui-2xl);
     left: 0;
     padding: var(--space-lg);
