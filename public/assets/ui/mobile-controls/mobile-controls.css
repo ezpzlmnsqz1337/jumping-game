@@ -104,3 +104,92 @@
   height: 2.75rem;
   width: 4rem;
 }
+
+/* Narrow / portrait phones (e.g. Xiaomi 15: ~393px wide) */
+@media (pointer: coarse) and (width <= 500px) {
+  /* stylelint-disable-next-line media-feature-range-notation */
+  .mobile-controls {
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .controls-dpad,
+  .controls-actions {
+    gap: var(--space-xxs);
+  }
+
+  .controls-dpad-row,
+  .controls-actions-row {
+    gap: var(--space-xxs);
+  }
+
+  .controls-btn {
+    border-width: var(--border-width-thick);
+    font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-dpad {
+    height: 3rem;
+    width: 3rem;
+  }
+
+  .controls-btn-action {
+    font-size: var(--font-size-ui-sm);
+    height: 3rem;
+    width: 4.5rem;
+  }
+
+  .controls-btn-jump {
+    width: 9.5rem;
+  }
+
+  .controls-btn-utility {
+    font-size: var(--font-size-ui-xs);
+    height: 2rem;
+    width: 3rem;
+  }
+}
+
+/* Landscape mobile — limited vertical space */
+@media (pointer: coarse) and (height <= 500px) {
+  .mobile-controls {
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-3xl);
+  }
+
+  .controls-dpad,
+  .controls-actions {
+    gap: var(--space-xxs);
+  }
+
+  .controls-dpad-row,
+  .controls-actions-row {
+    gap: var(--space-xxs);
+  }
+
+  .controls-btn {
+    border-width: 1px;
+    font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-dpad {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
+  .controls-btn-action {
+    font-size: var(--font-size-ui-sm);
+    height: 2.5rem;
+    width: 4rem;
+  }
+
+  .controls-btn-jump {
+    width: 8.5rem;
+  }
+
+  .controls-btn-utility {
+    font-size: var(--font-size-ui-xs);
+    height: 1.75rem;
+    width: 2.75rem;
+  }
+}

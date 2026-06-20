@@ -48,3 +48,24 @@
     font-size: var(--font-size-ui-xs);
   }
 }
+
+/* Phone portrait — tighter spacing */
+@media only screen and (width <= 480px) {
+  .time-table {
+    font-size: var(--font-size-ui-xs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
+  .time-table>ol {
+    margin: var(--space-xxs) 0;
+    padding-left: var(--space-lg);
+  }
+
+  .time-table>ol>li {
+    padding: 0;
+  }
+
+  .time-table > .replay-metadata {
+    display: none;
+  }
+}

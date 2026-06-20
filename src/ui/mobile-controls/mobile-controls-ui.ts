@@ -31,6 +31,8 @@ const UTILITY_ACTIONS: Record<string, UtilityAction> = {
 
 export class MobileControlsUI extends AbstractUI {
   private controlsResizeObserver: ResizeObserver | null = null;
+  private hudVisible = true;
+  private fullscreenButton: HTMLButtonElement | null = null;
 
   /** Returns true if the device has a coarse primary pointer (touch). */
   static isTouchDevice(): boolean {
@@ -44,6 +46,42 @@ export class MobileControlsUI extends AbstractUI {
   private updateControlsHeight(height: number): void {
     document.body.style.setProperty('--mobile-controls-height', `${height}px`);
   }
+
+  private toggleHud(): void {
+    this.hudVisible = !this.hudVisible;
+    const show = this.hudVisible;
+
+    gameRoot.uiManager?.gameSettingsUI.show(show);
+    gameRoot.uiManager?.timeTableUI.show(show);
+  }
+
+  private async toggleFullscreen(): Promise<void> {
+    if (!document.fullscreenElement) {
+      try {
+        await document.documentElement.requestFullscreen();
+        this.updateFullscreenButtonLabel();
+      } catch {
+        // Fullscreen may be blocked by browser — silently ignore
+      }
+    } else {
+      try {
+        await document.exitFullscreen();
+        this.updateFullscreenButtonLabel();
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  private updateFullscreenButtonLabel(): void {
+    if (!this.fullscreenButton) return;
+    const label = document.fullscreenElement ? 'Exit FS' : '&#9974;';
+    this.fullscreenButton.innerHTML = label;
+  }
+
+  private handleFullscreenChange = (): void => {
+    this.updateFullscreenButtonLabel();
+  };
 
   async bindUI(): Promise<void> {
     await super.bindUI();
@@ -98,12 +136,39 @@ export class MobileControlsUI extends AbstractUI {
       });
     }
 
+    // Bind HUD toggle button
+    const hudBtn = document.getElementById('btn-toggle-hud') as HTMLButtonElement | null;
+    if (hudBtn) {
+      hudBtn.addEventListener('pointerdown', (e: PointerEvent) => {
+        e.preventDefault();
+        hudBtn.setPointerCapture(e.pointerId);
+        this.toggleHud();
+      });
+    }
+
+    // Bind fullscreen button
+    this.fullscreenButton = document.getElementById('btn-fullscreen') as HTMLButtonElement | null;
+    if (this.fullscreenButton) {
+      this.fullscreenButton.addEventListener('pointerdown', (e: PointerEvent) => {
+        e.preventDefault();
+        this.fullscreenButton!.setPointerCapture(e.pointerId);
+        void this.toggleFullscreen();
+      });
+      // Listen for fullscreen changes from other sources (e.g., browser toolbar)
+      document.addEventListener('fullscreenchange', this.handleFullscreenChange);
+    }
+
     // Release all keys when page visibility changes (e.g., user switches apps)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.releaseAllKeys();
       }
     });
+  }
+
+  destroy(): void {
+    this.controlsResizeObserver?.disconnect();
+    document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
   }
 
   private releaseAllKeys(): void {
