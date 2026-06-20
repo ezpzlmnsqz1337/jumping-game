@@ -53,14 +53,14 @@ function createMockControls(): MockControls {
 /** Inserts the mobile-controls HTML structure into document.body */
 function setupMobileControlsDom(): void {
   document.body.innerHTML = `
+    <div class="controls-topbar">
+      <button id="btn-respawn">R</button>
+      <button id="btn-chat">Chat</button>
+      <button id="btn-toggle-hud">HUD</button>
+      <button id="btn-fullscreen">FS</button>
+      <button id="btn-lobby">Lobby</button>
+    </div>
     <div class="mobile-controls">
-      <div class="controls-topbar">
-        <button id="btn-respawn">R</button>
-        <button id="btn-chat">Chat</button>
-        <button id="btn-toggle-hud">HUD</button>
-        <button id="btn-fullscreen">FS</button>
-        <button id="btn-lobby">Lobby</button>
-      </div>
       <div class="mobile-controls-bottom">
         <div class="controls-dpad">
           <div class="controls-dpad-row">

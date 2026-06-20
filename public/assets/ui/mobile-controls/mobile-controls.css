@@ -1,8 +1,32 @@
-/* Mobile controls overlay — hidden by default, shown on touch devices */
+/* ================================================================
+   Top bar — utility buttons, hidden by default, shown on touch
+   ================================================================ */
+.controls-topbar {
+  display: none;
+  gap: var(--space-sm);
+  justify-content: center;
+  left: 0;
+  padding: var(--space-sm) var(--space-3xl);
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  touch-action: none;
+  z-index: var(--z-overlay);
+}
+
+@media (pointer: coarse) {
+  .controls-topbar {
+    display: flex;
+  }
+}
+
+/* ================================================================
+   Bottom mobile controls — hidden by default, shown on touch
+   ================================================================ */
 .mobile-controls {
   bottom: 0;
   display: none;
-  flex-direction: column;
   left: 0;
   pointer-events: none;
   position: fixed;
@@ -13,21 +37,10 @@
 
 @media (pointer: coarse) {
   .mobile-controls {
-    display: flex;
+    display: block;
   }
 }
 
-/* Top bar — utility buttons */
-.controls-topbar {
-  display: flex;
-  gap: var(--space-sm);
-  justify-content: center;
-  padding: var(--space-sm) var(--space-3xl);
-  pointer-events: none;
-  width: 100%;
-}
-
-/* Bottom row — D-pad + actions */
 .mobile-controls-bottom {
   display: flex;
   justify-content: space-between;
@@ -36,7 +49,9 @@
   width: 100%;
 }
 
-/* D-pad grouping */
+/* ================================================================
+   D-pad grouping (left side, bottom)
+   ================================================================ */
 .controls-dpad {
   align-items: center;
   display: flex;
@@ -50,7 +65,9 @@
   justify-content: center;
 }
 
-/* Action buttons grouping */
+/* ================================================================
+   Action buttons grouping (right side, bottom)
+   ================================================================ */
 .controls-actions {
   align-items: center;
   display: flex;
@@ -64,7 +81,9 @@
   justify-content: center;
 }
 
-/* All buttons base */
+/* ================================================================
+   All buttons base
+   ================================================================ */
 .controls-btn {
   align-items: center;
   background-color: var(--color-surface-overlay-strong);
@@ -99,7 +118,9 @@
   pointer-events: none;
 }
 
-/* Top bar button size */
+/* ================================================================
+   Button sizes
+   ================================================================ */
 .controls-btn-topbar {
   font-size: var(--font-size-ui-sm);
   height: 2.5rem;
@@ -107,13 +128,11 @@
   padding: 0 var(--space-lg);
 }
 
-/* D-pad button size */
 .controls-btn-dpad {
   height: 4rem;
   width: 4rem;
 }
 
-/* Action button sizes */
 .controls-btn-action {
   height: 4rem;
   width: 6rem;
@@ -123,7 +142,9 @@
   width: 12.5rem;
 }
 
-/* Narrow / portrait phones (e.g. Xiaomi 15: ~393px wide) */
+/* ================================================================
+   Narrow / portrait phones (e.g. Xiaomi 15: ~393px wide)
+   ================================================================ */
 @media (pointer: coarse) and (width <= 500px) {
   .mobile-controls-bottom {
     gap: var(--space-lg);
@@ -173,7 +194,9 @@
   }
 }
 
-/* Landscape mobile — limited vertical space */
+/* ================================================================
+   Landscape mobile — limited vertical space
+   ================================================================ */
 @media (pointer: coarse) and (height <= 500px) {
   .mobile-controls-bottom {
     gap: var(--space-lg);
