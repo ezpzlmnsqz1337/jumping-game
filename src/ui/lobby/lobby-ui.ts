@@ -234,9 +234,11 @@ export class LobbyUI extends AbstractUI {
 
     this.lobbyDiv.classList.toggle('is-dev', this.isDev);
     this.lobbyDiv.style.display = this.open ? 'block' : 'none';
-    this.showOtherUIs(!this.open);
 
     const gameSettings = GameStorage.getGameSettings();
+    this.playerInfoWasVisible = gameSettings.playerInfoVisible ?? false;
+
+    this.showOtherUIs(!this.open);
 
     // Player setup
     this.nicknameInput = document.querySelector('.nickname-input') as HTMLInputElement;
@@ -322,7 +324,12 @@ export class LobbyUI extends AbstractUI {
     gameRoot.uiManager?.timerUI.show(show);
     gameRoot.uiManager?.timeTableUI.show(show);
     gameRoot.uiManager?.gameSettingsUI.show(show);
-    gameRoot.uiManager?.editorUI.show(show);
+    if (show) {
+      const editModeEnabled = gameRoot.gameSettings.editModeEnabled ?? true;
+      gameRoot.uiManager?.editorUI.show(editModeEnabled);
+    } else {
+      gameRoot.uiManager?.editorUI.show(false);
+    }
     gameRoot.uiManager?.chatUI.show(show ? this.chatWasVisible : false);
     gameRoot.uiManager?.playerInfoUI.show(show ? this.playerInfoWasVisible : false);
   }
