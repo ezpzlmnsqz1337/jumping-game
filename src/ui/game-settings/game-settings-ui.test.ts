@@ -252,4 +252,56 @@ describe('GameSettingsUI', () => {
     const editModeDiv = document.querySelector('.edit-mode-visibility') as HTMLElement;
     expect(editModeDiv.style.display).toBe('none');
   });
+
+  it('changeQuality saves settings, updates qualityTier, and applies engine quality for concrete tier', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameStorage } = await import('../../game-storage');
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
+    const setHardwareScalingLevel = vi.fn();
+    const resize = vi.fn();
+    gameRoot.engine = { setHardwareScalingLevel, resize } as never;
+    gameRoot.gameSettings = { nickname: 'test', color: 'blue', qualityTier: 'auto' };
+
+    const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
+    ui.changeQuality('low');
+
+    expect(gameRoot.gameSettings.qualityTier).toBe('low');
+    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
+    expect(gameRoot.qualityTier).toBe('low');
+    expect(setHardwareScalingLevel).toHaveBeenCalledWith(1.5);
+    expect(resize).toHaveBeenCalled();
+  });
+
+  it('changeQuality resolves auto to a concrete tier and applies engine quality', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameStorage } = await import('../../game-storage');
+    const qualityModule = await import('../../quality');
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    vi.spyOn(qualityModule, 'resolveQualityTier').mockReturnValue('medium');
+    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
+    const setHardwareScalingLevel = vi.fn();
+    const resize = vi.fn();
+    gameRoot.engine = { setHardwareScalingLevel, resize } as never;
+    gameRoot.gameSettings = { nickname: 'test', color: 'blue', qualityTier: 'low' };
+
+    const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
+    ui.changeQuality('auto');
+
+    expect(gameRoot.gameSettings.qualityTier).toBe('auto');
+    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
+    expect(gameRoot.qualityTier).toBe('medium');
+    expect(setHardwareScalingLevel).toHaveBeenCalledWith(1.25);
+    expect(resize).toHaveBeenCalled();
+  });
+
+  it('loads default qualityTier as auto when localStorage has no qualityTier', async () => {
+    localStorage.removeItem('qualityTier');
+    const { GameStorage } = await import('../../game-storage');
+
+    const settings = GameStorage.getGameSettings();
+    expect(settings.qualityTier).toBe('auto');
+  });
 });
