@@ -87,8 +87,8 @@
   }
 }
 
-/* On mobile portrait, float above the touch controls */
-@media (pointer: coarse) and (orientation: portrait) {
+/* On touch devices, float above the touch controls */
+@media (pointer: coarse) {
   .player-info {
     bottom: calc(var(--mobile-controls-height, 0rem) + var(--space-player-info-bottom));
   }

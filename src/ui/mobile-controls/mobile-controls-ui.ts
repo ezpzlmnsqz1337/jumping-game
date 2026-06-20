@@ -180,6 +180,14 @@ export class MobileControlsUI extends AbstractUI {
       document.addEventListener('fullscreenchange', this.handleFullscreenChange);
     }
 
+    // Prevent long-press context menu on all control buttons (Android Chrome, etc.)
+    document.addEventListener('contextmenu', (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.controls-btn')) {
+        e.preventDefault();
+      }
+    });
+
     // Release all keys when page visibility changes (e.g., user switches apps)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
