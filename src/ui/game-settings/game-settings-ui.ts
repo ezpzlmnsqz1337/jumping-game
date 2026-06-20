@@ -55,6 +55,8 @@ export class GameSettingsUI extends AbstractUI {
     } else {
       this.player.collisionEnabled = !this.player.collisionEnabled;
     }
+    // MultiplayerSession.toggleCollissions synchronously updates
+    // player.collisionEnabled, so reading it here is safe for both paths
     this.collissionsCheckBox.checked = this.player.collisionEnabled;
 
     gameRoot.gameSettings.collisionsEnabled = this.player.collisionEnabled;
@@ -149,7 +151,8 @@ export class GameSettingsUI extends AbstractUI {
       this.toggleFollowCamera();
     });
 
-    if (settings.collisionsEnabled !== undefined) {
+    if (settings.collisionsEnabled !== undefined && !gameRoot.multiplayer) {
+      // In multiplayer, collision state is server-authoritative; skip local restore
       this.player.collisionEnabled = settings.collisionsEnabled;
     }
     this.collissionsCheckBox.checked = this.player.collisionEnabled;

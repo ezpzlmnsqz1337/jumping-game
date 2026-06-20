@@ -117,17 +117,45 @@ describe('GameSettingsUI', () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameSettingsUI } = await import('./game-settings-ui');
 
-    const toggleCollissions = vi.fn();
+    const player = { collisionEnabled: false } as SettingsPlayer;
+    const toggleCollissions = vi.fn(() => {
+      player.collisionEnabled = !player.collisionEnabled;
+    });
     gameRoot.multiplayer = { toggleCollissions } as never;
 
-    const player = { collisionEnabled: false } as SettingsPlayer;
     const ui = new GameSettingsUI({} as never, player as never);
     ui.collissionsCheckBox = document.createElement('input');
 
     ui.toggleCollissions();
 
     expect(toggleCollissions).toHaveBeenCalledTimes(1);
-    expect(ui.collissionsCheckBox.checked).toBe(false);
+    expect(player.collisionEnabled).toBe(true);
+    expect(ui.collissionsCheckBox.checked).toBe(true);
+  });
+
+  it('toggleCollissions persists collision state after multiplayer toggle', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameStorage } = await import('../../game-storage');
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    const player = { collisionEnabled: false } as SettingsPlayer;
+    const toggleCollissions = vi.fn(() => {
+      player.collisionEnabled = !player.collisionEnabled;
+    });
+    gameRoot.multiplayer = { toggleCollissions } as never;
+    gameRoot.gameSettings = { nickname: 'test', color: 'blue' };
+
+    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
+
+    const ui = new GameSettingsUI({} as never, player as never);
+    ui.collissionsCheckBox = document.createElement('input');
+
+    ui.toggleCollissions();
+
+    expect(toggleCollissions).toHaveBeenCalledTimes(1);
+    expect(player.collisionEnabled).toBe(true);
+    expect(gameRoot.gameSettings.collisionsEnabled).toBe(true);
+    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
   });
 
   it('toggleEditMode dispatches editor edit mode event', async () => {
@@ -565,6 +593,53 @@ describe('GameSettingsUI', () => {
 
     expect(player.collisionEnabled).toBe(false);
     expect(ui.collissionsCheckBox.checked).toBe(false);
+  });
+
+  it('bindUI skips collision restore in multiplayer mode', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    document.body.innerHTML = `
+      <canvas id="render-canvas"></canvas>
+      <div class="game-settings"></div>
+      <select class="quality-tier"><option value="auto">Auto</option></select>
+      <input class="automatic-camera-enabled" type="checkbox" />
+      <input class="follow-camera-enabled" type="checkbox" />
+      <input class="collissions-enabled" type="checkbox" />
+      <input class="player-info-enabled" type="checkbox" />
+      <div class="edit-mode-visibility">
+        <input class="edit-mode-enabled-global" type="checkbox" />
+      </div>
+    `;
+
+    const scene = {
+      activeCamera: { automaticCameraEnabled: true },
+      getCameraByName: vi.fn(),
+      meshes: [],
+    };
+    // Player starts with collision enabled (mp-session-authoritative value)
+    const player = { collisionEnabled: true };
+
+    gameRoot.multiplayer = {} as never;
+    gameRoot.gameSettings = {
+      nickname: 'test',
+      color: 'blue',
+      // Saved setting says collisions off, but mp is authoritative
+      collisionsEnabled: false,
+    };
+
+    const ui = new GameSettingsUI(scene as never, player as never);
+    ui.loadCss = vi.fn();
+    ui.loadHtml = vi.fn(async () => {});
+
+    await ui.bindUI();
+
+    // In multiplayer, player.collisionEnabled should NOT be overwritten by saved settings
+    expect(player.collisionEnabled).toBe(true);
+    // Checkbox should reflect the mp-authoritative value
+    expect(ui.collissionsCheckBox.checked).toBe(true);
+
+    gameRoot.multiplayer = undefined;
   });
 
   it('bindUI restores saved playerInfoVisible and calls playerInfo show', async () => {
