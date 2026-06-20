@@ -14,6 +14,7 @@ import { GameLevel } from '../game-level.ts';
 import { GameStorage } from '../game-storage.ts';
 import { ArcRotateCameraOptions, MyArcRotateCamera } from '../cameras/arc-rotate-camera.ts';
 import { FollowCameraOptions, MyFollowCamera } from '../cameras/follow-camera.ts';
+import { hardwareScalingCapForTier } from '../quality.ts';
 
 const ENABLE_EDITOR = import.meta.env.DEV;
 const ENABLE_MULTIPLAYER = !import.meta.env.DEV;
@@ -79,7 +80,7 @@ export const createScene1 = async (engine: BABYLON.Engine) => {
 
   scene.activeCamera = arcRotateCamera;
 
-  createOptimizations(scene);
+  createOptimizations(scene, hardwareScalingCapForTier(gameRoot.qualityTier));
 
   scene.onBeforeRenderObservable.add(() => {
     if (scene.activeCamera?.name === 'followCamera') return;

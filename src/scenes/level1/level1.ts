@@ -33,6 +33,7 @@ import { createStage6 } from './stage6';
 import { TeleportTrigger } from '../../triggers/teleport-trigger';
 import { GameEntity } from '../../entities/game-entity';
 import { createBunnyHops } from './bunnyhops';
+import gameRoot from '../../game-root';
 
 export class Level1 extends GameLevel {
   private serializedDocument: LevelDocument | null | undefined;
@@ -475,9 +476,17 @@ export class Level1 extends GameLevel {
 
     const light1 = new BABYLON.PointLight('pointLight', new BABYLON.Vector3(-6, 6, 0), scene);
     light1.intensity = 0.4;
-    light1.shadowEnabled = true;
     light1.shadowMinZ = 0.1;
     light1.shadowMaxZ = 100;
+
+    const tier = gameRoot.qualityTier;
+
+    if (tier === 'low') {
+      light1.shadowEnabled = false;
+    } else {
+      light1.shadowEnabled = true;
+    }
+
     if (import.meta.env.DEV) {
       const utilLayer = new BABYLON.UtilityLayerRenderer(scene);
       const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
@@ -485,12 +494,18 @@ export class Level1 extends GameLevel {
     }
 
     this.lights = [hemiLight, light1];
-    this.shadowGenerators = [
-      new ShadowGenerator(
-        light1,
-        [...this.walls.map(x => x.mesh)],
-        [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
-      ),
-    ];
+
+    if (tier === 'low') {
+      this.shadowGenerators = [];
+    } else {
+      this.shadowGenerators = [
+        new ShadowGenerator(
+          tier,
+          light1,
+          [...this.walls.map(x => x.mesh)],
+          [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
+        ),
+      ];
+    }
   }
 }
