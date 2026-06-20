@@ -390,7 +390,7 @@ export class EditorUI extends AbstractUI {
       '.editor .lock-target-enabled'
     ) as HTMLInputElement;
 
-    const camera = this.scene.activeCamera as MyArcRotateCamera;
+    const camera = this.scene.getCameraByName('arcRotateCamera') as MyArcRotateCamera;
 
     if (!camera) return;
 
