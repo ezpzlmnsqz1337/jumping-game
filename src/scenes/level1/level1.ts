@@ -14,6 +14,7 @@ import {
   TextureVariant,
   SerializedTrigger,
 } from '../../level-document';
+import { type QualityTier } from '../../quality';
 import { ShadowGenerator } from '../../shadows';
 import { AutomaticCamera } from '../../cameras/automatic-camera';
 import { PlayerEntity } from '../../entities/player-entity';
@@ -506,6 +507,41 @@ export class Level1 extends GameLevel {
           [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
         ),
       ];
+    }
+  }
+
+  override recreateShadowsForTier(tier: QualityTier): void {
+    this.shadowGenerators.forEach(sg => sg.dispose());
+    this.shadowGenerators = [];
+
+    const light1 = this.lights.find(l => l instanceof BABYLON.PointLight) as
+      | BABYLON.PointLight
+      | undefined;
+
+    if (tier === 'low') {
+      if (light1) light1.shadowEnabled = false;
+      return;
+    }
+
+    if (!light1 || !this.player?.mesh || !this.ground) return;
+
+    light1.shadowEnabled = true;
+
+    this.shadowGenerators = [
+      new ShadowGenerator(
+        tier,
+        light1 as unknown as BABYLON.IShadowLight,
+        this.walls.map(x => x.mesh),
+        [this.player.mesh, this.ground, ...this.walls.map(x => x.mesh)]
+      ),
+    ];
+
+    if (this.scene) {
+      this.scene.meshes
+        .filter(mesh => mesh.name === 'player-body')
+        .forEach(mesh => {
+          this.shadowGenerators.forEach(sg => sg.addShadowCaster(mesh as BABYLON.Mesh));
+        });
     }
   }
 }

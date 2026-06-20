@@ -27,6 +27,8 @@ import {
 import { getDarkTexture, getLightTexture, getRedTexture } from './assets/textures';
 import { FILTER_GROUP_GROUND } from './collission-groups';
 
+import { type QualityTier } from './quality';
+
 export class GameLevel {
   name: string;
   skybox: BABYLON.Nullable<Skybox> = null;
@@ -112,6 +114,8 @@ export class GameLevel {
   protected createLights() {
     this.lights = [];
   }
+
+  recreateShadowsForTier(_tier: QualityTier): void {}
 
   resetPlayerProgress(player: PlayerEntity) {
     player.checkpoints = [];

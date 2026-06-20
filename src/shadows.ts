@@ -34,4 +34,9 @@ export class ShadowGenerator {
   addShadowCaster(mesh: BABYLON.Mesh) {
     this.shadowGenerator?.addShadowCaster(mesh);
   }
+
+  dispose() {
+    this.shadowGenerator?.dispose();
+    this.shadowGenerator = null;
+  }
 }
