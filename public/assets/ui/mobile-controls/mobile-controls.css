@@ -21,8 +21,9 @@
     display: flex;
   }
 
-  :root {
-    --mobile-topbar-height: calc(2.5rem + var(--space-sm) * 2);
+  body {
+    /* --space-sm (0.3rem) × 2 + button height (2.5rem) */
+    --mobile-topbar-height: calc(2.5rem + 0.6rem);
   }
 }
 
@@ -183,8 +184,9 @@
     padding: 0 var(--space-sm);
   }
 
-  :root {
-    --mobile-topbar-height: calc(2rem + var(--space-xxs) * 2);
+  body {
+    /* --space-xxs (0.15rem) × 2 + button height (2rem) */
+    --mobile-topbar-height: calc(2rem + 0.3rem);
   }
 
   .controls-btn-dpad {

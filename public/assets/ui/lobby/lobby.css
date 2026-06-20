@@ -517,6 +517,7 @@
   }
 
   .lobby {
+    height: 100%;
     margin: var(--space-none);
     padding: var(--space-xl);
   }

@@ -105,19 +105,21 @@ export class MobileControlsUI extends AbstractUI {
     // Set initial height immediately
     this.updateControlsHeight(root.offsetHeight);
 
-    // Observe the topbar height so scoreboard and settings can offset accordingly
+    // Observe the topbar height so scoreboard and settings can offset accordingly.
+    // CSS sets the initial value via calc() — the observer refines it for edge cases.
     const topbar = document.querySelector('.controls-topbar') as HTMLElement;
     if (topbar) {
       this.topbarResizeObserver = new ResizeObserver(entries => {
         for (const entry of entries) {
-          document.body.style.setProperty(
-            '--mobile-topbar-height',
-            `${entry.contentRect.height}px`
-          );
+          if (entry.contentRect.height > 0) {
+            document.body.style.setProperty(
+              '--mobile-topbar-height',
+              `${entry.contentRect.height}px`
+            );
+          }
         }
       });
       this.topbarResizeObserver.observe(topbar);
-      document.body.style.setProperty('--mobile-topbar-height', `${topbar.offsetHeight}px`);
     }
 
     // Bind movement/turning/jumping buttons → keyStatus
