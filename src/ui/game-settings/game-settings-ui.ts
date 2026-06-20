@@ -60,6 +60,7 @@ export class GameSettingsUI extends AbstractUI {
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
     camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
+    renderingCanvas.focus();
   }
 
   togglePlayerInfo() {
