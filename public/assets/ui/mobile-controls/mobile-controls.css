@@ -1,0 +1,106 @@
+/* Mobile controls overlay — hidden by default, shown on touch devices */
+.mobile-controls {
+  bottom: 0;
+  display: none;
+  gap: var(--space-3xl);
+  justify-content: space-between;
+  left: 0;
+  padding: var(--space-3xl) var(--space-4xl);
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  touch-action: none;
+  z-index: var(--z-overlay);
+}
+
+@media (pointer: coarse) {
+  .mobile-controls {
+    display: flex;
+  }
+}
+
+/* D-pad grouping */
+.controls-dpad {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.controls-dpad-row {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* Action buttons grouping */
+.controls-actions {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.controls-actions-row {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* All buttons base */
+.controls-btn {
+  align-items: center;
+  background-color: var(--color-surface-overlay-strong);
+  border: var(--border-width-thick) solid var(--color-brand-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-ui-xl);
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.controls-btn:hover {
+  background-color: var(--color-brand-hover-overlay);
+}
+
+.controls-btn:active {
+  background-color: var(--color-brand-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.controls-btn:focus-visible {
+  outline: 0.2rem solid var(--color-text-primary);
+  outline-offset: 0.2rem;
+}
+
+.controls-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* D-pad button size */
+.controls-btn-dpad {
+  height: 4rem;
+  width: 4rem;
+}
+
+/* Action button sizes */
+.controls-btn-action {
+  height: 4rem;
+  width: 6rem;
+}
+
+.controls-btn-jump {
+  width: 12.5rem;
+}
+
+/* Utility buttons — minimum 44px touch target (WCAG 2.5.8) */
+.controls-btn-utility {
+  font-size: var(--font-size-ui-sm);
+  height: 2.75rem;
+  width: 4rem;
+}
