@@ -22,8 +22,8 @@
   }
 
   body {
-    /* --space-sm (0.3rem) × 2 + button height (2.5rem) */
-    --mobile-topbar-height: calc(2.5rem + 0.6rem);
+    /* Topbar height: ~50px — generous to clear all button + padding sizes */
+    --mobile-topbar-height: 50px;
   }
 }
 
@@ -185,8 +185,8 @@
   }
 
   body {
-    /* --space-xxs (0.15rem) × 2 + button height (2rem) */
-    --mobile-topbar-height: calc(2rem + 0.3rem);
+    /* Narrow topbar height: ~40px */
+    --mobile-topbar-height: 40px;
   }
 
   .controls-btn-dpad {
@@ -239,6 +239,10 @@
     height: 1.75rem;
     min-width: 2.5rem;
     padding: 0 var(--space-sm);
+  }
+
+  body {
+    --mobile-topbar-height: 35px;
   }
 
   .controls-btn-dpad {
