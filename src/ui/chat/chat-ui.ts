@@ -11,6 +11,7 @@ export class ChatUI extends AbstractUI {
   chatDiv!: HTMLDivElement;
   chatMessagesDiv!: HTMLDivElement;
   chatInput!: HTMLInputElement;
+  chatSendBtn!: HTMLButtonElement;
 
   hideChatTimeout!: ReturnType<typeof setTimeout>;
 
@@ -60,6 +61,7 @@ export class ChatUI extends AbstractUI {
   startChat() {
     this.showChat();
     this.chatInput.style.display = 'block';
+    this.chatSendBtn.style.display = 'block';
     this.chatInput.focus();
     this.player.status = 'in_chat';
     setTimeout(() => (this.chatInput.value = ''));
@@ -67,6 +69,7 @@ export class ChatUI extends AbstractUI {
 
   stopChat() {
     this.chatInput.style.display = 'none';
+    this.chatSendBtn.style.display = 'none';
     renderingCanvas.focus();
     this.player.status = 'playing';
     this.restartChatTimeout();
@@ -93,13 +96,21 @@ export class ChatUI extends AbstractUI {
     this.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     this.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     this.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    this.chatSendBtn = document.querySelector('.chat-send-btn') as HTMLButtonElement;
     this.rootElement = this.chatDiv;
 
     this.chatDiv.style.display = 'none';
     this.chatInput.style.display = 'none';
+    this.chatSendBtn.style.display = 'none';
 
     this.chatInput.addEventListener('blur', () => {
       this.stopChat();
+    });
+
+    // Use pointerdown (fires before blur) so sendChatMessage runs while status is still 'in_chat'
+    this.chatSendBtn.addEventListener('pointerdown', (e: PointerEvent) => {
+      e.preventDefault();
+      this.sendChatMessage();
     });
   }
 }

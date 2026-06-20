@@ -48,3 +48,45 @@
     font-size: var(--font-size-ui-xs);
   }
 }
+
+/* On touch devices, offset below the topbar */
+@media (pointer: coarse) {
+  .time-table {
+    top: var(--mobile-topbar-height-base);
+  }
+}
+
+/* Phone portrait — tighter spacing */
+@media only screen and (width <= 480px) {
+  .time-table {
+    font-size: var(--font-size-ui-xs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
+  .time-table>ol {
+    margin: var(--space-xxs) 0;
+    padding-left: var(--space-lg);
+  }
+
+  .time-table>ol>li {
+    padding: 0;
+  }
+
+  .time-table > .replay-metadata {
+    display: none;
+  }
+}
+
+/* Narrow portrait on touch — tighter top offset */
+@media (pointer: coarse) and (width <= 480px) {
+  .time-table {
+    top: var(--mobile-topbar-height-narrow);
+  }
+}
+
+/* Landscape mobile — even tighter top offset */
+@media (pointer: coarse) and (height <= 500px) {
+  .time-table {
+    top: var(--mobile-topbar-height-landscape);
+  }
+}

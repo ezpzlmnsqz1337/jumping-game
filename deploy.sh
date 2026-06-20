@@ -3,7 +3,7 @@
 shopt -s expand_aliases
 DESTINATION="hosting@hosting"
 
-podman build --pull --rm -f 'Dockerfile' -t 'jumping-game:latest' '.'
+podman build --no-cache --pull --rm -f 'Dockerfile' -t 'jumping-game:latest' '.'
 podman save jumping-game:latest -o jumping-game.tar
 
 scp -r jumping-game.tar $DESTINATION:/opt/containers/jumping-game.tar

@@ -1,0 +1,249 @@
+/* ================================================================
+   Top bar — utility buttons, hidden by default, shown on touch
+   ================================================================ */
+.controls-topbar {
+  background-color: var(--color-surface-overlay);
+  display: none;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  left: 0;
+  padding: var(--space-sm) var(--space-3xl);
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  touch-action: none;
+  z-index: var(--z-overlay);
+}
+
+@media (pointer: coarse) {
+  .controls-topbar {
+    display: flex;
+  }
+}
+
+/* ================================================================
+   Bottom mobile controls — hidden by default, shown on touch
+   ================================================================ */
+.mobile-controls {
+  bottom: 0;
+  display: none;
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  touch-action: none;
+  z-index: var(--z-overlay);
+}
+
+@media (pointer: coarse) {
+  .mobile-controls {
+    display: block;
+  }
+}
+
+.mobile-controls-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-3xl) var(--space-4xl);
+  pointer-events: none;
+  width: 100%;
+}
+
+/* ================================================================
+   D-pad grouping (left side, bottom)
+   ================================================================ */
+.controls-dpad {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.controls-dpad-row {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* ================================================================
+   Action buttons grouping (right side, bottom)
+   ================================================================ */
+.controls-actions {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.controls-actions-row {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* ================================================================
+   All buttons base
+   ================================================================ */
+.controls-btn {
+  align-items: center;
+  background-color: var(--color-surface-overlay-strong);
+  border: var(--border-width-thick) solid var(--color-brand-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-ui-xl);
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.controls-btn:hover {
+  background-color: var(--color-brand-hover-overlay);
+}
+
+.controls-btn:active {
+  background-color: var(--color-brand-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.controls-btn:focus-visible {
+  outline: var(--size-focus-outline) solid var(--color-text-primary);
+  outline-offset: var(--size-focus-outline);
+}
+
+.controls-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ================================================================
+   Button sizes
+   ================================================================ */
+.controls-btn-topbar {
+  font-size: var(--font-size-ui-sm);
+  height: var(--size-btn-topbar-h);
+  min-width: var(--size-btn-topbar-min-w);
+  padding: 0 var(--space-lg);
+}
+
+.controls-btn-dpad {
+  height: var(--size-btn-dpad);
+  width: var(--size-btn-dpad);
+}
+
+.controls-btn-action {
+  height: var(--size-btn-action-h);
+  width: var(--size-btn-action-w);
+}
+
+.controls-btn-jump {
+  width: var(--size-btn-jump-w);
+}
+
+/* ================================================================
+   Narrow / portrait phones (e.g. Xiaomi 15: ~393px wide)
+   ================================================================ */
+@media (pointer: coarse) and (width <= 500px) {
+  .mobile-controls-bottom {
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .controls-dpad,
+  .controls-actions {
+    gap: var(--space-xxs);
+  }
+
+  .controls-dpad-row,
+  .controls-actions-row {
+    gap: var(--space-xxs);
+  }
+
+  .controls-topbar {
+    gap: var(--space-xxs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
+  .controls-btn {
+    border-width: var(--border-width-thick);
+    font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-topbar {
+    font-size: var(--font-size-ui-xs);
+    height: var(--size-btn-topbar-h-narrow);
+    min-width: var(--size-btn-topbar-min-w-narrow);
+    padding: 0 var(--space-sm);
+  }
+
+  .controls-btn-dpad {
+    height: var(--size-btn-dpad-narrow);
+    width: var(--size-btn-dpad-narrow);
+  }
+
+  .controls-btn-action {
+    font-size: var(--font-size-ui-sm);
+    height: var(--size-btn-action-h-narrow);
+    width: var(--size-btn-action-w-narrow);
+  }
+
+  .controls-btn-jump {
+    width: var(--size-btn-jump-w-narrow);
+  }
+}
+
+/* ================================================================
+   Landscape mobile — limited vertical space
+   ================================================================ */
+@media (pointer: coarse) and (height <= 500px) {
+  .mobile-controls-bottom {
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-3xl);
+  }
+
+  .controls-dpad,
+  .controls-actions {
+    gap: var(--space-xxs);
+  }
+
+  .controls-dpad-row,
+  .controls-actions-row {
+    gap: var(--space-xxs);
+  }
+
+  .controls-topbar {
+    gap: var(--space-xxs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
+  .controls-btn {
+    border-width: 1px;
+    font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-topbar {
+    font-size: var(--font-size-ui-xs);
+    height: var(--size-btn-topbar-h-landscape);
+    min-width: var(--size-btn-topbar-min-w-landscape);
+    padding: 0 var(--space-sm);
+  }
+
+  .controls-btn-dpad {
+    height: var(--size-btn-dpad-landscape);
+    width: var(--size-btn-dpad-landscape);
+  }
+
+  .controls-btn-action {
+    font-size: var(--font-size-ui-sm);
+    height: var(--size-btn-action-h-landscape);
+    width: var(--size-btn-action-w-landscape);
+  }
+
+  .controls-btn-jump {
+    width: var(--size-btn-jump-w-landscape);
+  }
+}

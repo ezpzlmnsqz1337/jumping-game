@@ -82,3 +82,21 @@
     font-size: var(--font-size-ui-xs);
   }
 }
+
+/* On mobile portrait, float the timer above the touch controls,
+   shrink it, and right-align so it doesn't overlap the D-pad */
+@media (pointer: coarse) and (orientation: portrait) {
+  .timer {
+    align-items: flex-end;
+    bottom: var(--mobile-controls-height);
+    font-size: var(--font-size-ui-lg);
+    left: auto;
+    padding: var(--space-xs) 0;
+    right: var(--space-3xl);
+    width: auto;
+  }
+
+  .timer>div {
+    padding: var(--space-xs) var(--space-lg);
+  }
+}

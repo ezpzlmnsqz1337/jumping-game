@@ -15,7 +15,10 @@ describe('ChatUI', () => {
       <canvas id="render-canvas"></canvas>
       <div class="chat"></div>
       <div class="chat-messages"></div>
-      <input class="chat-input" />
+      <div class="chat-input-row">
+        <input class="chat-input" />
+        <button class="chat-send-btn">Send</button>
+      </div>
     `;
   });
 
@@ -36,6 +39,7 @@ describe('ChatUI', () => {
     chatUi.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     chatUi.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     chatUi.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    chatUi.chatSendBtn = document.querySelector('.chat-send-btn') as HTMLButtonElement;
     chatUi.chatInput.value = 'hello';
 
     chatUi.sendChatMessage();
@@ -113,6 +117,7 @@ describe('ChatUI', () => {
     chatUi.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     chatUi.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     chatUi.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    chatUi.chatSendBtn = document.querySelector('.chat-send-btn') as HTMLButtonElement;
 
     chatUi.toggleChat();
     expect(player.status).toBe('in_chat');
@@ -156,6 +161,7 @@ describe('ChatUI', () => {
     chatUi.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     chatUi.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     chatUi.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    chatUi.chatSendBtn = document.querySelector('.chat-send-btn') as HTMLButtonElement;
 
     chatUi.restartChatTimeout();
     expect(chatUi.chatDiv.style.display).toBe('block');
@@ -201,6 +207,7 @@ describe('ChatUI', () => {
     chatUi.chatDiv = document.querySelector('.chat') as HTMLDivElement;
     chatUi.chatMessagesDiv = document.querySelector('.chat-messages') as HTMLDivElement;
     chatUi.chatInput = document.querySelector('.chat-input') as HTMLInputElement;
+    chatUi.chatSendBtn = document.querySelector('.chat-send-btn') as HTMLButtonElement;
 
     chatUi.restartChatTimeout();
     expect(chatUi.chatDiv.style.display).toBe('block');

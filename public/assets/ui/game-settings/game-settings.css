@@ -44,3 +44,46 @@
     font-size: var(--font-size-ui-xs);
   }
 }
+
+@media (pointer: coarse) {
+  .game-settings input[type="checkbox"] {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+
+  /* Tip line is useless on touch — hide it entirely */
+  .game-settings > .settings-note {
+    display: none;
+  }
+
+  /* Offset below the topbar — matches topbar button + padding height */
+  .game-settings {
+    top: var(--mobile-topbar-height-base);
+  }
+}
+
+/* Phone portrait — use minimal sizing */
+@media only screen and (width <= 480px) {
+  .game-settings {
+    font-size: var(--font-size-ui-xs);
+    padding: var(--space-xs) var(--space-lg);
+  }
+
+  .game-settings>div {
+    gap: var(--space-md);
+  }
+}
+
+/* Narrow portrait on touch — tighter top offset */
+@media (pointer: coarse) and (width <= 480px) {
+  .game-settings {
+    top: var(--mobile-topbar-height-narrow);
+  }
+}
+
+/* Landscape mobile — even tighter top offset */
+@media (pointer: coarse) and (height <= 500px) {
+  .game-settings {
+    top: var(--mobile-topbar-height-landscape);
+  }
+}

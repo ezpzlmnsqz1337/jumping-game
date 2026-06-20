@@ -3,6 +3,7 @@ import { PlayerEntity } from '../entities/player-entity';
 import { ChatUI } from './chat/chat-ui';
 import { EditorUI } from './editor/editor-ui';
 import { LobbyUI } from './lobby/lobby-ui';
+import { MobileControlsUI } from './mobile-controls/mobile-controls-ui';
 import { PlayerInfoUI } from './player-info/player-info-ui';
 import { TimeTableUI } from './time-table/time-table-ui';
 import { TimerUI } from './timer/timer-ui';
@@ -21,6 +22,7 @@ export class UIManager {
   chatUI: ChatUI;
   editorUI: EditorUI;
   lobbyUI: LobbyUI;
+  mobileControlsUI: MobileControlsUI;
 
   constructor(scene: BABYLON.Scene, player: PlayerEntity, gizmoManager?: BABYLON.GizmoManager) {
     this.scene = scene;
@@ -31,6 +33,7 @@ export class UIManager {
     this.chatUI = new ChatUI(scene, player);
     this.editorUI = new EditorUI(scene, player, gizmoManager);
     this.lobbyUI = new LobbyUI(scene, player);
+    this.mobileControlsUI = new MobileControlsUI(scene, player);
   }
 
   async bindUI() {
@@ -43,6 +46,7 @@ export class UIManager {
     await this.chatUI.bindUI();
     await this.editorUI.bindUI();
     await this.lobbyUI.bindUI();
+    await this.mobileControlsUI.bindUI();
 
     this.initialized = true;
   }

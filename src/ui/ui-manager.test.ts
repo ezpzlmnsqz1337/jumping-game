@@ -15,6 +15,7 @@ describe('UIManager', () => {
       chatUI: mk('chatUI'),
       editorUI: mk('editorUI'),
       lobbyUI: mk('lobbyUI'),
+      mobileControlsUI: mk('mobileControlsUI'),
     } as unknown as UIManager;
 
     await UIManager.prototype.bindUI.call(manager);
@@ -28,6 +29,7 @@ describe('UIManager', () => {
       'chatUI',
       'editorUI',
       'lobbyUI',
+      'mobileControlsUI',
     ]);
     expect(manager.playerInfoUI.bindUI).toHaveBeenCalledTimes(1);
     expect(manager.timerUI.bindUI).toHaveBeenCalledTimes(1);
@@ -77,6 +79,11 @@ describe('UIManager', () => {
         kind = 'lobbyUI';
       },
     }));
+    vi.doMock('./mobile-controls/mobile-controls-ui', () => ({
+      MobileControlsUI: class {
+        kind = 'mobileControlsUI';
+      },
+    }));
 
     const { UIManager: MockedUIManager } = await import('./ui-manager');
 
@@ -89,6 +96,7 @@ describe('UIManager', () => {
     expect((manager.chatUI as unknown as { kind: string }).kind).toBe('chatUI');
     expect((manager.editorUI as unknown as { kind: string }).kind).toBe('editorUI');
     expect((manager.lobbyUI as unknown as { kind: string }).kind).toBe('lobbyUI');
+    expect((manager.mobileControlsUI as unknown as { kind: string }).kind).toBe('mobileControlsUI');
 
     vi.doUnmock('./player-info/player-info-ui');
     vi.doUnmock('./timer/timer-ui');
@@ -97,5 +105,6 @@ describe('UIManager', () => {
     vi.doUnmock('./chat/chat-ui');
     vi.doUnmock('./editor/editor-ui');
     vi.doUnmock('./lobby/lobby-ui');
+    vi.doUnmock('./mobile-controls/mobile-controls-ui');
   });
 });

@@ -460,6 +460,17 @@
   z-index: var(--z-modal-top);
 }
 
+@media (pointer: coarse) {
+  .ui-buttons {
+    display: none;
+  }
+
+  /* Give the lobby wrapper a background so the topbar doesn't show through */
+  .lobby-wrapper {
+    background-color: var(--color-surface-overlay-strong);
+  }
+}
+
 .ui-buttons > div {
   padding: var(--space-lg) var(--space-3xl);
 }
@@ -506,6 +517,7 @@
   }
 
   .lobby {
+    height: 100%;
     margin: var(--space-none);
     padding: var(--space-xl);
   }
