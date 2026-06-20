@@ -94,10 +94,12 @@ export class GameSettingsUI extends AbstractUI {
   }
 
   changeQuality(setting: QualitySetting) {
+    const newTier = resolveQualityTier(setting);
+    if (newTier === gameRoot.qualityTier) return;
+
     gameRoot.gameSettings.qualityTier = setting;
     GameStorage.saveGameSettings(gameRoot.gameSettings);
 
-    const newTier = resolveQualityTier(setting);
     gameRoot.qualityTier = newTier;
 
     if (gameRoot.engine) {
