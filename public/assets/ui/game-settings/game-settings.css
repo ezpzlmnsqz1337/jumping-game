@@ -56,9 +56,9 @@
     display: none;
   }
 
-  /* Offset below the topbar */
+  /* Offset below the topbar — matches topbar button + padding height */
   .game-settings {
-    top: calc(var(--mobile-topbar-height, 0rem));
+    top: 50px;
   }
 }
 
@@ -71,5 +71,19 @@
 
   .game-settings>div {
     gap: var(--space-md);
+  }
+}
+
+/* Narrow portrait on touch — tighter top offset */
+@media (pointer: coarse) and (width <= 480px) {
+  .game-settings {
+    top: 38px;
+  }
+}
+
+/* Landscape mobile — even tighter top offset */
+@media (pointer: coarse) and (height <= 500px) {
+  .game-settings {
+    top: 35px;
   }
 }

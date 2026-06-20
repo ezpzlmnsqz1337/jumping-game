@@ -52,7 +52,7 @@
 /* On touch devices, offset below the topbar */
 @media (pointer: coarse) {
   .time-table {
-    top: calc(var(--mobile-topbar-height, 0rem));
+    top: 50px;
   }
 }
 
@@ -74,5 +74,19 @@
 
   .time-table > .replay-metadata {
     display: none;
+  }
+}
+
+/* Narrow portrait on touch — tighter top offset */
+@media (pointer: coarse) and (width <= 480px) {
+  .time-table {
+    top: 38px;
+  }
+}
+
+/* Landscape mobile — even tighter top offset */
+@media (pointer: coarse) and (height <= 500px) {
+  .time-table {
+    top: 35px;
   }
 }
