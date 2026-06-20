@@ -1,11 +1,13 @@
 import { PlayerColor } from './assets/colors';
 import { type GameLevel } from './game-level';
 import { isLevelDocument, type LevelDocument } from './level-document';
+import { type QualitySetting } from './quality';
 
 export interface GameSettings {
   nickname: string;
   color: PlayerColor;
   newlyCreated?: boolean;
+  qualityTier?: QualitySetting;
 }
 
 const LEVEL_INDEX_KEY = 'level-index';
@@ -15,17 +17,22 @@ export class GameStorage {
     const nickname = localStorage.getItem('nickname') || 'player';
     const color = (localStorage.getItem('color') || 'blue') as PlayerColor;
     const newlyCreated = ['nickname', 'color'].every(x => localStorage.getItem(x) === null);
+    const qualityTier = (localStorage.getItem('qualityTier') as QualitySetting) || 'auto';
 
     return {
       nickname,
       color,
       newlyCreated,
+      qualityTier,
     };
   }
 
   static saveGameSettings(settings: GameSettings): void {
     localStorage.setItem('nickname', settings.nickname);
     localStorage.setItem('color', settings.color);
+    if (settings.qualityTier) {
+      localStorage.setItem('qualityTier', settings.qualityTier);
+    }
   }
 
   static saveLevel(level: GameLevel): LevelDocument {
