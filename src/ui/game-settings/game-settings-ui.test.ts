@@ -146,6 +146,12 @@ describe('GameSettingsUI', () => {
     document.body.innerHTML = `
       <canvas id="render-canvas"></canvas>
       <div class="game-settings"></div>
+      <select class="quality-tier">
+        <option value="auto">Auto</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
       <input class="automatic-camera-enabled" type="checkbox" />
       <input class="follow-camera-enabled" type="checkbox" />
       <input class="collissions-enabled" type="checkbox" />
@@ -215,6 +221,12 @@ describe('GameSettingsUI', () => {
 
     document.body.innerHTML = `
       <div class="game-settings"></div>
+      <select class="quality-tier">
+        <option value="auto">Auto</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
       <input class="automatic-camera-enabled" type="checkbox" />
       <input class="follow-camera-enabled" type="checkbox" />
       <input class="collissions-enabled" type="checkbox" />

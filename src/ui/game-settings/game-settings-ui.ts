@@ -2,6 +2,8 @@ import * as BABYLON from '@babylonjs/core';
 import { AutomaticCamera } from '../../cameras/automatic-camera';
 import { PlayerEntity } from '../../entities/player-entity';
 import gameRoot from '../../game-root';
+import { GameStorage } from '../../game-storage';
+import { resolveQualityTier, applyEngineQuality, type QualitySetting } from '../../quality';
 import { AbstractUI } from '../abstract-ui';
 import { renderingCanvas } from '../ui-manager';
 
@@ -12,6 +14,7 @@ export class GameSettingsUI extends AbstractUI {
   followCameraCheckBox!: HTMLInputElement;
   collissionsCheckBox!: HTMLInputElement;
   editModeCheckBox!: HTMLInputElement;
+  qualitySelect!: HTMLSelectElement;
 
   followCameraEnabled = false;
 
@@ -57,7 +60,6 @@ export class GameSettingsUI extends AbstractUI {
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
     camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
-    renderingCanvas.focus();
   }
 
   togglePlayerInfo() {
@@ -70,9 +72,23 @@ export class GameSettingsUI extends AbstractUI {
     renderingCanvas.focus();
   }
 
+  changeQuality(setting: QualitySetting) {
+    gameRoot.gameSettings.qualityTier = setting;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
+
+    const newTier = resolveQualityTier(setting);
+    gameRoot.qualityTier = newTier;
+
+    if (gameRoot.engine) {
+      applyEngineQuality(gameRoot.engine, newTier);
+      gameRoot.engine.resize();
+    }
+    renderingCanvas.focus();
+  }
+
   async bindUI() {
     await super.bindUI();
-    this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLInputElement;
+    this.gameSettingsDiv = document.querySelector('.game-settings') as HTMLDivElement;
     this.automaticCameraCheckBox = document.querySelector(
       '.automatic-camera-enabled'
     ) as HTMLInputElement;
@@ -82,6 +98,7 @@ export class GameSettingsUI extends AbstractUI {
     this.collissionsCheckBox = document.querySelector('.collissions-enabled') as HTMLInputElement;
     this.playerInfoCheckBox = document.querySelector('.player-info-enabled') as HTMLInputElement;
     this.editModeCheckBox = document.querySelector('.edit-mode-enabled-global') as HTMLInputElement;
+    this.qualitySelect = document.querySelector('.quality-tier') as HTMLSelectElement;
 
     if (gameRoot.multiplayer || !gameRoot.gizmoManager) {
       const editModeDiv = this.editModeCheckBox.closest('.edit-mode-visibility') as HTMLElement;
@@ -118,6 +135,11 @@ export class GameSettingsUI extends AbstractUI {
       this.toggleEditMode();
     });
     this.toggleEditMode();
+
+    this.qualitySelect.value = gameRoot.gameSettings.qualityTier ?? 'auto';
+    this.qualitySelect.addEventListener('change', () => {
+      this.changeQuality(this.qualitySelect.value as QualitySetting);
+    });
 
     this.rootElement = this.gameSettingsDiv;
   }

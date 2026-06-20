@@ -27,6 +27,14 @@
   padding-bottom: var(--space-sm);
 }
 
+.game-settings .quality-tier {
+  background-color: var(--color-surface-overlay-strong);
+  border: 1px solid var(--color-brand-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-ui-sm);
+  padding: var(--space-xxs) var(--space-sm);
+}
+
 @media only screen and (width <= 1000px) {
   .game-settings {
     display: block;
