@@ -3,6 +3,10 @@ import * as BABYLON from '@babylonjs/core';
 export type QualityTier = 'low' | 'medium' | 'high';
 export type QualitySetting = 'auto' | QualityTier;
 
+// Heuristic uses CPU cores + touch input only. A 16-core iGPU laptop
+// will land on 'high' and may still struggle. Future work could use
+// WEBGL_debug_renderer_info or a frame-time adaptation loop to detect
+// actual GPU performance.
 export function detectQualityTier(): QualityTier {
   const cores = navigator.hardwareConcurrency;
   const isTouchDevice =
