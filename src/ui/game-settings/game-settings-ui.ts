@@ -161,7 +161,9 @@ export class GameSettingsUI extends AbstractUI {
 
     const playerInfoVisible = settings.playerInfoVisible ?? false;
     this.playerInfoCheckBox.checked = playerInfoVisible;
-    this.togglePlayerInfo();
+    gameRoot.uiManager?.playerInfoUI.show(playerInfoVisible);
+    gameRoot.gameSettings.playerInfoVisible = playerInfoVisible;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
     this.playerInfoCheckBox.addEventListener('click', () => {
       this.togglePlayerInfo();
     });

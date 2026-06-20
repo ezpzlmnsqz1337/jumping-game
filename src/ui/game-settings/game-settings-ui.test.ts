@@ -623,7 +623,51 @@ describe('GameSettingsUI', () => {
     gameRoot.multiplayer = undefined;
   });
 
-  it('bindUI restores saved playerInfoVisible and calls playerInfo toggle', async () => {
+  it('bindUI restores saved playerInfoVisible and applies via show', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameStorage } = await import('../../game-storage');
+    const { GameSettingsUI } = await import('./game-settings-ui');
+
+    document.body.innerHTML = `
+      <canvas id="render-canvas"></canvas>
+      <div class="game-settings"></div>
+      <select class="quality-tier"><option value="auto">Auto</option></select>
+      <input class="automatic-camera-enabled" type="checkbox" />
+      <input class="follow-camera-enabled" type="checkbox" />
+      <input class="collissions-enabled" type="checkbox" />
+      <input class="player-info-enabled" type="checkbox" />
+      <div class="edit-mode-visibility">
+        <input class="edit-mode-enabled-global" type="checkbox" />
+      </div>
+    `;
+
+    const scene = {
+      activeCamera: { automaticCameraEnabled: true },
+      getCameraByName: vi.fn(),
+      meshes: [],
+    };
+    const player = { collisionEnabled: true };
+    const show = vi.fn();
+    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
+    gameRoot.uiManager = { playerInfoUI: { show, toggle: vi.fn() } } as never;
+    gameRoot.gameSettings = {
+      nickname: 'test',
+      color: 'blue',
+      playerInfoVisible: true,
+    };
+
+    const ui = new GameSettingsUI(scene as never, player as never);
+    ui.loadCss = vi.fn();
+    ui.loadHtml = vi.fn(async () => {});
+
+    await ui.bindUI();
+
+    expect(ui.playerInfoCheckBox.checked).toBe(true);
+    expect(show).toHaveBeenCalledWith(true);
+    expect(saveSpy).toHaveBeenCalled();
+  });
+
+  it('bindUI restores saved playerInfoVisible=false and applies via show', async () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameSettingsUI } = await import('./game-settings-ui');
 
@@ -646,12 +690,12 @@ describe('GameSettingsUI', () => {
       meshes: [],
     };
     const player = { collisionEnabled: true };
-    const toggle = vi.fn();
-    gameRoot.uiManager = { playerInfoUI: { toggle } } as never;
+    const show = vi.fn();
+    gameRoot.uiManager = { playerInfoUI: { show, toggle: vi.fn() } } as never;
     gameRoot.gameSettings = {
       nickname: 'test',
       color: 'blue',
-      playerInfoVisible: true,
+      playerInfoVisible: false,
     };
 
     const ui = new GameSettingsUI(scene as never, player as never);
@@ -660,8 +704,8 @@ describe('GameSettingsUI', () => {
 
     await ui.bindUI();
 
-    expect(ui.playerInfoCheckBox.checked).toBe(true);
-    expect(toggle).toHaveBeenCalledTimes(1);
+    expect(ui.playerInfoCheckBox.checked).toBe(false);
+    expect(show).toHaveBeenCalledWith(false);
   });
 
   it('bindUI restores saved editModeEnabled as false and dispatches enabled=false', async () => {
