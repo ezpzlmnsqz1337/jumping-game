@@ -90,6 +90,6 @@
 /* On touch devices, float above the touch controls (same level as timer) */
 @media (pointer: coarse) {
   .player-info {
-    bottom: calc(var(--mobile-controls-height, 0rem));
+    bottom: var(--mobile-controls-height);
   }
 }
