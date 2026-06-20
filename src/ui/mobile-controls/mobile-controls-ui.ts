@@ -1,11 +1,11 @@
 import * as BABYLON from '@babylonjs/core';
-import { GameControls } from '../../controls';
+import { GameControls, KeyStatus } from '../../controls';
 import { PlayerEntity } from '../../entities/player-entity';
 import gameRoot from '../../game-root';
 import { AbstractUI } from '../abstract-ui';
 
 /** Movement/turning/jumping buttons that map to keyStatus booleans */
-const KEY_STATUS_MAP: Record<string, string> = {
+const KEY_STATUS_MAP: Record<string, keyof KeyStatus> = {
   'btn-forward': 'KeyW',
   'btn-back': 'KeyS',
   'btn-left': 'KeyA',
@@ -35,7 +35,6 @@ const UTILITY_ACTIONS: Record<string, UtilityAction> = {
 
 export class MobileControlsUI extends AbstractUI {
   private controlsResizeObserver: ResizeObserver | null = null;
-  private topbarResizeObserver: ResizeObserver | null = null;
   private hudVisible = true;
   private fullscreenButton: HTMLButtonElement | null = null;
 
@@ -80,12 +79,25 @@ export class MobileControlsUI extends AbstractUI {
 
   private updateFullscreenButtonLabel(): void {
     if (!this.fullscreenButton) return;
-    const label = document.fullscreenElement ? 'Exit FS' : '&#9974;';
-    this.fullscreenButton.innerHTML = label;
+    const label = document.fullscreenElement ? 'Exit FS' : '⛶';
+    this.fullscreenButton.textContent = label;
   }
 
   private handleFullscreenChange = (): void => {
     this.updateFullscreenButtonLabel();
+  };
+
+  private handleContextMenu = (e: MouseEvent): void => {
+    const target = e.target as HTMLElement;
+    if (target.closest('.controls-btn')) {
+      e.preventDefault();
+    }
+  };
+
+  private handleVisibilityChange = (): void => {
+    if (document.hidden) {
+      this.releaseAllKeys();
+    }
   };
 
   async bindUI(): Promise<void> {
@@ -104,23 +116,6 @@ export class MobileControlsUI extends AbstractUI {
     this.controlsResizeObserver.observe(root);
     // Set initial height immediately
     this.updateControlsHeight(root.offsetHeight);
-
-    // Observe the topbar height so scoreboard and settings can offset accordingly.
-    // CSS sets the initial value via calc() — the observer refines it for edge cases.
-    const topbar = document.querySelector('.controls-topbar') as HTMLElement;
-    if (topbar) {
-      this.topbarResizeObserver = new ResizeObserver(entries => {
-        for (const entry of entries) {
-          if (entry.contentRect.height > 0) {
-            document.body.style.setProperty(
-              '--mobile-topbar-height',
-              `${entry.contentRect.height}px`
-            );
-          }
-        }
-      });
-      this.topbarResizeObserver.observe(topbar);
-    }
 
     // Bind movement/turning/jumping buttons → keyStatus
     for (const [id, key] of Object.entries(KEY_STATUS_MAP)) {
@@ -181,31 +176,23 @@ export class MobileControlsUI extends AbstractUI {
     }
 
     // Prevent long-press context menu on all control buttons (Android Chrome, etc.)
-    document.addEventListener('contextmenu', (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('.controls-btn')) {
-        e.preventDefault();
-      }
-    });
+    document.addEventListener('contextmenu', this.handleContextMenu);
 
     // Release all keys when page visibility changes (e.g., user switches apps)
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        this.releaseAllKeys();
-      }
-    });
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   destroy(): void {
     this.controlsResizeObserver?.disconnect();
-    this.topbarResizeObserver?.disconnect();
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.removeEventListener('contextmenu', this.handleContextMenu);
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   private releaseAllKeys(): void {
     const controls = gameRoot.controls;
     if (!controls) return;
-    for (const key of Object.values(KEY_STATUS_MAP)) {
+    for (const key of Object.values(KEY_STATUS_MAP) as (keyof KeyStatus)[]) {
       controls.setKeyStatus(key, false);
     }
   }

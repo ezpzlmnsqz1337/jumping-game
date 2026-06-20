@@ -54,31 +54,31 @@ function createMockControls(): MockControls {
 function setupMobileControlsDom(): void {
   document.body.innerHTML = `
     <div class="controls-topbar">
-      <button id="btn-respawn">R</button>
-      <button id="btn-chat">Chat</button>
-      <button id="btn-toggle-hud">HUD</button>
-      <button id="btn-fullscreen">FS</button>
-      <button id="btn-lobby">Lobby</button>
+      <button id="btn-respawn" class="controls-btn controls-btn-topbar">R</button>
+      <button id="btn-chat" class="controls-btn controls-btn-topbar">Chat</button>
+      <button id="btn-toggle-hud" class="controls-btn controls-btn-topbar">HUD</button>
+      <button id="btn-fullscreen" class="controls-btn controls-btn-topbar">FS</button>
+      <button id="btn-lobby" class="controls-btn controls-btn-topbar">Lobby</button>
     </div>
     <div class="mobile-controls">
       <div class="mobile-controls-bottom">
         <div class="controls-dpad">
           <div class="controls-dpad-row">
-            <button id="btn-forward">W</button>
+            <button id="btn-forward" class="controls-btn controls-btn-dpad">W</button>
           </div>
           <div class="controls-dpad-row">
-            <button id="btn-left">A</button>
-            <button id="btn-back">S</button>
-            <button id="btn-right">D</button>
+            <button id="btn-left" class="controls-btn controls-btn-dpad">A</button>
+            <button id="btn-back" class="controls-btn controls-btn-dpad">S</button>
+            <button id="btn-right" class="controls-btn controls-btn-dpad">D</button>
           </div>
         </div>
         <div class="controls-actions">
           <div class="controls-actions-row">
-            <button id="btn-turn-left">Turn L</button>
-            <button id="btn-turn-right">Turn R</button>
+            <button id="btn-turn-left" class="controls-btn controls-btn-action">Turn L</button>
+            <button id="btn-turn-right" class="controls-btn controls-btn-action">Turn R</button>
           </div>
           <div class="controls-actions-row">
-            <button id="btn-jump">Jump</button>
+            <button id="btn-jump" class="controls-btn controls-btn-action controls-btn-jump">Jump</button>
           </div>
         </div>
       </div>
@@ -373,5 +373,127 @@ describe('MobileControlsUI', () => {
     expect(() => {
       btn.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1, bubbles: true }));
     }).not.toThrow();
+  });
+
+  // -----------------------------------------------------------------------
+  // destroy()
+  // -----------------------------------------------------------------------
+
+  it('destroy_disconnectsResizeObservers_andRemovesDocumentListeners', async () => {
+    const { ui } = await createBoundMobileControlsUi(null, 'playing');
+
+    const disconnectSpy = vi.spyOn(ResizeObserver.prototype, 'disconnect');
+    const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+
+    ui.destroy();
+
+    expect(disconnectSpy).toHaveBeenCalled();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('contextmenu', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('fullscreenchange', expect.any(Function));
+  });
+
+  // -----------------------------------------------------------------------
+  // toggleHud()
+  // -----------------------------------------------------------------------
+
+  it('toggleHud_hidesAndShowsGameSettingsAndTimeTable', async () => {
+    const { MobileControlsUI } = await import('./mobile-controls-ui');
+    const { default: gameRoot } = await import('../../game-root');
+    setupMobileControlsDom();
+
+    const controls = createMockControls();
+    gameRoot.controls = controls as never;
+
+    const showGameSettings = vi.fn();
+    const showTimeTable = vi.fn();
+    const hideGameSettings = vi.fn();
+    const hideTimeTable = vi.fn();
+
+    gameRoot.uiManager = {
+      gameSettingsUI: { show: showGameSettings },
+      timeTableUI: { show: showTimeTable },
+    } as never;
+
+    const ui = new MobileControlsUI({} as never, { status: 'playing' } as never);
+    ui.loadCss = vi.fn();
+    ui.loadHtml = vi.fn(async () => {});
+    await ui.bindUI();
+
+    // First toggle: hudVisible goes true → false
+    const hudBtn = document.getElementById('btn-toggle-hud') as HTMLButtonElement;
+    hudBtn.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1, bubbles: true }));
+
+    // show(false) should be called for both
+    expect(showGameSettings).toHaveBeenCalledWith(false);
+    expect(showTimeTable).toHaveBeenCalledWith(false);
+
+    // Second toggle: hudVisible goes false → true
+    gameRoot.uiManager = {
+      gameSettingsUI: { show: hideGameSettings },
+      timeTableUI: { show: hideTimeTable },
+    } as never;
+
+    hudBtn.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1, bubbles: true }));
+
+    expect(hideGameSettings).toHaveBeenCalledWith(true);
+    expect(hideTimeTable).toHaveBeenCalledWith(true);
+  });
+
+  // -----------------------------------------------------------------------
+  // contextmenu prevention
+  // -----------------------------------------------------------------------
+
+  it('contextmenu_preventedOnControlButtons', async () => {
+    await createBoundMobileControlsUi(null, 'playing');
+
+    const btn = document.getElementById('btn-forward') as HTMLButtonElement;
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    btn.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('contextmenu_notPreventedOnNonControlElements', async () => {
+    await createBoundMobileControlsUi(null, 'playing');
+
+    const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    document.body.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  // -----------------------------------------------------------------------
+  // updateFullscreenButtonLabel
+  // -----------------------------------------------------------------------
+
+  it('updateFullscreenButtonLabel_showsExitFS_whenFullscreen', async () => {
+    const { ui } = await createBoundMobileControlsUi(null, 'playing');
+
+    const fsBtn = document.getElementById('btn-fullscreen') as HTMLButtonElement;
+    expect(fsBtn).not.toBeNull();
+
+    // Mock document.fullscreenElement to return a truthy value
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: document.documentElement,
+      configurable: true,
+    });
+    (ui as unknown as { updateFullscreenButtonLabel: () => void }).updateFullscreenButtonLabel();
+    expect(fsBtn.textContent).toBe('Exit FS');
+
+    // Restore
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+  });
+
+  it('updateFullscreenButtonLabel_showsSailboat_whenNotFullscreen', async () => {
+    const { ui } = await createBoundMobileControlsUi(null, 'playing');
+
+    const fsBtn = document.getElementById('btn-fullscreen') as HTMLButtonElement;
+    expect(fsBtn).not.toBeNull();
+
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+    (ui as unknown as { updateFullscreenButtonLabel: () => void }).updateFullscreenButtonLabel();
+    // After Fix 7, innerHTML is replaced with textContent using the Unicode char ⛴
+    expect(fsBtn.textContent).toBe('⛶');
   });
 });

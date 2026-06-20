@@ -20,11 +20,6 @@
   .controls-topbar {
     display: flex;
   }
-
-  body {
-    /* Topbar height: ~50px — generous to clear all button + padding sizes */
-    --mobile-topbar-height: 50px;
-  }
 }
 
 /* ================================================================
@@ -116,8 +111,8 @@
 }
 
 .controls-btn:focus-visible {
-  outline: 0.2rem solid var(--color-text-primary);
-  outline-offset: 0.2rem;
+  outline: var(--size-focus-outline) solid var(--color-text-primary);
+  outline-offset: var(--size-focus-outline);
 }
 
 .controls-btn:disabled {
@@ -130,23 +125,23 @@
    ================================================================ */
 .controls-btn-topbar {
   font-size: var(--font-size-ui-sm);
-  height: 2.5rem;
-  min-width: 3rem;
+  height: var(--size-btn-topbar-h);
+  min-width: var(--size-btn-topbar-min-w);
   padding: 0 var(--space-lg);
 }
 
 .controls-btn-dpad {
-  height: 4rem;
-  width: 4rem;
+  height: var(--size-btn-dpad);
+  width: var(--size-btn-dpad);
 }
 
 .controls-btn-action {
-  height: 4rem;
-  width: 6rem;
+  height: var(--size-btn-action-h);
+  width: var(--size-btn-action-w);
 }
 
 .controls-btn-jump {
-  width: 12.5rem;
+  width: var(--size-btn-jump-w);
 }
 
 /* ================================================================
@@ -180,29 +175,24 @@
 
   .controls-btn-topbar {
     font-size: var(--font-size-ui-xs);
-    height: 2rem;
-    min-width: 2.5rem;
+    height: var(--size-btn-topbar-h-narrow);
+    min-width: var(--size-btn-topbar-min-w-narrow);
     padding: 0 var(--space-sm);
   }
 
-  body {
-    /* Narrow topbar height: ~40px */
-    --mobile-topbar-height: 40px;
-  }
-
   .controls-btn-dpad {
-    height: 3rem;
-    width: 3rem;
+    height: var(--size-btn-dpad-narrow);
+    width: var(--size-btn-dpad-narrow);
   }
 
   .controls-btn-action {
     font-size: var(--font-size-ui-sm);
-    height: 3rem;
-    width: 4.5rem;
+    height: var(--size-btn-action-h-narrow);
+    width: var(--size-btn-action-w-narrow);
   }
 
   .controls-btn-jump {
-    width: 9.5rem;
+    width: var(--size-btn-jump-w-narrow);
   }
 }
 
@@ -237,27 +227,23 @@
 
   .controls-btn-topbar {
     font-size: var(--font-size-ui-xs);
-    height: 1.75rem;
-    min-width: 2.5rem;
+    height: var(--size-btn-topbar-h-landscape);
+    min-width: var(--size-btn-topbar-min-w-landscape);
     padding: 0 var(--space-sm);
   }
 
-  body {
-    --mobile-topbar-height: 35px;
-  }
-
   .controls-btn-dpad {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: var(--size-btn-dpad-landscape);
+    width: var(--size-btn-dpad-landscape);
   }
 
   .controls-btn-action {
     font-size: var(--font-size-ui-sm);
-    height: 2.5rem;
-    width: 4rem;
+    height: var(--size-btn-action-h-landscape);
+    width: var(--size-btn-action-w-landscape);
   }
 
   .controls-btn-jump {
-    width: 8.5rem;
+    width: var(--size-btn-jump-w-landscape);
   }
 }
