@@ -523,7 +523,10 @@ export class Level1 extends GameLevel {
       return;
     }
 
-    if (!light1 || !this.player?.mesh || !this.ground) return;
+    if (!light1 || !this.player?.mesh || !this.ground) {
+      console.warn('[Level1] recreateShadowsForTier: required scene refs not ready, skipping');
+      return;
+    }
 
     light1.shadowEnabled = true;
 
@@ -537,6 +540,12 @@ export class Level1 extends GameLevel {
     ];
 
     if (this.scene) {
+      // Re-add dynamically-spawned player-body meshes (e.g. remote multiplayer
+      // players who joined after the level was created) as shadow casters.
+      // The constructor only adds the local player.mesh; the
+      // scene.onNewMeshAddedObservable handler covers meshes added AFTER
+      // construction, so this scan handles any that joined between
+      // construction and the tier change.
       this.scene.meshes
         .filter(mesh => mesh.name === 'player-body')
         .forEach(mesh => {
