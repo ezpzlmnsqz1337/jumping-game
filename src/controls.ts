@@ -26,6 +26,13 @@ export class GameControls {
     ControlLeft: false,
   };
 
+  /** Sets a key status flag. Used by both keyboard events and mobile controls. */
+  setKeyStatus(key: string, pressed: boolean): void {
+    if (key in this.keyStatus) {
+      this.keyStatus[key as keyof KeyStatus] = pressed;
+    }
+  }
+
   bindControls(scene: BABYLON.Scene, player: PlayerEntity): void {
     scene.actionManager = new BABYLON.ActionManager(scene);
 
