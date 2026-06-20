@@ -460,6 +460,12 @@
   z-index: var(--z-modal-top);
 }
 
+@media (pointer: coarse) {
+  .ui-buttons {
+    display: none;
+  }
+}
+
 .ui-buttons > div {
   padding: var(--space-lg) var(--space-3xl);
 }

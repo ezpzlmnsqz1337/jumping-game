@@ -2,9 +2,10 @@
    Top bar — utility buttons, hidden by default, shown on touch
    ================================================================ */
 .controls-topbar {
+  background-color: var(--color-surface-overlay);
   display: none;
   gap: var(--space-sm);
-  justify-content: center;
+  justify-content: space-between;
   left: 0;
   padding: var(--space-sm) var(--space-3xl);
   pointer-events: none;
