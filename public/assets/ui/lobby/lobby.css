@@ -464,6 +464,11 @@
   .ui-buttons {
     display: none;
   }
+
+  /* Give the lobby wrapper a background so the topbar doesn't show through */
+  .lobby-wrapper {
+    background-color: var(--color-surface-overlay-strong);
+  }
 }
 
 .ui-buttons > div {

@@ -20,6 +20,10 @@
   .controls-topbar {
     display: flex;
   }
+
+  :root {
+    --mobile-topbar-height: calc(2.5rem + var(--space-sm) * 2);
+  }
 }
 
 /* ================================================================
@@ -177,6 +181,10 @@
     height: 2rem;
     min-width: 2.5rem;
     padding: 0 var(--space-sm);
+  }
+
+  :root {
+    --mobile-topbar-height: calc(2rem + var(--space-xxs) * 2);
   }
 
   .controls-btn-dpad {
