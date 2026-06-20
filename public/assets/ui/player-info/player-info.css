@@ -67,9 +67,9 @@
 
 @media only screen and (width <= 1000px) {
   .player-info {
-    bottom: 0.5rem;
+    bottom: var(--space-player-info-bottom);
     font-size: var(--font-size-ui-xs);
-    left: 0.5rem;
+    left: var(--space-3xl);
     padding: var(--space-xs) var(--space-sm);
   }
 
