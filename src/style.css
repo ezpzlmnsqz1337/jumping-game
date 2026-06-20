@@ -77,7 +77,9 @@ body {
   --space-chat-bottom: 7rem;
   --space-player-info-bottom: 0.5rem;
   --mobile-controls-height: 0rem;
-  --mobile-topbar-height: 50px;
+  --mobile-topbar-height-base: 50px;
+  --mobile-topbar-height-narrow: 38px;
+  --mobile-topbar-height-landscape: 35px;
   --size-checkbox: 1rem;
   --color-status-running: var(--yellow);
   --color-status-finished: var(--blue);

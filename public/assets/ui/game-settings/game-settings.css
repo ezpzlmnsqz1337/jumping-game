@@ -58,7 +58,7 @@
 
   /* Offset below the topbar — matches topbar button + padding height */
   .game-settings {
-    top: 50px;
+    top: var(--mobile-topbar-height-base);
   }
 }
 
@@ -77,13 +77,13 @@
 /* Narrow portrait on touch — tighter top offset */
 @media (pointer: coarse) and (width <= 480px) {
   .game-settings {
-    top: 38px;
+    top: var(--mobile-topbar-height-narrow);
   }
 }
 
 /* Landscape mobile — even tighter top offset */
 @media (pointer: coarse) and (height <= 500px) {
   .game-settings {
-    top: 35px;
+    top: var(--mobile-topbar-height-landscape);
   }
 }

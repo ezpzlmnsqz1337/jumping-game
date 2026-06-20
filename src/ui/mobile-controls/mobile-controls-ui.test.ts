@@ -309,6 +309,19 @@ describe('MobileControlsUI', () => {
     expect(controls.handleOpenChat).not.toHaveBeenCalled();
   });
 
+  it('lobbyButton_callsOpenLobby', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    await createBoundMobileControlsUi(null, 'playing');
+
+    const openLobby = vi.fn();
+    gameRoot.uiManager = { lobbyUI: { openLobby } } as never;
+
+    const btn = document.getElementById('btn-lobby') as HTMLButtonElement;
+    btn.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1, bubbles: true }));
+
+    expect(openLobby).toHaveBeenCalledTimes(1);
+  });
+
   // -----------------------------------------------------------------------
   // Visibility change
   // -----------------------------------------------------------------------
