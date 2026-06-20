@@ -42,6 +42,11 @@ describe('quality tier detection', () => {
     expect(detectQualityTier()).toBe('low');
   });
 
+  it('returns low when hardwareConcurrency is 0 on a touch device', () => {
+    mockCapabilities(true, 0, 1);
+    expect(detectQualityTier()).toBe('low');
+  });
+
   it('returns low when cores <= 4 and device has maxTouchPoints > 0', () => {
     mockCapabilities(false, 4, 1);
     expect(detectQualityTier()).toBe('low');
