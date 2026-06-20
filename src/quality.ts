@@ -26,14 +26,14 @@ export function resolveQualityTier(setting: QualitySetting): QualityTier {
   return setting;
 }
 
-export function applyEngineQuality(engine: BABYLON.Engine, tier: QualityTier): void {
-  const scalingLevel: Record<QualityTier, number> = {
-    low: 1.5,
-    medium: 1.25,
-    high: 1,
-  };
+const QUALITY_CONFIG: Record<QualityTier, { baseScaling: number; optimizerCap: number }> = {
+  low: { baseScaling: 1.5, optimizerCap: 2 },
+  medium: { baseScaling: 1.25, optimizerCap: 1.5 },
+  high: { baseScaling: 1, optimizerCap: 1 },
+};
 
-  engine.setHardwareScalingLevel(scalingLevel[tier]);
+export function applyEngineQuality(engine: BABYLON.Engine, tier: QualityTier): void {
+  engine.setHardwareScalingLevel(QUALITY_CONFIG[tier].baseScaling);
 }
 
 export function shouldEnableAntialias(tier: QualityTier): boolean {
@@ -41,11 +41,5 @@ export function shouldEnableAntialias(tier: QualityTier): boolean {
 }
 
 export function hardwareScalingCapForTier(tier: QualityTier): number {
-  const caps: Record<QualityTier, number> = {
-    low: 2,
-    medium: 1.5,
-    high: 1,
-  };
-
-  return caps[tier];
+  return QUALITY_CONFIG[tier].optimizerCap;
 }
