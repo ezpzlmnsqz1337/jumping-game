@@ -86,3 +86,10 @@
     padding: var(--space-xxs) var(--space-xs);
   }
 }
+
+/* On mobile portrait, float above the touch controls */
+@media (pointer: coarse) and (orientation: portrait) {
+  .player-info {
+    bottom: calc(var(--mobile-controls-height, 0rem) + var(--space-player-info-bottom));
+  }
+}
