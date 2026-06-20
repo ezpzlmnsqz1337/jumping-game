@@ -62,9 +62,11 @@ export class LobbyUI extends AbstractUI {
 
     this.scene.sounds?.find(x => x.name === 'open-lobby')?.play();
     this.player.status = 'in_lobby';
+    // Chat visibility is tracked via the DOM because it has no persisted setting;
+    // playerInfo reads from the saved setting so close-time restore matches
+    // the source of truth that bindUI uses to initialize this flag.
     this.chatWasVisible = gameRoot.uiManager?.chatUI.rootElement?.style.display !== 'none';
-    this.playerInfoWasVisible =
-      gameRoot.uiManager?.playerInfoUI.rootElement?.style.display !== 'none';
+    this.playerInfoWasVisible = gameRoot.gameSettings.playerInfoVisible ?? false;
     this.showOtherUIs(false);
   }
 
