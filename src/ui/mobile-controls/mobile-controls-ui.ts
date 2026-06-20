@@ -35,6 +35,7 @@ const UTILITY_ACTIONS: Record<string, UtilityAction> = {
 
 export class MobileControlsUI extends AbstractUI {
   private controlsResizeObserver: ResizeObserver | null = null;
+  private topbarResizeObserver: ResizeObserver | null = null;
   private hudVisible = true;
   private fullscreenButton: HTMLButtonElement | null = null;
 
@@ -104,6 +105,21 @@ export class MobileControlsUI extends AbstractUI {
     // Set initial height immediately
     this.updateControlsHeight(root.offsetHeight);
 
+    // Observe the topbar height so scoreboard and settings can offset accordingly
+    const topbar = document.querySelector('.controls-topbar') as HTMLElement;
+    if (topbar) {
+      this.topbarResizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          document.body.style.setProperty(
+            '--mobile-topbar-height',
+            `${entry.contentRect.height}px`
+          );
+        }
+      });
+      this.topbarResizeObserver.observe(topbar);
+      document.body.style.setProperty('--mobile-topbar-height', `${topbar.offsetHeight}px`);
+    }
+
     // Bind movement/turning/jumping buttons → keyStatus
     for (const [id, key] of Object.entries(KEY_STATUS_MAP)) {
       const btn = document.getElementById(id) as HTMLButtonElement | null;
@@ -172,6 +188,7 @@ export class MobileControlsUI extends AbstractUI {
 
   destroy(): void {
     this.controlsResizeObserver?.disconnect();
+    this.topbarResizeObserver?.disconnect();
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
   }
 

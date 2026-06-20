@@ -49,6 +49,13 @@
   }
 }
 
+/* On touch devices, offset below the topbar */
+@media (pointer: coarse) {
+  .time-table {
+    top: calc(var(--mobile-topbar-height, 0rem));
+  }
+}
+
 /* Phone portrait — tighter spacing */
 @media only screen and (width <= 480px) {
   .time-table {

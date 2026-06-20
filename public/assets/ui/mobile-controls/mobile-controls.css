@@ -2,10 +2,8 @@
 .mobile-controls {
   bottom: 0;
   display: none;
-  gap: var(--space-3xl);
-  justify-content: space-between;
+  flex-direction: column;
   left: 0;
-  padding: var(--space-3xl) var(--space-4xl);
   pointer-events: none;
   position: fixed;
   right: 0;
@@ -17,6 +15,25 @@
   .mobile-controls {
     display: flex;
   }
+}
+
+/* Top bar — utility buttons */
+.controls-topbar {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  padding: var(--space-sm) var(--space-3xl);
+  pointer-events: none;
+  width: 100%;
+}
+
+/* Bottom row — D-pad + actions */
+.mobile-controls-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-3xl) var(--space-4xl);
+  pointer-events: none;
+  width: 100%;
 }
 
 /* D-pad grouping */
@@ -82,6 +99,14 @@
   pointer-events: none;
 }
 
+/* Top bar button size */
+.controls-btn-topbar {
+  font-size: var(--font-size-ui-sm);
+  height: 2.5rem;
+  min-width: 3rem;
+  padding: 0 var(--space-lg);
+}
+
 /* D-pad button size */
 .controls-btn-dpad {
   height: 4rem;
@@ -98,17 +123,9 @@
   width: 12.5rem;
 }
 
-/* Utility buttons — minimum 44px touch target (WCAG 2.5.8) */
-.controls-btn-utility {
-  font-size: var(--font-size-ui-sm);
-  height: 2.75rem;
-  width: 4rem;
-}
-
 /* Narrow / portrait phones (e.g. Xiaomi 15: ~393px wide) */
 @media (pointer: coarse) and (width <= 500px) {
-  /* stylelint-disable-next-line media-feature-range-notation */
-  .mobile-controls {
+  .mobile-controls-bottom {
     gap: var(--space-lg);
     padding: var(--space-lg) var(--space-md);
   }
@@ -123,9 +140,21 @@
     gap: var(--space-xxs);
   }
 
+  .controls-topbar {
+    gap: var(--space-xxs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
   .controls-btn {
     border-width: var(--border-width-thick);
     font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-topbar {
+    font-size: var(--font-size-ui-xs);
+    height: 2rem;
+    min-width: 2.5rem;
+    padding: 0 var(--space-sm);
   }
 
   .controls-btn-dpad {
@@ -142,17 +171,11 @@
   .controls-btn-jump {
     width: 9.5rem;
   }
-
-  .controls-btn-utility {
-    font-size: var(--font-size-ui-xs);
-    height: 2rem;
-    width: 3rem;
-  }
 }
 
 /* Landscape mobile — limited vertical space */
 @media (pointer: coarse) and (height <= 500px) {
-  .mobile-controls {
+  .mobile-controls-bottom {
     gap: var(--space-lg);
     padding: var(--space-sm) var(--space-3xl);
   }
@@ -167,9 +190,21 @@
     gap: var(--space-xxs);
   }
 
+  .controls-topbar {
+    gap: var(--space-xxs);
+    padding: var(--space-xxs) var(--space-sm);
+  }
+
   .controls-btn {
     border-width: 1px;
     font-size: var(--font-size-ui-md);
+  }
+
+  .controls-btn-topbar {
+    font-size: var(--font-size-ui-xs);
+    height: 1.75rem;
+    min-width: 2.5rem;
+    padding: 0 var(--space-sm);
   }
 
   .controls-btn-dpad {
@@ -185,11 +220,5 @@
 
   .controls-btn-jump {
     width: 8.5rem;
-  }
-
-  .controls-btn-utility {
-    font-size: var(--font-size-ui-xs);
-    height: 1.75rem;
-    width: 2.75rem;
   }
 }

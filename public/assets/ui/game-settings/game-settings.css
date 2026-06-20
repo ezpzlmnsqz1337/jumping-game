@@ -50,14 +50,20 @@
     height: 1.5rem;
     width: 1.5rem;
   }
-}
 
-/* Phone portrait — hide tip line and use minimal sizing */
-@media only screen and (width <= 480px) {
+  /* Tip line is useless on touch — hide it entirely */
   .game-settings > .settings-note {
     display: none;
   }
 
+  /* Offset below the topbar */
+  .game-settings {
+    top: calc(var(--mobile-topbar-height, 0rem));
+  }
+}
+
+/* Phone portrait — use minimal sizing */
+@media only screen and (width <= 480px) {
   .game-settings {
     font-size: var(--font-size-ui-xs);
     padding: var(--space-xs) var(--space-lg);

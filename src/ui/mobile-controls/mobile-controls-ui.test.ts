@@ -54,30 +54,32 @@ function createMockControls(): MockControls {
 function setupMobileControlsDom(): void {
   document.body.innerHTML = `
     <div class="mobile-controls">
-      <div class="controls-dpad">
-        <div class="controls-dpad-row">
-          <button id="btn-forward">W</button>
-        </div>
-        <div class="controls-dpad-row">
-          <button id="btn-left">A</button>
-          <button id="btn-back">S</button>
-          <button id="btn-right">D</button>
-        </div>
+      <div class="controls-topbar">
+        <button id="btn-respawn">R</button>
+        <button id="btn-chat">Chat</button>
+        <button id="btn-toggle-hud">HUD</button>
+        <button id="btn-fullscreen">FS</button>
+        <button id="btn-lobby">Lobby</button>
       </div>
-      <div class="controls-actions">
-        <div class="controls-actions-row">
-          <button id="btn-turn-left">Turn L</button>
-          <button id="btn-turn-right">Turn R</button>
+      <div class="mobile-controls-bottom">
+        <div class="controls-dpad">
+          <div class="controls-dpad-row">
+            <button id="btn-forward">W</button>
+          </div>
+          <div class="controls-dpad-row">
+            <button id="btn-left">A</button>
+            <button id="btn-back">S</button>
+            <button id="btn-right">D</button>
+          </div>
         </div>
-        <div class="controls-actions-row">
-          <button id="btn-jump">Jump</button>
-        </div>
-        <div class="controls-actions-row">
-          <button id="btn-respawn">R</button>
-          <button id="btn-chat">Chat</button>
-          <button id="btn-toggle-hud">HUD</button>
-          <button id="btn-fullscreen">FS</button>
-          <button id="btn-lobby">Lobby</button>
+        <div class="controls-actions">
+          <div class="controls-actions-row">
+            <button id="btn-turn-left">Turn L</button>
+            <button id="btn-turn-right">Turn R</button>
+          </div>
+          <div class="controls-actions-row">
+            <button id="btn-jump">Jump</button>
+          </div>
         </div>
       </div>
     </div>
