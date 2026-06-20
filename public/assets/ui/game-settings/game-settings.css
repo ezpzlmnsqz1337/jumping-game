@@ -44,3 +44,10 @@
     font-size: var(--font-size-ui-xs);
   }
 }
+
+@media (pointer: coarse) {
+  .game-settings input[type="checkbox"] {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+}
