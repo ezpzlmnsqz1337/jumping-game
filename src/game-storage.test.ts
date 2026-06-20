@@ -81,3 +81,30 @@ describe('GameStorage boolean settings persistence', () => {
     expect(settings.editModeEnabled).toBe(false);
   });
 });
+
+describe('GameStorage quality tier validation', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('returns auto when qualityTier is missing', () => {
+    expect(GameStorage.getGameSettings().qualityTier).toBe('auto');
+  });
+
+  it('accepts each valid quality tier value', () => {
+    for (const tier of ['auto', 'low', 'medium', 'high'] as const) {
+      localStorage.clear();
+      localStorage.setItem('qualityTier', tier);
+      expect(GameStorage.getGameSettings().qualityTier).toBe(tier);
+    }
+  });
+
+  it('falls back to auto when qualityTier is corrupt or unrecognized', () => {
+    const corruptValues = ['ULTRA', 'lowish', '123', '', 'auto; extra', 'low\n'];
+    for (const corrupt of corruptValues) {
+      localStorage.clear();
+      localStorage.setItem('qualityTier', corrupt);
+      expect(GameStorage.getGameSettings().qualityTier).toBe('auto');
+    }
+  });
+});

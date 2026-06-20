@@ -28,12 +28,19 @@ function saveBoolSetting(key: string, value: boolean | undefined): void {
   }
 }
 
+const VALID_QUALITY_TIERS: readonly QualitySetting[] = ['auto', 'low', 'medium', 'high'];
+
+function readQualityTier(): QualitySetting {
+  const raw = localStorage.getItem('qualityTier');
+  return VALID_QUALITY_TIERS.includes(raw as QualitySetting) ? (raw as QualitySetting) : 'auto';
+}
+
 export class GameStorage {
   static getGameSettings(): GameSettings {
     const nickname = localStorage.getItem('nickname') || 'player';
     const color = (localStorage.getItem('color') || 'blue') as PlayerColor;
     const newlyCreated = ['nickname', 'color'].every(x => localStorage.getItem(x) === null);
-    const qualityTier = (localStorage.getItem('qualityTier') as QualitySetting) || 'auto';
+    const qualityTier = readQualityTier();
 
     return {
       nickname,
