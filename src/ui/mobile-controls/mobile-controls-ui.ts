@@ -27,6 +27,10 @@ const UTILITY_ACTIONS: Record<string, UtilityAction> = {
     if (p.status === 'in_lobby') return;
     c.handleOpenChat('KeyT');
   },
+  'btn-lobby': (_c: GameControls, _p: PlayerEntity) => {
+    // Player status check is done inside openLobby()
+    gameRoot.uiManager?.lobbyUI.openLobby();
+  },
 };
 
 export class MobileControlsUI extends AbstractUI {

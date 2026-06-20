@@ -60,7 +60,7 @@
 
 @media only screen and (width <= 1000px) {
   .timer {
-    bottom: calc(var(--mobile-controls-height, 0rem));
+    bottom: 0;
     font-size: var(--font-size-ui-2xl);
     left: 0;
     padding: var(--space-lg);
@@ -80,5 +80,12 @@
   .timer > div > .run-status,
   .timer > div > .connection-status {
     font-size: var(--font-size-ui-xs);
+  }
+}
+
+/* On mobile portrait, float the timer above the touch controls */
+@media (pointer: coarse) and (orientation: portrait) {
+  .timer {
+    bottom: calc(var(--mobile-controls-height, 0rem));
   }
 }

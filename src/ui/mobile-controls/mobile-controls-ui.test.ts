@@ -75,6 +75,9 @@ function setupMobileControlsDom(): void {
         <div class="controls-actions-row">
           <button id="btn-respawn">R</button>
           <button id="btn-chat">Chat</button>
+          <button id="btn-toggle-hud">HUD</button>
+          <button id="btn-fullscreen">FS</button>
+          <button id="btn-lobby">Lobby</button>
         </div>
       </div>
     </div>
