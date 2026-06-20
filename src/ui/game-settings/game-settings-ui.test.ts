@@ -96,9 +96,9 @@ describe('GameSettingsUI', () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameSettingsUI } = await import('./game-settings-ui');
 
-    const show = vi.fn();
+    const toggle = vi.fn();
     gameRoot.uiManager = {
-      playerInfoUI: { show },
+      playerInfoUI: { toggle },
     } as never;
 
     const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
@@ -106,11 +106,11 @@ describe('GameSettingsUI', () => {
 
     ui.playerInfoCheckBox.checked = true;
     ui.togglePlayerInfo();
-    expect(show).toHaveBeenCalledWith(true);
+    expect(toggle).toHaveBeenCalledTimes(1);
 
     ui.playerInfoCheckBox.checked = false;
     ui.togglePlayerInfo();
-    expect(show).toHaveBeenLastCalledWith(false);
+    expect(toggle).toHaveBeenCalledTimes(2);
   });
 
   it('toggleCollissions delegates to multiplayer and syncs checkbox', async () => {
@@ -413,25 +413,6 @@ describe('GameSettingsUI', () => {
     expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
   });
 
-  it('togglePlayerInfo persists to gameSettings and saves', async () => {
-    const { default: gameRoot } = await import('../../game-root');
-    const { GameStorage } = await import('../../game-storage');
-    const { GameSettingsUI } = await import('./game-settings-ui');
-
-    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
-    const show = vi.fn();
-    gameRoot.uiManager = { playerInfoUI: { show } } as never;
-    gameRoot.gameSettings = { nickname: 'test', color: 'blue' };
-    const ui = new GameSettingsUI({} as never, { collisionEnabled: true } as never);
-    ui.playerInfoCheckBox = document.createElement('input');
-    ui.playerInfoCheckBox.checked = true;
-
-    ui.togglePlayerInfo();
-
-    expect(gameRoot.gameSettings.playerInfoVisible).toBe(true);
-    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
-  });
-
   it('toggleEditMode persists to gameSettings and saves', async () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameStorage } = await import('../../game-storage');
@@ -642,7 +623,7 @@ describe('GameSettingsUI', () => {
     gameRoot.multiplayer = undefined;
   });
 
-  it('bindUI restores saved playerInfoVisible and calls playerInfo show', async () => {
+  it('bindUI restores saved playerInfoVisible and calls playerInfo toggle', async () => {
     const { default: gameRoot } = await import('../../game-root');
     const { GameSettingsUI } = await import('./game-settings-ui');
 
@@ -665,8 +646,8 @@ describe('GameSettingsUI', () => {
       meshes: [],
     };
     const player = { collisionEnabled: true };
-    const show = vi.fn();
-    gameRoot.uiManager = { playerInfoUI: { show } } as never;
+    const toggle = vi.fn();
+    gameRoot.uiManager = { playerInfoUI: { toggle } } as never;
     gameRoot.gameSettings = {
       nickname: 'test',
       color: 'blue',
@@ -680,7 +661,7 @@ describe('GameSettingsUI', () => {
     await ui.bindUI();
 
     expect(ui.playerInfoCheckBox.checked).toBe(true);
-    expect(show).toHaveBeenCalledWith(true);
+    expect(toggle).toHaveBeenCalledTimes(1);
   });
 
   it('bindUI restores saved editModeEnabled as false and dispatches enabled=false', async () => {

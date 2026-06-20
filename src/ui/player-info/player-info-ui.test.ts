@@ -94,6 +94,33 @@ describe('PlayerInfoUI', () => {
     expect(ui.rootElement.style.display).toBe('none');
   });
 
+  it('toggle syncs the checkbox, persists playerInfoVisible, and saves settings', async () => {
+    const { default: gameRoot } = await import('../../game-root');
+    const { GameStorage } = await import('../../game-storage');
+
+    document.body.innerHTML = '<input class="player-info-enabled" type="checkbox" />';
+    const checkbox = document.querySelector('.player-info-enabled') as HTMLInputElement;
+    checkbox.checked = false;
+
+    gameRoot.gameSettings = { nickname: 'test', color: 'blue' };
+    const saveSpy = vi.spyOn(GameStorage, 'saveGameSettings');
+
+    const ui = new PlayerInfoUI({} as never, {} as never);
+    ui.rootElement = document.createElement('div');
+
+    ui.toggle();
+
+    expect(checkbox.checked).toBe(true);
+    expect(gameRoot.gameSettings.playerInfoVisible).toBe(true);
+    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
+
+    ui.toggle();
+
+    expect(checkbox.checked).toBe(false);
+    expect(gameRoot.gameSettings.playerInfoVisible).toBe(false);
+    expect(saveSpy).toHaveBeenCalledWith(gameRoot.gameSettings);
+  });
+
   it('updateUI refreshes fps text when interval elapsed', () => {
     const player: PlayerInfoTestPlayer = {
       moving: false,

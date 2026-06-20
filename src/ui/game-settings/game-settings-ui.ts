@@ -77,10 +77,7 @@ export class GameSettingsUI extends AbstractUI {
   }
 
   togglePlayerInfo() {
-    gameRoot.uiManager?.playerInfoUI.show(this.playerInfoCheckBox.checked);
-
-    gameRoot.gameSettings.playerInfoVisible = this.playerInfoCheckBox.checked;
-    GameStorage.saveGameSettings(gameRoot.gameSettings);
+    gameRoot.uiManager?.playerInfoUI.toggle();
   }
 
   toggleEditMode() {
