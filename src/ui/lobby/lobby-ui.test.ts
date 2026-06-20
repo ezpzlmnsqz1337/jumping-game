@@ -137,6 +137,7 @@ describe('LobbyUI', () => {
       chatUI: { show: chatShow, rootElement: chatRootElement },
       playerInfoUI: { show: playerInfoShow, rootElement: playerInfoRootElement },
     } as never;
+    gameRoot.gameSettings.playerInfoVisible = true;
 
     const ui = new LobbyUI(
       {
@@ -327,6 +328,7 @@ describe('LobbyUI', () => {
       chatUI: { show: chatShow, rootElement: chatRootElement },
       playerInfoUI: { show: playerInfoShow, rootElement: playerInfoRootElement },
     } as never;
+    gameRoot.gameSettings.playerInfoVisible = true;
 
     const camera: TestCamera = {
       name: 'arcCamera',
