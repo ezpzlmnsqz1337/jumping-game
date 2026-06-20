@@ -195,4 +195,12 @@ describe('GameLevel run transitions', () => {
     expect(gameRoot.demoService.reset).toHaveBeenCalledTimes(1);
     expect(gameRoot.uiManager?.timerUI.showRunStatus).toHaveBeenCalledWith('reset', 'teleport');
   });
+
+  it('recreateShadowsForTier is a no-op on base GameLevel', () => {
+    const level = new GameLevel('test');
+    level.shadowGenerators = [{ addShadowCaster: vi.fn() } as never];
+    expect(() => level.recreateShadowsForTier('low')).not.toThrow();
+    expect(() => level.recreateShadowsForTier('high')).not.toThrow();
+    expect(level.shadowGenerators).toEqual([{ addShadowCaster: expect.any(Function) }]);
+  });
 });
