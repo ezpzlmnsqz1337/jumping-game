@@ -8,9 +8,25 @@ export interface GameSettings {
   color: PlayerColor;
   newlyCreated?: boolean;
   qualityTier?: QualitySetting;
+  autoCameraEnabled?: boolean;
+  followCameraEnabled?: boolean;
+  collisionsEnabled?: boolean;
+  playerInfoVisible?: boolean;
+  editModeEnabled?: boolean;
 }
 
 const LEVEL_INDEX_KEY = 'level-index';
+
+function readBoolSetting(key: string): boolean | undefined {
+  const value = localStorage.getItem(key);
+  return value === null ? undefined : value === 'true';
+}
+
+function saveBoolSetting(key: string, value: boolean | undefined): void {
+  if (value !== undefined) {
+    localStorage.setItem(key, String(value));
+  }
+}
 
 export class GameStorage {
   static getGameSettings(): GameSettings {
@@ -24,6 +40,11 @@ export class GameStorage {
       color,
       newlyCreated,
       qualityTier,
+      autoCameraEnabled: readBoolSetting('autoCameraEnabled'),
+      followCameraEnabled: readBoolSetting('followCameraEnabled'),
+      collisionsEnabled: readBoolSetting('collisionsEnabled'),
+      playerInfoVisible: readBoolSetting('playerInfoVisible'),
+      editModeEnabled: readBoolSetting('editModeEnabled'),
     };
   }
 
@@ -33,6 +54,11 @@ export class GameStorage {
     if (settings.qualityTier) {
       localStorage.setItem('qualityTier', settings.qualityTier);
     }
+    saveBoolSetting('autoCameraEnabled', settings.autoCameraEnabled);
+    saveBoolSetting('followCameraEnabled', settings.followCameraEnabled);
+    saveBoolSetting('collisionsEnabled', settings.collisionsEnabled);
+    saveBoolSetting('playerInfoVisible', settings.playerInfoVisible);
+    saveBoolSetting('editModeEnabled', settings.editModeEnabled);
   }
 
   static saveLevel(level: GameLevel): LevelDocument {

@@ -39,6 +39,9 @@ export class GameSettingsUI extends AbstractUI {
     this.followCameraEnabled = !this.followCameraEnabled;
     this.followCameraCheckBox.checked = this.followCameraEnabled;
 
+    gameRoot.gameSettings.followCameraEnabled = this.followCameraEnabled;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
+
     this.automaticCameraCheckBox.checked =
       (this.scene.activeCamera as { automaticCameraEnabled?: boolean }).automaticCameraEnabled ??
       false;
@@ -53,6 +56,10 @@ export class GameSettingsUI extends AbstractUI {
       this.player.collisionEnabled = !this.player.collisionEnabled;
     }
     this.collissionsCheckBox.checked = this.player.collisionEnabled;
+
+    gameRoot.gameSettings.collisionsEnabled = this.player.collisionEnabled;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
+
     renderingCanvas.focus();
   }
 
@@ -60,16 +67,27 @@ export class GameSettingsUI extends AbstractUI {
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
     camera.automaticCameraEnabled = !camera.automaticCameraEnabled;
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
+
+    gameRoot.gameSettings.autoCameraEnabled = camera.automaticCameraEnabled;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
+
     renderingCanvas.focus();
   }
 
   togglePlayerInfo() {
     gameRoot.uiManager?.playerInfoUI.show(this.playerInfoCheckBox.checked);
+
+    gameRoot.gameSettings.playerInfoVisible = this.playerInfoCheckBox.checked;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
   }
 
   toggleEditMode() {
     const enabled = this.editModeCheckBox.checked;
     window.dispatchEvent(new CustomEvent('editor-edit-mode-changed', { detail: { enabled } }));
+
+    gameRoot.gameSettings.editModeEnabled = this.editModeCheckBox.checked;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
+
     renderingCanvas.focus();
   }
 
@@ -84,6 +102,9 @@ export class GameSettingsUI extends AbstractUI {
       applyEngineQuality(gameRoot.engine, newTier);
       gameRoot.engine.resize();
     }
+
+    gameRoot.level?.recreateShadowsForTier(newTier);
+
     renderingCanvas.focus();
   }
 
@@ -109,29 +130,42 @@ export class GameSettingsUI extends AbstractUI {
     }
 
     const camera = this.scene.activeCamera as unknown as AutomaticCamera;
+    const settings = gameRoot.gameSettings;
 
+    if (settings.autoCameraEnabled !== undefined) {
+      camera.automaticCameraEnabled = settings.autoCameraEnabled;
+    }
     this.automaticCameraCheckBox.checked = camera.automaticCameraEnabled;
-
     this.automaticCameraCheckBox.addEventListener('click', () => {
       this.toggleAutomaticCamera();
     });
 
+    this.followCameraEnabled = false;
+    this.followCameraCheckBox.checked = false;
+    if (settings.followCameraEnabled === true) {
+      this.toggleFollowCamera();
+    }
     this.followCameraCheckBox.addEventListener('click', () => {
       this.toggleFollowCamera();
     });
 
+    if (settings.collisionsEnabled !== undefined) {
+      this.player.collisionEnabled = settings.collisionsEnabled;
+    }
     this.collissionsCheckBox.checked = this.player.collisionEnabled;
-
     this.collissionsCheckBox.addEventListener('click', () => {
       this.toggleCollissions();
     });
 
-    this.playerInfoCheckBox.checked = false;
+    const playerInfoVisible = settings.playerInfoVisible ?? false;
+    this.playerInfoCheckBox.checked = playerInfoVisible;
+    this.togglePlayerInfo();
     this.playerInfoCheckBox.addEventListener('click', () => {
       this.togglePlayerInfo();
     });
 
-    this.editModeCheckBox.checked = true;
+    const editModeEnabled = settings.editModeEnabled ?? true;
+    this.editModeCheckBox.checked = editModeEnabled;
     this.editModeCheckBox.addEventListener('click', () => {
       this.toggleEditMode();
     });
