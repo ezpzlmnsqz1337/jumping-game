@@ -14,6 +14,7 @@ import {
   TextureVariant,
   SerializedTrigger,
 } from '../../level-document';
+import { type QualityTier } from '../../quality';
 import { ShadowGenerator } from '../../shadows';
 import { AutomaticCamera } from '../../cameras/automatic-camera';
 import { PlayerEntity } from '../../entities/player-entity';
@@ -33,6 +34,7 @@ import { createStage6 } from './stage6';
 import { TeleportTrigger } from '../../triggers/teleport-trigger';
 import { GameEntity } from '../../entities/game-entity';
 import { createBunnyHops } from './bunnyhops';
+import gameRoot from '../../game-root';
 
 export class Level1 extends GameLevel {
   private serializedDocument: LevelDocument | null | undefined;
@@ -475,9 +477,17 @@ export class Level1 extends GameLevel {
 
     const light1 = new BABYLON.PointLight('pointLight', new BABYLON.Vector3(-6, 6, 0), scene);
     light1.intensity = 0.4;
-    light1.shadowEnabled = true;
     light1.shadowMinZ = 0.1;
     light1.shadowMaxZ = 100;
+
+    const tier = gameRoot.qualityTier;
+
+    if (tier === 'low') {
+      light1.shadowEnabled = false;
+    } else {
+      light1.shadowEnabled = true;
+    }
+
     if (import.meta.env.DEV) {
       const utilLayer = new BABYLON.UtilityLayerRenderer(scene);
       const lightGizmo1 = new BABYLON.LightGizmo(utilLayer);
@@ -485,12 +495,62 @@ export class Level1 extends GameLevel {
     }
 
     this.lights = [hemiLight, light1];
+
+    if (tier === 'low') {
+      this.shadowGenerators = [];
+    } else {
+      this.shadowGenerators = [
+        new ShadowGenerator(
+          tier,
+          light1,
+          [...this.walls.map(x => x.mesh)],
+          [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
+        ),
+      ];
+    }
+  }
+
+  override recreateShadowsForTier(tier: QualityTier): void {
+    this.shadowGenerators.forEach(sg => sg.dispose());
+    this.shadowGenerators = [];
+
+    const light1 = this.lights.find(l => l instanceof BABYLON.PointLight) as
+      | BABYLON.PointLight
+      | undefined;
+
+    if (tier === 'low') {
+      if (light1) light1.shadowEnabled = false;
+      return;
+    }
+
+    if (!light1 || !this.player?.mesh || !this.ground) {
+      console.warn('[Level1] recreateShadowsForTier: required scene refs not ready, skipping');
+      return;
+    }
+
+    light1.shadowEnabled = true;
+
     this.shadowGenerators = [
       new ShadowGenerator(
-        light1,
-        [...this.walls.map(x => x.mesh)],
-        [player.mesh!, this.ground!, ...this.walls.map(x => x.mesh)]
+        tier,
+        light1 as unknown as BABYLON.IShadowLight,
+        this.walls.map(x => x.mesh),
+        [this.player.mesh, this.ground, ...this.walls.map(x => x.mesh)]
       ),
     ];
+
+    if (this.scene) {
+      // Re-add dynamically-spawned player-body meshes (e.g. remote multiplayer
+      // players who joined after the level was created) as shadow casters.
+      // The constructor only adds the local player.mesh; the
+      // scene.onNewMeshAddedObservable handler covers meshes added AFTER
+      // construction, so this scan handles any that joined between
+      // construction and the tier change.
+      this.scene.meshes
+        .filter(mesh => mesh.name === 'player-body')
+        .forEach(mesh => {
+          this.shadowGenerators.forEach(sg => sg.addShadowCaster(mesh as BABYLON.Mesh));
+        });
+    }
   }
 }

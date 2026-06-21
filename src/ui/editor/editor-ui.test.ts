@@ -485,7 +485,10 @@ describe('EditorUI', () => {
       },
     };
 
-    const ui = new EditorUI({ activeCamera: camera } as never, { mesh: playerMesh } as never);
+    const ui = new EditorUI(
+      { getCameraByName: () => camera } as never,
+      { mesh: playerMesh } as never
+    );
     ui.bindCameraInfoUI();
 
     const lockCheckBox = document.querySelector('.editor .lock-target-enabled') as HTMLInputElement;
@@ -515,7 +518,7 @@ describe('EditorUI', () => {
       </div>
     `;
 
-    const ui = new EditorUI({ activeCamera: null } as never, {} as never);
+    const ui = new EditorUI({ getCameraByName: () => null } as never, {} as never);
 
     expect(() => ui.bindCameraInfoUI()).not.toThrow();
   });
@@ -557,7 +560,11 @@ describe('EditorUI', () => {
       },
     } as never;
 
-    const ui = new EditorUI({ activeCamera } as never, { mesh: null } as never, gizmoManager);
+    const ui = new EditorUI(
+      { getCameraByName: () => activeCamera } as never,
+      { mesh: null } as never,
+      gizmoManager
+    );
     ui.loadCss = vi.fn();
     ui.loadHtml = vi.fn(async () => {});
 

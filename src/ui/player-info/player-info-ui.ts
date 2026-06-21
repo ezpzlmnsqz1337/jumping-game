@@ -1,5 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { PlayerEntity } from '../../entities/player-entity';
+import gameRoot from '../../game-root';
+import { GameStorage } from '../../game-storage';
 import { AbstractUI } from '../abstract-ui';
 
 export class PlayerInfoUI extends AbstractUI {
@@ -76,6 +78,8 @@ export class PlayerInfoUI extends AbstractUI {
     this.show(!this.enabled);
     const checkbox = document.querySelector('.player-info-enabled') as HTMLInputElement | null;
     if (checkbox) checkbox.checked = this.enabled;
+    gameRoot.gameSettings.playerInfoVisible = this.enabled;
+    GameStorage.saveGameSettings(gameRoot.gameSettings);
   }
 
   updateUI(): void {

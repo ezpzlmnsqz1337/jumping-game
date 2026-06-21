@@ -1,31 +1,71 @@
 import { PlayerColor } from './assets/colors';
 import { type GameLevel } from './game-level';
 import { isLevelDocument, type LevelDocument } from './level-document';
+import { type QualitySetting } from './quality';
 
 export interface GameSettings {
   nickname: string;
   color: PlayerColor;
   newlyCreated?: boolean;
+  qualityTier?: QualitySetting;
+  autoCameraEnabled?: boolean;
+  followCameraEnabled?: boolean;
+  collisionsEnabled?: boolean;
+  playerInfoVisible?: boolean;
+  editModeEnabled?: boolean;
 }
 
 const LEVEL_INDEX_KEY = 'level-index';
+
+function readBoolSetting(key: string): boolean | undefined {
+  const value = localStorage.getItem(key);
+  return value === null ? undefined : value === 'true';
+}
+
+function saveBoolSetting(key: string, value: boolean | undefined): void {
+  if (value !== undefined) {
+    localStorage.setItem(key, String(value));
+  }
+}
+
+const VALID_QUALITY_TIERS: readonly QualitySetting[] = ['auto', 'low', 'medium', 'high'];
+
+function readQualityTier(): QualitySetting {
+  const raw = localStorage.getItem('qualityTier');
+  return VALID_QUALITY_TIERS.includes(raw as QualitySetting) ? (raw as QualitySetting) : 'auto';
+}
 
 export class GameStorage {
   static getGameSettings(): GameSettings {
     const nickname = localStorage.getItem('nickname') || 'player';
     const color = (localStorage.getItem('color') || 'blue') as PlayerColor;
     const newlyCreated = ['nickname', 'color'].every(x => localStorage.getItem(x) === null);
+    const qualityTier = readQualityTier();
 
     return {
       nickname,
       color,
       newlyCreated,
+      qualityTier,
+      autoCameraEnabled: readBoolSetting('autoCameraEnabled'),
+      followCameraEnabled: readBoolSetting('followCameraEnabled'),
+      collisionsEnabled: readBoolSetting('collisionsEnabled'),
+      playerInfoVisible: readBoolSetting('playerInfoVisible'),
+      editModeEnabled: readBoolSetting('editModeEnabled'),
     };
   }
 
   static saveGameSettings(settings: GameSettings): void {
     localStorage.setItem('nickname', settings.nickname);
     localStorage.setItem('color', settings.color);
+    if (settings.qualityTier) {
+      localStorage.setItem('qualityTier', settings.qualityTier);
+    }
+    saveBoolSetting('autoCameraEnabled', settings.autoCameraEnabled);
+    saveBoolSetting('followCameraEnabled', settings.followCameraEnabled);
+    saveBoolSetting('collisionsEnabled', settings.collisionsEnabled);
+    saveBoolSetting('playerInfoVisible', settings.playerInfoVisible);
+    saveBoolSetting('editModeEnabled', settings.editModeEnabled);
   }
 
   static saveLevel(level: GameLevel): LevelDocument {
