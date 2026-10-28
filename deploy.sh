@@ -3,7 +3,8 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-DESTINATION="hosting@hosting"
+DESTINATION="${DESTINATION:-hosting@hosting}"
+REMOTE_DIR="${REMOTE_DIR:-work/jumping-game}"
 TAR_FILE="jumping-game.tar"
 
 log_info()  { printf "\033[34m%s\033[0m %s\n"  "$1" "$2"; }
@@ -36,32 +37,46 @@ trap cleanup EXIT
 
 DEPLOY_START=$(now_seconds)
 
-CURRENT_STEP="Building container image"
-START=$(now_seconds)
-log_info "📦" "Building container image..."
-podman build --no-cache --pull --rm -f 'Dockerfile' -t 'localhost/jumping-game:latest' '.'
-log_dim "  Image built in $(( $(now_seconds) - START ))s"
-log_ok "✅" "Image built"
+# Build locally when Podman is available (workstation). Otherwise build on the
+# hosting VM — that is how the OpenCode container deploys, since it has no
+# local Podman and only SSH access to the host.
+if command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
+  BUILT_LOCALLY=1
 
-CURRENT_STEP="Exporting image to $TAR_FILE"
-START=$(now_seconds)
-log_info "💾" "Exporting image to $TAR_FILE..."
-podman save localhost/jumping-game:latest -o "$TAR_FILE"
-TAR_SIZE=$(du -h "$TAR_FILE" | cut -f1)
-log_dim "  Saved $TAR_SIZE"
-log_ok "✅" "Saved ($TAR_SIZE, in $(( $(now_seconds) - START ))s)"
+  CURRENT_STEP="Building container image"
+  START=$(now_seconds)
+  log_info "📦" "Building container image..."
+  podman build --no-cache --pull --rm -f 'Dockerfile' -t 'localhost/jumping-game:latest' '.'
+  log_dim "  Image built in $(( $(now_seconds) - START ))s"
+  log_ok "✅" "Image built"
 
-CURRENT_STEP="Copying image to $DESTINATION:/opt/containers/$TAR_FILE"
-START=$(now_seconds)
-log_info "📤" "Copying image to $DESTINATION:/opt/containers/$TAR_FILE..."
-scp -r "$TAR_FILE" "$DESTINATION:/opt/containers/$TAR_FILE"
-log_ok "✅" "Copied in $(( $(now_seconds) - START ))s"
+  CURRENT_STEP="Exporting image to $TAR_FILE"
+  START=$(now_seconds)
+  log_info "💾" "Exporting image to $TAR_FILE..."
+  podman save localhost/jumping-game:latest -o "$TAR_FILE"
+  TAR_SIZE=$(du -h "$TAR_FILE" | cut -f1)
+  log_dim "  Saved $TAR_SIZE"
+  log_ok "✅" "Saved ($TAR_SIZE, in $(( $(now_seconds) - START ))s)"
 
-CURRENT_STEP="Loading image on remote host"
-START=$(now_seconds)
-log_info "🔄" "Loading image on remote host..."
-ssh "$DESTINATION" 'podman load -i /opt/containers/jumping-game.tar'
-log_ok "✅" "Remote image loaded in $(( $(now_seconds) - START ))s"
+  CURRENT_STEP="Copying image to $DESTINATION:/opt/containers/$TAR_FILE"
+  START=$(now_seconds)
+  log_info "📤" "Copying image to $DESTINATION:/opt/containers/$TAR_FILE..."
+  scp -r "$TAR_FILE" "$DESTINATION:/opt/containers/$TAR_FILE"
+  log_ok "✅" "Copied in $(( $(now_seconds) - START ))s"
+
+  CURRENT_STEP="Loading image on remote host"
+  START=$(now_seconds)
+  log_info "🔄" "Loading image on remote host..."
+  ssh "$DESTINATION" 'podman load -i /opt/containers/jumping-game.tar'
+  log_ok "✅" "Remote image loaded in $(( $(now_seconds) - START ))s"
+else
+  CURRENT_STEP="Building container image on the hosting VM"
+  START=$(now_seconds)
+  log_warn "⚠️" "No working local Podman — building on $DESTINATION instead..."
+  ssh "$DESTINATION" "set -e; cd \"\$HOME/$REMOTE_DIR\"; podman build --no-cache --pull --rm -f Dockerfile -t localhost/jumping-game:latest ."
+  log_dim "  Image built in $(( $(now_seconds) - START ))s"
+  log_ok "✅" "Image built on the hosting VM"
+fi
 
 CURRENT_STEP="Installing Quadlet units"
 START=$(now_seconds)
