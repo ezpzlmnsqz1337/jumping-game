@@ -1,0 +1,14 @@
+[Unit]
+Description=jumping-game (node, :8081)
+
+[Container]
+ContainerName=jumping-game
+Image=localhost/jumping-game:latest
+PodmanArgs=--memory=256m
+PublishPort=8081:13370
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

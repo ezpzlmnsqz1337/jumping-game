@@ -63,6 +63,12 @@ log_info "🔄" "Loading image on remote host..."
 ssh "$DESTINATION" 'podman load -i /opt/containers/jumping-game.tar'
 log_ok "✅" "Remote image loaded in $(( $(now_seconds) - START ))s"
 
+CURRENT_STEP="Installing Quadlet units"
+START=$(now_seconds)
+log_info "📦" "Installing Quadlet units..."
+DESTINATION="$DESTINATION" bash "$(dirname "$0")/deployment/install-quadlet.sh"
+log_ok "✅" "Units installed in $(( $(now_seconds) - START ))s"
+
 CURRENT_STEP="Restarting jumping-game service"
 START=$(now_seconds)
 log_info "🚀" "Restarting jumping-game service..."
