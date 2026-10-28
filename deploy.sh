@@ -39,14 +39,14 @@ DEPLOY_START=$(now_seconds)
 CURRENT_STEP="Building container image"
 START=$(now_seconds)
 log_info "📦" "Building container image..."
-podman build --no-cache --pull --rm -f 'Dockerfile' -t 'jumping-game:latest' '.'
+podman build --no-cache --pull --rm -f 'Dockerfile' -t 'localhost/jumping-game:latest' '.'
 log_dim "  Image built in $(( $(now_seconds) - START ))s"
 log_ok "✅" "Image built"
 
 CURRENT_STEP="Exporting image to $TAR_FILE"
 START=$(now_seconds)
 log_info "💾" "Exporting image to $TAR_FILE..."
-podman save jumping-game:latest -o "$TAR_FILE"
+podman save localhost/jumping-game:latest -o "$TAR_FILE"
 TAR_SIZE=$(du -h "$TAR_FILE" | cut -f1)
 log_dim "  Saved $TAR_SIZE"
 log_ok "✅" "Saved ($TAR_SIZE, in $(( $(now_seconds) - START ))s)"
@@ -63,11 +63,11 @@ log_info "🔄" "Loading image on remote host..."
 ssh "$DESTINATION" 'podman load -i /opt/containers/jumping-game.tar'
 log_ok "✅" "Remote image loaded in $(( $(now_seconds) - START ))s"
 
-CURRENT_STEP="Restarting container-jumping-game service"
+CURRENT_STEP="Restarting jumping-game service"
 START=$(now_seconds)
-log_info "🚀" "Restarting container-jumping-game service..."
-ssh "$DESTINATION" 'systemctl --user restart container-jumping-game'
-log_ok "✅" "Service restarted in $(( $(now_seconds) - START ))s)"
+log_info "🚀" "Restarting jumping-game service..."
+ssh "$DESTINATION" 'systemctl --user restart jumping-game.service && systemctl --user is-active jumping-game.service'
+log_ok "✅" "Service restarted in $(( $(now_seconds) - START ))s"
 
 CURRENT_STEP=""
 
