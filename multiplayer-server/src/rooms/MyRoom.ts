@@ -50,50 +50,6 @@ export class MyRoom extends Room<MyRoomState> {
   onCreate(_options: Record<string, unknown>) {
     this.setState(new MyRoomState());
 
-    // DEMO SEED DATA — the six placeholder leaderboard entries below are written
-    // into every room instance, including production. They are kept for local demos
-    // for now. Move them to a dedicated seed script (or gate them behind an explicit
-    // env flag) before relying on the production leaderboard.
-    // TODO(leaderboard-seed): decide the production seeding strategy and remove this block.
-    this.state.times.push(
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 184055,
-        timeStr: '03:04.055',
-        checkpoints: 15,
-      }),
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 179384,
-        timeStr: '02:59.384',
-        checkpoints: 17,
-      }),
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 186865,
-        timeStr: '03:06.865',
-        checkpoints: 17,
-      }),
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 203082,
-        timeStr: '03:23.082',
-        checkpoints: 17,
-      }),
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 202316,
-        timeStr: '03:22.316',
-        checkpoints: 24,
-      }),
-      new TimeEntry({
-        nickname: 'ezpzlmnsqz1337',
-        time: 274392,
-        timeStr: '04:34.392',
-        checkpoints: 25,
-      })
-    );
-
     this.onMessage(EventType.PLAYER_INFO, (client, playerInfo) => {
       this.updatePlayerInfo(client, playerInfo);
     });

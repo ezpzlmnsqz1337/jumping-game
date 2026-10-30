@@ -48,6 +48,12 @@ describe("testing your Colyseus app", () => {
     assert.strictEqual(Array.isArray(syncedState.times), true);
     assert.strictEqual(Array.isArray(syncedState.chatMessages), true);
   });
+
+  it("createRoom_onCreate_startsWithEmptyLeaderboard", async () => {
+    const room = await colyseus.createRoom<MyRoomState>("my_room", {});
+
+    assert.strictEqual(room.state.times.length, 0);
+  });
 });
 
 describe("MyRoom unit behavior", () => {
