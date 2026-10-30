@@ -1,4 +1,4 @@
-FROM node:22-slim AS build
+FROM docker.io/library/node:22-slim AS build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY . /app
 RUN npm ci && npm run build
 RUN cd multiplayer-server && npm ci && npm run build
 
-FROM node:22-slim
+FROM docker.io/library/node:22-slim
 
 WORKDIR /app
 
