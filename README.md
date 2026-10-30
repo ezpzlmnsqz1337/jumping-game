@@ -67,9 +67,15 @@ Open your browser to the local Vite URL (typically `http://localhost:5173`) to p
 
 - `npm run dev` - Starts the Vite development server.
 - `npm run build` - Builds the client for production.
+- `npm run build:server` - Builds the multiplayer server.
 - `npm run build:all` - Builds both the client and the server.
+- `npm run start:server` - Starts the multiplayer server.
 - `npm run test:ui` - Runs unit tests using Vitest.
+- `npm run test:ui:coverage` - Runs unit tests with coverage.
 - `npm run lint` / `npm run format` - Runs ESLint and Prettier.
+- `npm run lint:css` - Lints the UI stylesheets with Stylelint.
+- `npm run format:check` - Checks formatting without writing files.
+- `npm run typecheck` - Type-checks the client with `tsc --noEmit`.
 
 ## Contributing
 

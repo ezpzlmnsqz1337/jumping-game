@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import * as Colyseus from 'colyseus.js';
+import { isPlayerColor } from './assets/colors';
 import { getModel } from './assets/models';
 import {
   FILTER_GROUP_PLAYER_MP,
@@ -100,8 +101,10 @@ export class MultiplayerSession {
   constructor(scene: BABYLON.Scene, player: PlayerEntity, _objects: BABYLON.Mesh[]) {
     this.scene = scene;
     this.player = player;
+    // Use wss:// when the page is served over https to avoid mixed-content blocking.
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     this.ws = new Colyseus.Client(
-      `ws://${localStorage.getItem('mp-server-address') || window.location.host}`
+      `${wsProtocol}//${localStorage.getItem('mp-server-address') || window.location.host}`
     );
     const roomId = localStorage.getItem('mp-room-id');
     const joinPromise = roomId
@@ -167,7 +170,8 @@ export class MultiplayerSession {
       for (const [id, info] of playerInfo) {
         if (id === this.localPlayerId) continue;
         const nickname = info.nickname || 'player';
-        const color = info.color || 'blue';
+        // Never trust remote input to build an asset URL (e.g. `player-<color>.glb`).
+        const color = isPlayerColor(info.color) ? info.color : 'blue';
 
         let player = this.players.get(id);
         if (!player) {
@@ -367,33 +371,36 @@ export class MultiplayerSession {
     if (this.updatingObjects) return;
     this.updatingObjects = true;
 
-    for (const [id, info] of objectInfo) {
-      if (!this.objects.get(id)) this.objects.set(id, {});
-      const o = this.objects.get(id) as ObjectInfo;
-      // update local player positions based on server response
-      o.position = info.position;
-      o.rotation = info.rotation;
+    try {
+      for (const [id, info] of objectInfo) {
+        if (!this.objects.get(id)) this.objects.set(id, {});
+        const o = this.objects.get(id) as ObjectInfo;
+        // update local player positions based on server response
+        o.position = info.position;
+        o.rotation = info.rotation;
 
-      // create mesh for another player if player mesh doesn't exist
-      if (!o.mesh) {
-        const mesh = this.scene.getMeshByName(id);
-        if (!mesh) continue;
-        o.mesh = mesh as BABYLON.Mesh;
+        // create mesh for another player if player mesh doesn't exist
+        if (!o.mesh) {
+          const mesh = this.scene.getMeshByName(id);
+          if (!mesh) continue;
+          o.mesh = mesh as BABYLON.Mesh;
+        }
+        if (info.position && info.rotation) {
+          const physicsBody = o.mesh.physicsBody;
+          if (physicsBody) physicsBody.disablePreStep = true;
+          o.mesh.position = new BABYLON.Vector3(info.position.x, info.position.y, info.position.z);
+          o.mesh.rotationQuaternion = new BABYLON.Quaternion(
+            info.rotation.x,
+            info.rotation.y,
+            info.rotation.z,
+            info.rotation.w
+          );
+          if (physicsBody) physicsBody.disablePreStep = false;
+        }
       }
-      if (info.position && info.rotation) {
-        o.mesh.physicsBody!.disablePreStep = true;
-        o.mesh.position = new BABYLON.Vector3(info.position.x, info.position.y, info.position.z);
-        o.mesh.rotationQuaternion = new BABYLON.Quaternion(
-          info.rotation.x,
-          info.rotation.y,
-          info.rotation.z,
-          info.rotation.w
-        );
-        o.mesh.physicsBody!.disablePreStep = false;
-      }
+    } finally {
+      this.updatingObjects = false;
     }
-
-    this.updatingObjects = false;
   }
 
   sendTimeToServer(timeEntry: TimeEntry) {
@@ -502,7 +509,8 @@ export class MultiplayerSession {
     );
     box.visibility = 0;
 
-    const playerModel = await getModel(scene, `player-${color || 'red'}.glb`);
+    const safeColor = isPlayerColor(color) ? color : 'red';
+    const playerModel = await getModel(scene, `player-${safeColor}.glb`);
     playerModel.meshes.forEach(mesh => {
       if (mesh.parent === null) {
         mesh.setParent(box);

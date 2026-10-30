@@ -131,13 +131,25 @@ export class LobbyUI extends AbstractUI {
       const source =
         level.triggers.length === 0 && level.walls.length <= 1 ? 'template' : 'imported';
 
-      entry.innerHTML = `
-        <div class="level-info">
-          <div class="level-name">${level.name}</div>
-          <div class="level-meta">${level.walls.length} walls &middot; ${level.startTriggers.length + level.endTriggers.length} triggers</div>
-        </div>
-        <div class="level-source-badge">${source}</div>
-      `;
+      const info = document.createElement('div');
+      info.className = 'level-info';
+
+      const name = document.createElement('div');
+      name.className = 'level-name';
+      name.textContent = level.name;
+
+      const meta = document.createElement('div');
+      meta.className = 'level-meta';
+      meta.textContent = `${level.walls.length} walls \u00b7 ${
+        level.startTriggers.length + level.endTriggers.length
+      } triggers`;
+
+      const badge = document.createElement('div');
+      badge.className = 'level-source-badge';
+      badge.textContent = source;
+
+      info.append(name, meta);
+      entry.append(info, badge);
 
       entry.addEventListener('click', () => {
         this.levelListDiv
@@ -165,21 +177,35 @@ export class LobbyUI extends AbstractUI {
     levels.forEach(level => {
       const entry = document.createElement('div');
       entry.className = 'stored-level-entry';
-      entry.innerHTML = `
-        <span class="sl-name">${level.name}</span>
-        <span class="sl-meta">${level.walls.length} walls</span>
-        <button class="export-level-btn" title="Export as JSON">Export</button>
-        <button class="delete-level-btn" title="Delete level">Delete</button>
-      `;
 
-      entry.querySelector('.export-level-btn')?.addEventListener('click', () => {
+      const name = document.createElement('span');
+      name.className = 'sl-name';
+      name.textContent = level.name;
+
+      const meta = document.createElement('span');
+      meta.className = 'sl-meta';
+      meta.textContent = `${level.walls.length} walls`;
+
+      const exportButton = document.createElement('button');
+      exportButton.className = 'export-level-btn';
+      exportButton.title = 'Export as JSON';
+      exportButton.textContent = 'Export';
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'delete-level-btn';
+      deleteButton.title = 'Delete level';
+      deleteButton.textContent = 'Delete';
+
+      exportButton.addEventListener('click', () => {
         this.exportLevel(level.name);
       });
-      entry.querySelector('.delete-level-btn')?.addEventListener('click', () => {
+      deleteButton.addEventListener('click', () => {
         GameStorage.deleteLevel(level.name);
         this.refreshStoredLevels();
         this.refreshLevelList();
       });
+
+      entry.append(name, meta, exportButton, deleteButton);
 
       this.storedLevelListDiv.appendChild(entry);
     });

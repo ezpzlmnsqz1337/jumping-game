@@ -2,6 +2,24 @@ import * as BABYLON from '@babylonjs/core';
 
 export type PlayerColor = 'blue' | 'green' | 'red' | 'orange' | 'yellow' | 'pink' | 'purple';
 
+/**
+ * Player colors that have a corresponding `player-<color>.glb` asset.
+ * Used to validate remote input before it is turned into an asset URL.
+ */
+export const PLAYER_COLORS: readonly PlayerColor[] = [
+  'blue',
+  'green',
+  'red',
+  'orange',
+  'yellow',
+  'pink',
+  'purple',
+];
+
+export function isPlayerColor(value: unknown): value is PlayerColor {
+  return typeof value === 'string' && (PLAYER_COLORS as readonly string[]).includes(value);
+}
+
 export const playerColor = new BABYLON.Color3(0.11, 0.58, 1);
 export const startTriggerColor = new BABYLON.Color3(0.58, 1.0, 0.11);
 export const endTriggerColor = new BABYLON.Color3(1, 0.19, 0.19);

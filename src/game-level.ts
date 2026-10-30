@@ -11,7 +11,7 @@ import { EndTrigger } from './triggers/end-trigger';
 import { StartTrigger } from './triggers/start-trigger';
 import { TeleportTrigger } from './triggers/teleport-trigger';
 import { GameEntity } from './entities/game-entity';
-import { AutomaticCamera } from './cameras/automatic-camera';
+import { isAutomaticCamera } from './cameras/automatic-camera';
 import gameRoot from './game-root';
 import {
   deserializeColor3,
@@ -559,8 +559,8 @@ export class DocumentLevel extends GameLevel {
   private bindSerializedTriggerBehavior(trigger: Trigger, triggerData: SerializedTrigger) {
     if (triggerData.triggerType === 'camera' && triggerData.cameraTarget) {
       trigger.onEnter = (_mesh: BABYLON.Mesh, player: PlayerEntity) => {
-        const camera = player.mesh!.getScene().activeCamera as unknown as AutomaticCamera;
-        if (!camera) return;
+        const camera = player.mesh!.getScene().activeCamera;
+        if (!isAutomaticCamera(camera)) return;
         const { alpha, beta, radius, speed } = triggerData.cameraTarget!;
         camera.setMoveToTarget(alpha, beta, radius, speed ?? 50);
       };

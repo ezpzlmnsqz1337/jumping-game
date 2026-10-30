@@ -402,9 +402,11 @@ export class DemoService {
   }
 
   storeFrame(player: PlayerEntity): void {
+    if (!player.mesh) return;
+
     const frame = {
-      position: player.mesh!.position.clone(),
-      rotation: player.mesh!.rotationQuaternion!.clone(),
+      position: player.mesh.position.clone(),
+      rotation: (player.mesh.rotationQuaternion ?? BABYLON.Quaternion.Identity()).clone(),
     };
     this.recording.push(frame);
     this.recordingInterval = setTimeout(() => this.storeFrame(player), SAMPLE_RATE_MS);

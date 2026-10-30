@@ -20,6 +20,28 @@ const EventType = Object.freeze({
 const MAX_ALLOWED_SPEED = 250;
 const MAX_TELEPORT_RATE_MS = 1000;
 
+// Bounds for client-submitted run data. These mirror LevelTimer.isValidRun() on
+// the client so legitimate runs are never rejected.
+const MIN_TIME_MS = 100;
+const MAX_TIME_MS = 3600000; // 1 hour
+const MAX_CHECKPOINTS = 1000;
+const MAX_NICKNAME_LENGTH = 40;
+const MAX_CHAT_MESSAGE_LENGTH = 500;
+const MAX_CHAT_HISTORY = 100;
+
+function formatTime(timeMs: number): string {
+  const minutes = Math.floor(timeMs / 60000)
+    .toString()
+    .padStart(2, '0');
+  const seconds = Math.floor((timeMs % 60000) / 1000)
+    .toString()
+    .padStart(2, '0');
+  const milliseconds = Math.floor(timeMs % 1000)
+    .toString()
+    .padStart(3, '0');
+  return `${minutes}:${seconds}.${milliseconds}`;
+}
+
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
   playerLastUpdate: Map<string, number> = new Map();
@@ -28,7 +50,11 @@ export class MyRoom extends Room<MyRoomState> {
   onCreate(_options: Record<string, unknown>) {
     this.setState(new MyRoomState());
 
-    // stored best times
+    // DEMO SEED DATA — the six placeholder leaderboard entries below are written
+    // into every room instance, including production. They are kept for local demos
+    // for now. Move them to a dedicated seed script (or gate them behind an explicit
+    // env flag) before relying on the production leaderboard.
+    // TODO(leaderboard-seed): decide the production seeding strategy and remove this block.
     this.state.times.push(
       new TimeEntry({
         nickname: 'ezpzlmnsqz1337',
@@ -75,7 +101,9 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage(EventType.OBJECTS_INFO, (_client, _message) => {});
 
     this.onMessage(EventType.ADD_TIME, (client, time) => {
-      this.addTime(new TimeEntry(time));
+      if (!this.addTime(time)) {
+        console.warn(`[add:time] rejected invalid time entry from ${client.sessionId}`);
+      }
     });
 
     this.onMessage(EventType.CHAT_MESSAGE, (client, message) => {
@@ -96,7 +124,7 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   onLeave(client: Client, _consented: boolean) {
-    const playerName = this.state.players.get(client.sessionId).nickname;
+    const playerName = this.state.players.get(client.sessionId)?.nickname ?? client.sessionId;
     // remove this player from server
     this.state.players.delete(client.sessionId);
     this.playerLastUpdate.delete(client.sessionId);
@@ -171,23 +199,58 @@ export class MyRoom extends Room<MyRoomState> {
     player.status = playerInfo.status;
   }
 
-  addTime(time: TimeEntry) {
-    this.state.times.push(time);
+  addTime(entry: Partial<TimeEntry> | null | undefined): boolean {
+    const time = Number(entry?.time);
+    const checkpoints = Number(entry?.checkpoints);
+    const nickname =
+      typeof entry?.nickname === 'string'
+        ? entry.nickname.trim().slice(0, MAX_NICKNAME_LENGTH)
+        : '';
+
+    // Reject anything outside the same bounds the client enforces for a valid run.
+    if (!Number.isFinite(time) || time < MIN_TIME_MS || time > MAX_TIME_MS) return false;
+    if (!Number.isInteger(checkpoints) || checkpoints < 0 || checkpoints > MAX_CHECKPOINTS) {
+      return false;
+    }
+    if (!nickname) return false;
+
+    const validEntry = new TimeEntry();
+    validEntry.nickname = nickname;
+    validEntry.time = time;
+    // Derive timeStr server-side so a tampered client cannot rank one time while
+    // displaying another.
+    validEntry.timeStr = formatTime(time);
+    validEntry.checkpoints = checkpoints;
+
+    this.state.times.push(validEntry);
     this.state.times.sort((a, b) => {
       if (a.checkpoints === b.checkpoints) {
         return a.time - b.time;
       }
       return a.checkpoints - b.checkpoints;
     });
+    return true;
   }
 
-  handleChatMessage(playerId: string, text: string) {
+  handleChatMessage(playerId: string, text: unknown) {
     const player = this.state.players.get(playerId);
+    if (!player) return;
+    if (typeof text !== 'string') return;
+
+    const trimmed = text.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH);
+    if (!trimmed) return;
+
     const message = new ChatMessage();
-    message.nickname = player.nickname;
-    message.text = text;
+    message.nickname = player.nickname || 'player';
+    message.text = trimmed;
     this.state.chatMessages.push(message);
-    this.broadCastPlayerMessage(playerId, text);
+
+    // Bound history so a client cannot grow room state without limit.
+    while (this.state.chatMessages.length > MAX_CHAT_HISTORY) {
+      this.state.chatMessages.shift();
+    }
+
+    this.broadCastPlayerMessage(playerId, trimmed);
   }
 
   broadCastPlayerMessage(playerId: string, text: string) {

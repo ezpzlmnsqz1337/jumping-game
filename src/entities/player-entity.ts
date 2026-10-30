@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import { PlayerColor } from '../assets/colors';
+import { isPlayerColor, PlayerColor } from '../assets/colors';
 import { getModel } from '../assets/models';
 import {
   FILTER_GROUP_PLAYER,
@@ -78,6 +78,9 @@ export class PlayerEntity extends GameEntity {
   }
 
   async changeColor(color: string) {
+    // The color is interpolated into an asset URL, so only allow known player colors.
+    if (!isPlayerColor(color)) return;
+
     // remove old meshes
     this.mesh!.getChildMeshes()
       .filter(mesh => mesh.name.includes('player'))

@@ -64,6 +64,88 @@ describe("MyRoom unit behavior", () => {
     assert.strictEqual(room.state.times[2].nickname, "A");
   });
 
+  it("rejects time entries outside validation bounds", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    assert.strictEqual(room.addTime(createTimeEntry("A", 10, -5, "00:00.000")), false);
+    assert.strictEqual(room.addTime(createTimeEntry("A", 10, Number.NaN, "00:00.000")), false);
+    assert.strictEqual(room.addTime(createTimeEntry("A", -1, 2000, "00:02.000")), false);
+    assert.strictEqual(room.addTime(createTimeEntry("", 10, 2000, "00:02.000")), false);
+    assert.strictEqual(room.state.times.length, 0);
+  });
+
+  it("derives timeStr from the validated time", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    room.addTime(createTimeEntry("A", 10, 2000, "tampered"));
+
+    assert.strictEqual(room.state.times[0].timeStr, "00:02.000");
+  });
+
+  it("ignores chat messages from unknown players or with non-string text", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    room.handleChatMessage("missing", "hello");
+    room.handleChatMessage("p1", 42);
+
+    assert.strictEqual(room.state.chatMessages.length, 0);
+  });
+
+  it("caps chat message length", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+    (room as unknown as { broadcast: () => void }).broadcast = () => {};
+
+    const player = new Player();
+    room.state.players.set("p1", player);
+
+    room.handleChatMessage("p1", "x".repeat(600));
+
+    assert.strictEqual(room.state.chatMessages[0].text.length, 500);
+  });
+
+  it("caps chat history size", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+    (room as unknown as { broadcast: () => void }).broadcast = () => {};
+
+    const player = new Player();
+    room.state.players.set("p1", player);
+
+    for (let i = 0; i < 150; i++) {
+      room.handleChatMessage("p1", `msg-${i}`);
+    }
+
+    assert.strictEqual(room.state.chatMessages.length, 100);
+    assert.strictEqual(room.state.chatMessages[99].text, "msg-149");
+  });
+
+  it("falls back to the session id when the leaving player has no nickname entry", () => {
+    const room = new MyRoom();
+    room.setState(new MyRoomState());
+
+    const broadcasts: Array<{ type: string; payload: unknown }> = [];
+    (room as unknown as { broadcast: (type: string, payload: unknown) => void }).broadcast = (
+      type,
+      payload
+    ) => broadcasts.push({ type, payload });
+
+    room.onLeave({ sessionId: "gone" } as never, true);
+
+    assert.deepStrictEqual(broadcasts[1], {
+      type: "chat:update",
+      payload: {
+        playerId: "server",
+        nickname: "Server",
+        color: "gray",
+        text: "Player gone disconnected.",
+      },
+    });
+  });
+
   it("updates player transform and profile within speed limit", () => {
     const room = new MyRoom();
     room.setState(new MyRoomState());
